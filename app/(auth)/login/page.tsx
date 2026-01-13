@@ -35,7 +35,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0c] px-4">
+    <div className="min-h-screen flex items-center justify-center  px-4">
       {/* Subtle Background Glow to separate form from darkness */}
       <div className="absolute w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 

@@ -23,53 +23,62 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f172a] font-sans">
-      {/* Background Decorative Element */}
-      <div className="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -top-10 -left-10"></div>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      {/* Background Decorative Glow (Matches Login Page) */}
+      <div className="absolute w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
       
-      <div className="relative z-10 w-full max-w-md p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl">
-        <div className="mb-10 text-center">
-          <h2 className="text-4xl font-extrabold text-white tracking-tighter italic">JOIN THE CLUB</h2>
-          <p className="text-slate-400 text-sm mt-2 uppercase tracking-[0.2em]">Admin Portal v2.0</p>
+      {/* Light Card Container */}
+      <div className="relative z-10 w-full max-w-md p-10 bg-[#f8fafc] rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]">
+        
+        {/* Top Accent line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-blue-600 rounded-b-full"></div>
+
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight italic uppercase">Register Here</h2>
+          
         </div>
 
-        <div className="space-y-6">
-          <div className="group relative">
+        <div className="space-y-5">
+          {/* Input Group: Username */}
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-4 mb-1 block">Username</label>
             <input 
-              placeholder="Username" 
+              placeholder="e.g. master_admin" 
               onChange={e => setUsername(e.target.value)} 
-              className="w-full bg-transparent border-b border-slate-700 py-3 px-1 text-white outline-none transition-all focus:border-blue-500 placeholder:text-slate-600"
+              className="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 text-slate-900 outline-none transition-all focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400"
             />
           </div>
 
-          <div className="group relative">
+          {/* Input Group: Email */}
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-4 mb-1 block">Email Address</label>
             <input 
-              placeholder="Email" 
+              placeholder="admin@company.com" 
               onChange={e => setEmail(e.target.value)} 
-              className="w-full bg-transparent border-b border-slate-700 py-3 px-1 text-white outline-none transition-all focus:border-blue-500 placeholder:text-slate-600"
+              className="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 text-slate-900 outline-none transition-all focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400"
             />
           </div>
 
-          <div className="group relative">
+          {/* Input Group: Password */}
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-4 mb-1 block">Password</label>
             <input 
               type="password" 
-              placeholder="Password" 
+              placeholder="••••••••" 
               onChange={e => setPassword(e.target.value)} 
-              className="w-full bg-transparent border-b border-slate-700 py-3 px-1 text-white outline-none transition-all focus:border-blue-500 placeholder:text-slate-600"
+              className="w-full bg-slate-100 border-none rounded-2xl py-4 px-6 text-slate-900 outline-none transition-all focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400"
             />
           </div>
 
           <button 
             onClick={handleRegister}
-            className="w-full mt-8 bg-white text-black font-bold py-4 rounded-full hover:bg-blue-500 hover:text-white transition-all duration-300 active:scale-95 uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+            className="w-full mt-6 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-600 transition-all duration-300 transform active:scale-[0.97] shadow-xl shadow-blue-500/10 uppercase tracking-widest text-sm"
           >
-            Create Account
+            Create Admin Account
           </button>
         </div>
         
-        <p className="mt-8 text-center text-xs text-slate-500 uppercase tracking-widest">
-          Secure encrypted gateway
-        </p>
+        
       </div>
     </div>
   )
