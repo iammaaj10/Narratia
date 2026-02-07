@@ -37,18 +37,9 @@ export default function ProfileAvatar({
       const fileName = `avatar.${fileExt}`;
       const filePath = `${profile.id}/${fileName}`;
 
-      // Delete old avatar if exists (optional but cleaner)
-      const { data: existingFiles } = await supabase.storage
-        .from("avatars")
-        .list(profile.id);
+      console.log("📤 Uploading to:", filePath);
 
-      if (existingFiles && existingFiles.length > 0) {
-        await supabase.storage
-          .from("avatars")
-          .remove([`${profile.id}/${existingFiles[0].name}`]);
-      }
-
-      // Upload new avatar
+      // Upload new avatar (upsert will replace if exists)
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, file, {
@@ -57,18 +48,21 @@ export default function ProfileAvatar({
         });
 
       if (uploadError) {
-        console.error("Upload error:", uploadError);
+        console.error("❌ Upload error:", uploadError);
         alert(`Upload failed: ${uploadError.message}`);
         setUploading(false);
         return;
       }
 
-      // Get public URL
+      console.log("✅ Upload successful:", uploadData);
+
+      // Get public URL (without cache buster for database)
       const { data: urlData } = supabase.storage
         .from("avatars")
         .getPublicUrl(filePath);
 
       const publicUrl = urlData.publicUrl;
+      console.log("🔗 Public URL:", publicUrl);
 
       // Update profile in database
       const { error: updateError } = await supabase
@@ -77,18 +71,20 @@ export default function ProfileAvatar({
         .eq("id", profile.id);
 
       if (updateError) {
-        console.error("Database update error:", updateError);
+        console.error("❌ Database update error:", updateError);
         alert(`Failed to update profile: ${updateError.message}`);
         setUploading(false);
         return;
       }
 
-      // Update UI with cache buster
+      console.log("✅ Profile updated in database");
+
+      // Update UI with cache buster to force reload
       onAvatarUpdate(`${publicUrl}?t=${Date.now()}`);
       
-      console.log("✅ Avatar uploaded successfully");
+      alert("Profile picture updated successfully!");
     } catch (error) {
-      console.error("Unexpected error:", error);
+      console.error("❌ Unexpected error:", error);
       alert("An unexpected error occurred. Please try again.");
     } finally {
       setUploading(false);
@@ -100,12 +96,16 @@ export default function ProfileAvatar({
       <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/10 shadow-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
         {profile.avatar_url ? (
           <img
+            key={profile.avatar_url} // Force re-render when URL changes
             src={profile.avatar_url}
             className="w-full h-full object-cover"
             alt="Profile avatar"
             onError={(e) => {
-              console.error("Image failed to load:", profile.avatar_url);
+              console.error("❌ Image failed to load:", profile.avatar_url);
               e.currentTarget.style.display = "none";
+            }}
+            onLoad={() => {
+              console.log("✅ Image loaded successfully");
             }}
           />
         ) : (
@@ -143,7 +143,7 @@ export default function ProfileAvatar({
           if (file) {
             uploadAvatar(file);
           }
-          // Reset input so same file can be selected again
+          // Reset input
           e.target.value = "";
         }}
       />
