@@ -20,18 +20,19 @@ export default function DashboardLayout({
 }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
+        setLoading(true);
+
         // Get current user
         const {
           data: { user },
           error: userError,
         } = await supabase.auth.getUser();
-
-        console.log("🔍 User check:", { user: user?.id, error: userError });
 
         if (userError || !user) {
           console.error("❌ No authenticated user");
@@ -41,64 +42,45 @@ export default function DashboardLayout({
 
         console.log("✅ User authenticated:", user.id);
 
-        // Try to query profile with detailed error logging
-        const { data, error, status, statusText } = await supabase
+        // Try to get profile
+        let { data, error } = await supabase
           .from("profiles")
           .select("username, avatar_url")
           .eq("id", user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid error on no rows
 
-        console.log("📊 Query result:", {
-          data,
-          error,
-          status,
-          statusText,
-          errorMessage: error?.message,
-          errorCode: error?.code,
-          errorDetails: error?.details,
-          errorHint: error?.hint,
-        });
+        // If no profile exists, create one
+        if (!data) {
+          console.log("⚠️ No profile found, creating one...");
+          
+          const newUsername = user.email?.split("@")[0] || "Writer";
+          
+          const { data: newProfile, error: insertError } = await supabase
+            .from("profiles")
+            .insert({
+              id: user.id,
+              username: newUsername,
+              avatar_url: null,
+            })
+            .select("username, avatar_url")
+            .single();
 
-        if (error) {
-          console.error("❌ Profile query error:", error);
-
-          // Check if it's a "no rows returned" error
-          if (error.code === "PGRST116") {
-            console.log("⚠️ Profile doesn't exist, creating one...");
-            
-            const { data: newProfile, error: insertError } = await supabase
-              .from("profiles")
-              .insert({
-                id: user.id,
-                username: user.email?.split("@")[0] || "Writer",
-                avatar_url: null,
-              })
-              .select()
-              .single();
-
-            if (insertError) {
-              console.error("❌ Failed to create profile:", insertError);
-              alert("Failed to create profile. Please check console.");
-            } else {
-              console.log("✅ Profile created:", newProfile);
-              setProfile({
-                id: user.id,
-                username: newProfile.username ?? "Writer",
-                avatar_url: null,
-                email: user.email ?? "",
-              });
-            }
-            return;
+          if (insertError) {
+            console.error("❌ Failed to create profile:", insertError);
+            // Even if insert fails, show basic profile
+            data = {
+              username: newUsername,
+              avatar_url: null,
+            };
+          } else {
+            console.log("✅ Profile created successfully");
+            data = newProfile;
           }
-
-          // If it's an RLS error
-          alert("Unable to load profile. Please check RLS policies in Supabase.");
-          return;
         }
 
         console.log("✅ Profile loaded:", data);
 
-        // Add cache buster ONLY if avatar exists
+        // Set profile state
         const avatarUrl = data?.avatar_url
           ? `${data.avatar_url}?t=${Date.now()}`
           : null;
@@ -111,6 +93,8 @@ export default function DashboardLayout({
         });
       } catch (err) {
         console.error("❌ Unexpected error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -131,6 +115,17 @@ export default function DashboardLayout({
       path: "/dashboard/new-project",
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+        <div className="text-center">
+          <Sparkles className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
+          <p className="text-gray-400">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
