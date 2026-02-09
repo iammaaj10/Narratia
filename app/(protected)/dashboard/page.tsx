@@ -1,6 +1,7 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 export default function DashboardPage() {
+  const router = useRouter();
   return (
     <div className="p-12">
       <div className="text-center space-y-6 py-16">
@@ -29,7 +30,9 @@ export default function DashboardPage() {
         </p>
 
         <div className="pt-8">
-          <button className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105">
+          <button
+           onClick={() => router.push("/dashboard/new-project")}
+          className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105">
             Create Your First Story
           </button>
         </div>

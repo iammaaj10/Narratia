@@ -14,7 +14,7 @@ export default function DashboardPage() {
 
       <button
         onClick={() => router.push("/dashboard/new-project")}
-        className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg font-semibold"
+        className="px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 rounded-lg font-semibold"
       >
         Create your first story
       </button>
