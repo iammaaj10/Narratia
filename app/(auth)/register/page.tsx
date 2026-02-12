@@ -17,28 +17,96 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
-
-    const { error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: { username },
-      },
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert(error.message);
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters");
       return;
     }
 
-    alert("Account created successfully");
+    setLoading(true);
+
+    try {
+      console.log("📝 Registering user:", email);
+
+      // Step 1: Sign up the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: { 
+            username: username.trim() 
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (signUpError) {
+        console.error("❌ Signup error:", signUpError);
+        alert(`Failed to create account: ${signUpError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      console.log("✅ User created:", signUpData.user?.id);
+
+      // Step 2: Check if profile was created by trigger
+      if (signUpData.user) {
+        console.log("🔍 Checking for profile...");
+        
+        // Wait a moment for the trigger to fire
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id, username")
+          .eq("id", signUpData.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.warn("⚠️ Could not verify profile:", profileError);
+        } else if (profile) {
+          console.log("✅ Profile exists:", profile);
+        } else {
+          console.warn("⚠️ Profile not found, creating manually...");
+          
+          // Manually create profile if trigger didn't work
+          const { error: insertError } = await supabase
+            .from("profiles")
+            .insert({
+              id: signUpData.user.id,
+              username: username.trim(),
+              avatar_url: null,
+            });
+
+          if (insertError) {
+            console.error("❌ Failed to create profile:", insertError);
+          } else {
+            console.log("✅ Profile created manually");
+          }
+        }
+      }
+
+      setLoading(false);
+
+      // Show success message
+      alert(
+        "Account created successfully! " +
+        (signUpData.user?.email_confirmed_at 
+          ? "You can now log in."
+          : "Please check your email to verify your account before logging in.")
+      );
+
+      // Redirect to login
+      router.push("/login");
+
+    } catch (err) {
+      console.error("❌ Unexpected error:", err);
+      alert("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="relative bg-gray-950 transition-colors duration-300">
+    <div className="relative bg-gray-950 transition-colors duration-300 min-h-screen">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-screen filter blur-3xl animate-blob"></div>
@@ -72,7 +140,7 @@ export default function RegisterPage() {
       </nav>
 
       {/* Main Content */}
-      <div className="relative flex flex-1 items-center justify-center px-4">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Card */}
           <div className="relative bg-gray-900 rounded-2xl shadow-2xl shadow-indigo-500/10 border border-gray-800 overflow-hidden">

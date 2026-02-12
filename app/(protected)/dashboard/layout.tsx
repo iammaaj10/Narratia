@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import ProfileAvatar from "./components/ProfileAvatar";
+import IncomingInvites from "./components/IncomingInvites";
+
 import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
 
 type Profile = {
@@ -52,9 +54,9 @@ export default function DashboardLayout({
         // If no profile exists, create one
         if (!data) {
           console.log("⚠️ No profile found, creating one...");
-          
+
           const newUsername = user.email?.split("@")[0] || "Writer";
-          
+
           const { data: newProfile, error: insertError } = await supabase
             .from("profiles")
             .insert({
@@ -187,22 +189,26 @@ export default function DashboardLayout({
       <main className="flex-1 overflow-auto">
         <div className="max-w-7xl mx-auto p-8">
           {profile && (
-            <div className="mb-12 flex items-center justify-between">
-              <div className="space-y-1">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent">
-                  Welcome back, {profile.username}
-                </h2>
-                <p className="text-gray-400 text-sm">{profile.email}</p>
+            <>
+              <div className="mb-8 flex items-center justify-between">
+                <div className="space-y-1">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent">
+                    Welcome back, {profile.username}
+                  </h2>
+                  <p className="text-gray-400 text-sm">{profile.email}</p>
+                </div>
+
+                <ProfileAvatar
+                  profile={profile}
+                  onAvatarUpdate={(url) =>
+                    setProfile((p) => p && { ...p, avatar_url: url })
+                  }
+                />
               </div>
 
-              <ProfileAvatar
-                profile={profile}
-                onAvatarUpdate={(url) => {
-                  console.log("🔄 Updating avatar URL:", url);
-                  setProfile((p) => p && { ...p, avatar_url: url });
-                }}
-              />
-            </div>
+              
+              <IncomingInvites />
+            </>
           )}
 
           <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl">
