@@ -183,7 +183,7 @@ export default function NewProjectPage() {
   return (
     <div className="p-12">
       <div className="max-w-2xl mx-auto space-y-8">
-        <h2 className="text-3xl font-bold bg-linear-to-r from-white via-purple-100 to-white bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 to-white bg-clip-text text-transparent">
           Create New Story
         </h2>
 
@@ -268,7 +268,7 @@ export default function NewProjectPage() {
                 />
                 <button
                   onClick={addInvite}
-                  className="px-6 py-2 rounded-lg bg-linear-to-r from-purple-500 to-pink-500 hover:shadow-lg hover:shadow-purple-500/25 transition-all font-medium"
+                  className="px-6 py-2 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-purple-500/25 transition-all font-medium"
                 >
                   Add
                 </button>
@@ -303,7 +303,7 @@ export default function NewProjectPage() {
           <button
             disabled={loading}
             onClick={handleCreate}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-br from-indigo-600 to-purple-600 py-4 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating..." : "Create Story"}
           </button>
