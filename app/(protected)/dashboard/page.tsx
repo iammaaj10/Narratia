@@ -77,11 +77,11 @@ export default function DashboardPage() {
     return (
       <div className="p-12">
         <div className="text-center space-y-6 py-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/10 mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-linear-to-br from-purple-500/20 to-pink-500/20 border border-white/10 mb-4">
             <PlusCircle className="w-10 h-10 text-purple-300" />
           </div>
 
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
             Your Story Dashboard
           </h1>
 
@@ -92,7 +92,7 @@ export default function DashboardPage() {
           <div className="pt-8">
             <button
               onClick={() => router.push("/dashboard/new-project")}
-              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105"
+              className="px-8 py-4 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105"
             >
               Create Your First Story
             </button>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
 
         <button
           onClick={() => router.push("/dashboard/new-project")}
-          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:scale-105 transition"
+          className="flex items-center gap-2 px-5 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:scale-105 transition"
         >
           <PlusCircle className="w-5 h-5" />
           New Story
