@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { 
-  BookOpen, 
-  Users, 
-  PlusCircle, 
+import {
+  BookOpen,
+  Users,
+  PlusCircle,
   FolderOpen,
-  ArrowLeft 
+  ArrowLeft,
 } from "lucide-react";
 
 type Project = {
@@ -19,11 +19,11 @@ type Project = {
   owner_id: string;
 };
 
-
 type Member = {
   id: string;
   role: string;
-  profiles: {  // ← REPLACE the old Member type with this
+  profiles: {
+    // ← REPLACE the old Member type with this
     username: string;
     avatar_url: string | null;
   } | null;
@@ -84,23 +84,23 @@ export default function ProjectDetailPage() {
 
       // Load team members (if team project)
       if (projectData.is_team) {
-  const { data: membersData } = await supabase
-    .from("project_members")
-    .select(
-      `
+        const { data: membersData } = await supabase
+          .from("project_members")
+          .select(
+            `
       id,
       role,
       profiles!inner (
         username,
         avatar_url
       )
-    `
-    )
-    .eq("project_id", projectId)
-    .eq("status", "accepted");
+    `,
+          )
+          .eq("project_id", projectId)
+          .eq("status", "accepted");
 
-  setMembers((membersData || []) as unknown as Member[]);
-}
+        setMembers((membersData || []) as unknown as Member[]);
+      }
 
       // Load modules
       const { data: modulesData } = await supabase
@@ -161,52 +161,52 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Team Members */}
-     {/* Team Members */}
-{project.is_team && members.length > 0 && (
-  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
-    <div className="flex items-center gap-2 mb-4">
-      <Users className="w-5 h-5 text-purple-400" />
-      <h2 className="text-lg font-semibold text-white">Team Members</h2>
-      <span className="text-sm text-gray-400">({members.length})</span>
-    </div>
-
-    <div className="flex flex-wrap gap-3">
-      {members.map((member) => {
-        // Add null check for profiles
-        if (!member.profiles) return null;
-        
-        return (
-          <div
-            key={member.id}
-            className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
-          >
-            {member.profiles.avatar_url ? (
-              <img
-                src={member.profiles.avatar_url}
-                className="w-8 h-8 rounded-full"
-                alt={member.profiles.username}
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">
-                  {member.profiles.username[0].toUpperCase()}
-                </span>
-              </div>
-            )}
-            <div>
-              <div className="text-sm font-medium text-white">
-                {member.profiles.username}
-              </div>
-              <div className="text-xs text-gray-400 capitalize">
-                {member.role}
-              </div>
-            </div>
+      {/* Team Members */}
+      {project.is_team && members.length > 0 && (
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-purple-400" />
+            <h2 className="text-lg font-semibold text-white">Team Members</h2>
+            <span className="text-sm text-gray-400">({members.length})</span>
           </div>
-        );
-      })}
-    </div>
-  </div>
-)}
+
+          <div className="flex flex-wrap gap-3">
+            {members.map((member) => {
+              // Add null check for profiles
+              if (!member.profiles) return null;
+
+              return (
+                <div
+                  key={member.id}
+                  className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
+                >
+                  {member.profiles.avatar_url ? (
+                    <img
+                      src={member.profiles.avatar_url}
+                      className="w-8 h-8 rounded-full"
+                      alt={member.profiles.username}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                      <span className="text-white text-sm font-semibold">
+                        {member.profiles.username[0].toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-sm font-medium text-white">
+                      {member.profiles.username}
+                    </div>
+                    <div className="text-xs text-gray-400 capitalize">
+                      {member.role}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Modules Section */}
       <div>
@@ -219,7 +219,7 @@ export default function ProjectDetailPage() {
           {isOwner && (
             <button
               onClick={() => setShowCreateModule(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              className="flex items-center gap-2 px-5 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
             >
               <PlusCircle className="w-5 h-5" />
               Create Module
@@ -240,7 +240,7 @@ export default function ProjectDetailPage() {
             {isOwner && (
               <button
                 onClick={() => setShowCreateModule(true)}
-                className="px-6 py-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                className="px-6 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
                 Create First Module
               </button>
@@ -330,7 +330,9 @@ function CreateModuleModal({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-gray-900 rounded-2xl border border-white/10 p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-white mb-6">Create New Module</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">
+          Create New Module
+        </h2>
 
         <div className="space-y-4 mb-6">
           <div>
