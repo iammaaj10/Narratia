@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
         <button
           onClick={() => router.push("/dashboard/new-project")}
-          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:scale-105 transition"
+          className="flex items-center gap-2 px-5 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:scale-105 transition"
         >
           <PlusCircle className="w-5 h-5" />
           New Story
