@@ -192,7 +192,7 @@ export default function DashboardLayout({
             <>
               <div className="mb-8 flex items-center justify-between">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  <h2 className="text-3xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     Welcome back, {profile.username}
                   </h2>
                   <p className="text-gray-400 text-sm">{profile.email}</p>
