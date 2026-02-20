@@ -4,14 +4,14 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import CommentsPanel from "./components/CommentsPanel";
-import { 
-  ArrowLeft, 
-  Save, 
-  Clock, 
-  Check, 
+import {
+  ArrowLeft,
+  Save,
+  Clock,
+  Check,
   AlertCircle,
   FileText,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
 
 type Phase = {
@@ -60,7 +60,7 @@ export default function WritingEditorPage() {
   // Load phase data on mount
   useEffect(() => {
     loadPhaseData();
-    
+
     // Cleanup on unmount
     return () => {
       if (autoSaveTimeoutRef.current) {
@@ -102,7 +102,7 @@ export default function WritingEditorPage() {
       console.log("📊 Phase loaded:", {
         id: phaseData.id,
         title: phaseData.title,
-        contentLength: phaseData.content?.length || 0
+        contentLength: phaseData.content?.length || 0,
       });
 
       setPhase(phaseData);
@@ -196,7 +196,7 @@ export default function WritingEditorPage() {
 
     console.log("💾 Saving content...", {
       length: finalContent.length,
-      phaseId
+      phaseId,
     });
 
     try {
@@ -250,18 +250,19 @@ export default function WritingEditorPage() {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (content !== lastSavedContentRef.current) {
         e.preventDefault();
-        e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
-        
+        e.returnValue =
+          "You have unsaved changes. Are you sure you want to leave?";
+
         // Attempt to save
         saveContent();
       }
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      
+
       // Final save attempt on unmount
       if (content !== lastSavedContentRef.current) {
         saveContent();
@@ -284,18 +285,19 @@ export default function WritingEditorPage() {
   // Access denied state
   if (!phase || !canEdit) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Access Denied
-          </h2>
+          <h2 className="text-2xl font-bold text-white mb-3">Access Denied</h2>
           <p className="text-gray-400 mb-6">
-            You don't have permission to edit this phase. Only the project owner or assigned writer can edit.
+            You don't have permission to edit this phase. Only the project owner
+            or assigned writer can edit.
           </p>
           <button
-            onClick={() => router.push(`/dashboard/${projectId}/module/${moduleId}`)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            onClick={() =>
+              router.push(`/dashboard/${projectId}/module/${moduleId}`)
+            }
+            className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
             Go Back to Module
           </button>
@@ -306,7 +308,7 @@ export default function WritingEditorPage() {
 
   // Main editor interface
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
       {/* Header */}
       <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -340,7 +342,9 @@ export default function WritingEditorPage() {
             <div className="flex items-center gap-6">
               {/* Word and character count */}
               <div className="flex items-center gap-4 text-sm text-gray-400">
-                <span className="font-medium">{wordCount.toLocaleString()} words</span>
+                <span className="font-medium">
+                  {wordCount.toLocaleString()} words
+                </span>
                 <span className="text-gray-600">•</span>
                 <span>{charCount.toLocaleString()} characters</span>
               </div>
@@ -350,19 +354,25 @@ export default function WritingEditorPage() {
                 {saveStatus === "saving" && (
                   <>
                     <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
-                    <span className="text-sm text-yellow-400 font-medium">Saving...</span>
+                    <span className="text-sm text-yellow-400 font-medium">
+                      Saving...
+                    </span>
                   </>
                 )}
                 {saveStatus === "saved" && (
                   <>
                     <Check className="w-4 h-4 text-green-400" />
-                    <span className="text-sm text-green-400 font-medium">Saved</span>
+                    <span className="text-sm text-green-400 font-medium">
+                      Saved
+                    </span>
                   </>
                 )}
                 {saveStatus === "error" && (
                   <>
                     <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span className="text-sm text-red-400 font-medium">Error</span>
+                    <span className="text-sm text-red-400 font-medium">
+                      Error
+                    </span>
                   </>
                 )}
               </div>
@@ -381,7 +391,10 @@ export default function WritingEditorPage() {
               {/* Manual save button */}
               <button
                 onClick={handleManualSave}
-                disabled={saveStatus === "saving" || content === lastSavedContentRef.current}
+                disabled={
+                  saveStatus === "saving" ||
+                  content === lastSavedContentRef.current
+                }
                 className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Save now (Ctrl/Cmd + S)"
               >
@@ -396,7 +409,9 @@ export default function WritingEditorPage() {
       {/* Main content area with editor and comments */}
       <div className="flex h-[calc(100vh-80px)]">
         {/* Editor area */}
-        <div className={`flex-1 overflow-y-auto transition-all ${showComments ? "pr-0" : ""}`}>
+        <div
+          className={`flex-1 overflow-y-auto transition-all ${showComments ? "pr-0" : ""}`}
+        >
           <div className="max-w-5xl mx-auto px-6 py-8">
             {/* Phase description */}
             {phase.description && (
