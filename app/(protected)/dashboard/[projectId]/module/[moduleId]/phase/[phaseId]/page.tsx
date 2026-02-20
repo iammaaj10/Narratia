@@ -273,7 +273,7 @@ export default function WritingEditorPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
         <div className="text-center">
           <FileText className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
           <div className="text-gray-400">Loading editor...</div>
@@ -350,7 +350,7 @@ export default function WritingEditorPage() {
               </div>
 
               {/* Save status indicator */}
-              <div className="flex items-center gap-2 min-w-[100px]">
+              <div className="flex items-center gap-2 min-w-25">
                 {saveStatus === "saving" && (
                   <>
                     <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
@@ -424,7 +424,7 @@ export default function WritingEditorPage() {
             )}
 
             {/* Writing area */}
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-white/2 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
               <textarea
                 ref={textareaRef}
                 value={content}
@@ -435,7 +435,7 @@ export default function WritingEditorPage() {
 Your words will be automatically saved every 3 seconds as you write.
 
 Press Ctrl/Cmd + S to save manually at any time."
-                className="w-full min-h-[600px] p-10 bg-transparent text-gray-100 placeholder-gray-600 resize-none focus:outline-none text-lg leading-relaxed"
+                className="w-full min-h-150 p-10 bg-transparent text-gray-100 placeholder-gray-600 resize-none focus:outline-none text-lg leading-relaxed"
                 style={{
                   lineHeight: "1.8",
                   fontFamily: "'Georgia', 'Times New Roman', serif",
