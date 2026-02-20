@@ -3,13 +3,15 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import CommentsPanel from "./components/CommentsPanel";
 import { 
   ArrowLeft, 
   Save, 
   Clock, 
   Check, 
   AlertCircle,
-  FileText
+  FileText,
+  MessageSquare
 } from "lucide-react";
 
 type Phase = {
@@ -46,6 +48,8 @@ export default function WritingEditorPage() {
   const [wordCount, setWordCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [showComments, setShowComments] = useState(false);
+  const [isOwner, setIsOwner] = useState(false); // ← ADD THIS LINE
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,11 +132,12 @@ export default function WritingEditorPage() {
         .single();
 
       if (projectData) {
-        const isOwner = projectData.owner_id === user.id;
+        const ownerCheck = projectData.owner_id === user.id;
         const isAssigned = phaseData.assigned_to === user.id;
-        setCanEdit(isOwner || isAssigned);
+        setIsOwner(ownerCheck); // ← ADD THIS LINE
+        setCanEdit(ownerCheck || isAssigned);
 
-        if (!isOwner && !isAssigned) {
+        if (!ownerCheck && !isAssigned) {
           console.log("⚠️ User does not have edit permission");
         }
       }
@@ -310,7 +315,6 @@ export default function WritingEditorPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => {
-                  // Save before navigating away
                   if (content !== lastSavedContentRef.current) {
                     saveContent();
                   }
@@ -363,6 +367,17 @@ export default function WritingEditorPage() {
                 )}
               </div>
 
+              {/* Comments toggle button */}
+              <button
+                onClick={() => setShowComments(!showComments)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {showComments ? "Hide" : "Show"} Comments
+                </span>
+              </button>
+
               {/* Manual save button */}
               <button
                 onClick={handleManualSave}
@@ -378,54 +393,70 @@ export default function WritingEditorPage() {
         </div>
       </div>
 
-      {/* Main editor area */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Phase description */}
-        {phase.description && (
-          <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-sm text-blue-300">
-              <strong className="font-semibold">Phase Description:</strong>{" "}
-              {phase.description}
-            </p>
-          </div>
-        )}
+      {/* Main content area with editor and comments */}
+      <div className="flex h-[calc(100vh-80px)]">
+        {/* Editor area */}
+        <div className={`flex-1 overflow-y-auto transition-all ${showComments ? "pr-0" : ""}`}>
+          <div className="max-w-5xl mx-auto px-6 py-8">
+            {/* Phase description */}
+            {phase.description && (
+              <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                <p className="text-sm text-blue-300">
+                  <strong className="font-semibold">Phase Description:</strong>{" "}
+                  {phase.description}
+                </p>
+              </div>
+            )}
 
-        {/* Writing area */}
-        <div className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-          <textarea
-            ref={textareaRef}
-            value={content}
-            onChange={(e) => handleContentChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Start writing your story here...
+            {/* Writing area */}
+            <div className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => handleContentChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Start writing your story here...
 
 Your words will be automatically saved every 3 seconds as you write.
 
 Press Ctrl/Cmd + S to save manually at any time."
-            className="w-full min-h-[600px] p-10 bg-transparent text-gray-100 placeholder-gray-600 resize-none focus:outline-none text-lg leading-relaxed"
-            style={{
-              lineHeight: "1.8",
-              fontFamily: "'Georgia', 'Times New Roman', serif",
-            }}
-            spellCheck={true}
-          />
+                className="w-full min-h-[600px] p-10 bg-transparent text-gray-100 placeholder-gray-600 resize-none focus:outline-none text-lg leading-relaxed"
+                style={{
+                  lineHeight: "1.8",
+                  fontFamily: "'Georgia', 'Times New Roman', serif",
+                }}
+                spellCheck={true}
+              />
+            </div>
+
+            {/* Footer tips */}
+            <div className="mt-6 flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-4">
+                <span>💡 Press Ctrl/Cmd + S to save manually</span>
+                <span className="text-gray-600">•</span>
+                <span>Auto-saves every 3 seconds</span>
+              </div>
+              <div>
+                {phase.updated_at && (
+                  <span>
+                    Last updated: {new Date(phase.updated_at).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Footer tips */}
-        <div className="mt-6 flex items-center justify-between text-xs text-gray-500">
-          <div className="flex items-center gap-4">
-            <span>💡 Press Ctrl/Cmd + S to save manually</span>
-            <span className="text-gray-600">•</span>
-            <span>Auto-saves every 3 seconds</span>
+        {/* Comments panel */}
+        {showComments && (
+          <div className="w-96 h-full">
+            <CommentsPanel
+              phaseId={phaseId}
+              currentUserId={currentUserId}
+              isOwner={isOwner}
+            />
           </div>
-          <div>
-            {phase.updated_at && (
-              <span>
-                Last updated: {new Date(phase.updated_at).toLocaleString()}
-              </span>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
