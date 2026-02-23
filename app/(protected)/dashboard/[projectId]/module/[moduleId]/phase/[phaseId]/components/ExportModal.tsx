@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Import useEffect
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Download, FileText, X, Loader2 } from "lucide-react";
 import { exportAsPDF, exportAsDOCX, exportAsTXT } from "../../../../../../../../../lib/export/exportUtils";
@@ -28,10 +28,9 @@ export default function ExportModal({
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
 
-  // ✅ CORRECT: Use useEffect for side effects
   useEffect(() => {
     loadModules();
-  }, []); // Empty dependency array means run once when component mounts
+  }, []);
 
   const loadModules = async () => {
     const { data } = await supabase
@@ -56,6 +55,7 @@ export default function ExportModal({
   const handleModuleChange = (moduleId: string) => {
     setSelectedModule(moduleId);
     setSelectedPhase("");
+    setPhases([]); // Clear phases when module changes
     if (moduleId) {
       loadPhases(moduleId);
     }
@@ -163,6 +163,12 @@ export default function ExportModal({
     }
   };
 
+  // Check if export button should be enabled
+  const canExport = 
+    scope === "project" || 
+    (scope === "module" && selectedModule !== "") || 
+    (scope === "phase" && selectedPhase !== "");
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-gray-900 rounded-2xl border border-white/10 p-8 max-w-lg w-full shadow-2xl">
@@ -237,8 +243,13 @@ export default function ExportModal({
             </label>
             <select
               value={scope}
-              onChange={(e) => setScope(e.target.value as ExportScope)}
-              className="w-full bg-gray-600 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
+              onChange={(e) => {
+                setScope(e.target.value as ExportScope);
+                setSelectedModule("");
+                setSelectedPhase("");
+                setPhases([]);
+              }}
+              className="w-full bg-gray-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
             >
               <option value="project">Entire Project</option>
               <option value="module">Single Module</option>
@@ -255,7 +266,7 @@ export default function ExportModal({
               <select
                 value={selectedModule}
                 onChange={(e) => handleModuleChange(e.target.value)}
-                className="w-full bg-gray-700 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-gray-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
               >
                 <option value="">Choose a module...</option>
                 {modules.map((mod) => (
@@ -276,7 +287,7 @@ export default function ExportModal({
               <select
                 value={selectedPhase}
                 onChange={(e) => setSelectedPhase(e.target.value)}
-                className="w-full bg-gray-700 border border-white/10 rounded-xl px-4 py-3 text-black focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-gray-800 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
               >
                 <option value="">Choose a phase...</option>
                 {phases.map((phase) => (
@@ -298,11 +309,7 @@ export default function ExportModal({
             </button>
             <button
               onClick={handleExport}
-              disabled={
-                loading ||
-                (scope === "module" && !selectedModule) ||
-                (scope === "phase" && !selectedPhase)
-              }
+              disabled={loading || !canExport}
               className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
