@@ -3,13 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import {
-  BookOpen,
-  Users,
-  PlusCircle,
-  FolderOpen,
-  ArrowLeft,
-} from "lucide-react";
+import { Download, BookOpen, Users, PlusCircle, FolderOpen, ArrowLeft } from "lucide-react";
+import ExportModal from "./module/[moduleId]/phase/[phaseId]/components/ExportModal";
 
 type Project = {
   id: string;
@@ -23,7 +18,6 @@ type Member = {
   id: string;
   role: string;
   profiles: {
-    // ← REPLACE the old Member type with this
     username: string;
     avatar_url: string | null;
   } | null;
@@ -47,6 +41,7 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [showCreateModule, setShowCreateModule] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   useEffect(() => {
     loadProjectData();
@@ -88,13 +83,13 @@ export default function ProjectDetailPage() {
           .from("project_members")
           .select(
             `
-      id,
-      role,
-      profiles!inner (
-        username,
-        avatar_url
-      )
-    `,
+            id,
+            role,
+            profiles!inner (
+              username,
+              avatar_url
+            )
+          `,
           )
           .eq("project_id", projectId)
           .eq("status", "accepted");
@@ -161,7 +156,6 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Team Members */}
-      {/* Team Members */}
       {project.is_team && members.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -172,7 +166,6 @@ export default function ProjectDetailPage() {
 
           <div className="flex flex-wrap gap-3">
             {members.map((member) => {
-              // Add null check for profiles
               if (!member.profiles) return null;
 
               return (
@@ -216,15 +209,27 @@ export default function ProjectDetailPage() {
             <h2 className="text-2xl font-bold text-white">Story Modules</h2>
           </div>
 
-          {isOwner && (
+          <div className="flex items-center gap-3">
+            {/* Export Button */}
             <button
-              onClick={() => setShowCreateModule(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all"
             >
-              <PlusCircle className="w-5 h-5" />
-              Create Module
+              <Download className="w-5 h-5" />
+              Export
             </button>
-          )}
+
+            {/* Create Module Button */}
+            {isOwner && (
+              <button
+                onClick={() => setShowCreateModule(true)}
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              >
+                <PlusCircle className="w-5 h-5" />
+                Create Module
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Modules Grid */}
@@ -240,7 +245,7 @@ export default function ProjectDetailPage() {
             {isOwner && (
               <button
                 onClick={() => setShowCreateModule(true)}
-                className="px-6 py-3 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
                 Create First Module
               </button>
@@ -282,6 +287,15 @@ export default function ProjectDetailPage() {
             setShowCreateModule(false);
             loadProjectData();
           }}
+        />
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && project && (
+        <ExportModal
+          projectId={projectId}
+          projectTitle={project.title}
+          onClose={() => setShowExportModal(false)}
         />
       )}
     </div>
