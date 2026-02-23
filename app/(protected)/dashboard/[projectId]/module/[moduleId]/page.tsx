@@ -266,7 +266,7 @@ export default function ModuleDetailPage() {
             {isOwner && (
               <button
                 onClick={() => setShowCreatePhase(true)}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
                 Create First Phase
               </button>
