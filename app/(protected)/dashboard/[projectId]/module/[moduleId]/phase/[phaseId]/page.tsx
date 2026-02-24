@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import VersionHistory from "./components/VersionHistory";
 import CommentsPanel from "./components/CommentsPanel";
 import {
   ArrowLeft,
@@ -12,6 +13,7 @@ import {
   AlertCircle,
   FileText,
   MessageSquare,
+  History,
 } from "lucide-react";
 
 type Phase = {
@@ -49,7 +51,9 @@ export default function WritingEditorPage() {
   const [charCount, setCharCount] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [showComments, setShowComments] = useState(false);
-  const [isOwner, setIsOwner] = useState(false); // ← ADD THIS LINE
+  const [isOwner, setIsOwner] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [lastVersionSave, setLastVersionSave] = useState(0);
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -177,7 +181,6 @@ export default function WritingEditorPage() {
 
   // Save content to database
   const saveContent = async (contentToSave?: string) => {
-    // Prevent multiple simultaneous saves
     if (isSavingRef.current) {
       console.log("⏭️ Save already in progress, skipping");
       return;
@@ -185,7 +188,6 @@ export default function WritingEditorPage() {
 
     const finalContent = contentToSave !== undefined ? contentToSave : content;
 
-    // Don't save if content hasn't changed
     if (finalContent === lastSavedContentRef.current) {
       console.log("⏭️ Content unchanged, skipping save");
       return;
@@ -219,6 +221,33 @@ export default function WritingEditorPage() {
       lastSavedContentRef.current = finalContent;
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
+
+      // Save version snapshot if significant change (every 50 words or 5 minutes)
+      const wordCount = finalContent
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w.length > 0).length;
+      const now = Date.now();
+      const timeSinceLastVersion = now - lastVersionSave;
+      const shouldSaveVersion =
+        timeSinceLastVersion > 5 * 60 * 1000 || wordCount % 50 === 0; // 5 minutes or every 50 words
+
+      if (shouldSaveVersion && wordCount > 0) {
+        console.log("📸 Saving version snapshot...");
+        const { error: versionError } = await supabase
+          .from("phase_versions")
+          .insert({
+            phase_id: phaseId,
+            content: finalContent,
+            word_count: wordCount,
+            created_by: currentUserId,
+          });
+
+        if (!versionError) {
+          setLastVersionSave(now);
+          console.log("✅ Version saved");
+        }
+      }
     } catch (err) {
       console.error("❌ Unexpected save error:", err);
       setSaveStatus("error");
@@ -226,6 +255,12 @@ export default function WritingEditorPage() {
     } finally {
       isSavingRef.current = false;
     }
+  };
+
+  const handleRestoreVersion = (versionContent: string) => {
+    setContent(versionContent);
+    updateCounts(versionContent);
+    saveContent(versionContent);
   };
 
   // Manual save
@@ -388,6 +423,15 @@ export default function WritingEditorPage() {
                 </span>
               </button>
 
+              {/* Version History button */}
+              <button
+                onClick={() => setShowVersionHistory(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all"
+              >
+                <History className="w-4 h-4" />
+                <span className="text-sm font-medium">History</span>
+              </button>
+
               {/* Manual save button */}
               <button
                 onClick={handleManualSave}
@@ -471,6 +515,17 @@ Press Ctrl/Cmd + S to save manually at any time."
               isOwner={isOwner}
             />
           </div>
+        )}
+
+        {/* Version History Modal */}
+        {showVersionHistory && (
+          <VersionHistory
+            phaseId={phaseId}
+            currentUserId={currentUserId}
+            isOwner={isOwner}
+            onRestore={handleRestoreVersion}
+            onClose={() => setShowVersionHistory(false)}
+          />
         )}
       </div>
     </div>

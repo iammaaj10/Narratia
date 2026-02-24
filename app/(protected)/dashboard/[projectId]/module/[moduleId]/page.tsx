@@ -108,46 +108,57 @@ export default function ModuleDetailPage() {
 
         // Load team members if team project
         // Load team members if team project
+        // Load team members if team project
         if (projectData.is_team) {
-          // First get accepted members
+          console.log("📊 Loading team members for project:", projectId);
+
+          // Get all accepted members
           const { data: membersData, error: membersError } = await supabase
             .from("project_members")
-            .select("user_id")
+            .select("user_id, role")
             .eq("project_id", projectId)
             .eq("status", "accepted")
             .not("user_id", "is", null);
 
-          console.log("👥 Members query result:", {
-            data: membersData,
-            error: membersError,
-          });
+          console.log("👥 Raw members data:", membersData);
 
           if (membersError) {
             console.error("❌ Members error:", membersError);
           } else if (membersData && membersData.length > 0) {
-            // Then get their profiles separately
+            // Get user IDs
             const userIds = membersData.map((m) => m.user_id);
 
+            console.log("🔍 User IDs to fetch profiles for:", userIds);
+
+            // Fetch profiles for all members
             const { data: profilesData, error: profilesError } = await supabase
               .from("profiles")
               .select("id, username, avatar_url")
               .in("id", userIds);
 
-            console.log("👥 Profiles query result:", {
-              data: profilesData,
-              error: profilesError,
-            });
+            console.log("👤 Profiles fetched:", profilesData);
 
-            if (profilesData) {
-              // Combine them
-              const combined = membersData.map((member) => ({
-                user_id: member.user_id,
-                profiles:
-                  profilesData.find((p) => p.id === member.user_id) || null,
-              }));
+            if (profilesError) {
+              console.error("❌ Profiles error:", profilesError);
+            } else if (profilesData) {
+              // Combine members with their profiles
+              const combined = userIds
+                .map((userId) => {
+                  const profile = profilesData.find((p) => p.id === userId);
+                  return {
+                    user_id: userId,
+                    profiles: profile || null,
+                  };
+                })
+                .filter((m) => m.profiles !== null); // Only keep members with valid profiles
+
+              console.log("✅ Final combined team members:", combined);
+              console.log("✅ Team members count:", combined.length);
 
               setTeamMembers(combined as TeamMember[]);
             }
+          } else {
+            console.log("⚠️ No team members found");
           }
         }
       }
