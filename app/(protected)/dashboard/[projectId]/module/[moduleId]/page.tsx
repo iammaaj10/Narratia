@@ -106,9 +106,7 @@ export default function ModuleDetailPage() {
       if (projectData) {
         setIsOwner(projectData.owner_id === user.id);
 
-        // Load team members if team project
-        // Load team members if team project
-        // Load team members if team project
+        
         if (projectData.is_team) {
           console.log("📊 Loading team members for project:", projectId);
 
