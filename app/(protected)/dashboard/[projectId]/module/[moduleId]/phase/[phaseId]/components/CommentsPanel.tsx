@@ -24,7 +24,7 @@ type Comment = {
   profiles: {
     username: string;
     avatar_url: string | null;
-  };
+  } | null;
   replies?: Comment[];
 };
 
@@ -32,10 +32,10 @@ type CommentsPanelProps = {
   phaseId: string;
   currentUserId: string;
   isOwner: boolean;
-  projectId: string; // Add this
-  moduleId: string;  // Add this
-  phaseTitle: string; // Add this
-  assignedTo: string | null; // Add this
+  projectId: string;
+  moduleId: string;
+  phaseTitle: string;
+  assignedTo: string | null;
 };
 
 export default function CommentsPanel({
@@ -154,7 +154,6 @@ export default function CommentsPanel({
       return;
     }
 
-    // Send notification to assigned writer (if not commenting on own phase)
     if (assignedTo && assignedTo !== currentUserId) {
       const { data: currentUser } = await supabase
         .from("profiles")
@@ -198,7 +197,6 @@ export default function CommentsPanel({
       return;
     }
 
-    // Notify the person being replied to
     const parentComment = comments.find(c => c.id === parentId);
     if (parentComment && parentComment.user_id !== currentUserId) {
       const { data: currentUser } = await supabase
@@ -332,7 +330,6 @@ export default function CommentsPanel({
   );
 }
 
-// CommentItem component remains the same as before...
 function CommentItem({
   comment,
   currentUserId,
@@ -361,6 +358,11 @@ function CommentItem({
   const [showMenu, setShowMenu] = useState(false);
   const isOwn = comment.user_id === currentUserId;
   const canDelete = isOwn || isOwner;
+
+  // Add null check - if no profile, don't render
+  if (!comment.profiles) {
+    return null;
+  }
 
   return (
     <div
@@ -475,40 +477,45 @@ function CommentItem({
 
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-3 pl-6 space-y-2 border-l-2 border-purple-500/20">
-          {comment.replies.map((reply) => (
-            <div key={reply.id} className="p-2 rounded bg-white/5">
-              <div className="flex items-center gap-2 mb-1">
-                {reply.profiles.avatar_url ? (
-                  <img
-                    src={reply.profiles.avatar_url}
-                    className="w-5 h-5 rounded-full"
-                    alt={reply.profiles.username}
-                  />
-                ) : (
-                  <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center">
-                    <UserIcon className="w-3 h-3 text-purple-300" />
-                  </div>
-                )}
-                <span className="text-xs font-medium text-white">
-                  {reply.profiles.username}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {new Date(reply.created_at).toLocaleDateString()}
-                </span>
-                {(reply.user_id === currentUserId || isOwner) && (
-                  <button
-                    onClick={() => onDelete(reply.id)}
-                    className="ml-auto p-1 text-gray-400 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                )}
+          {comment.replies.map((reply) => {
+            // Add null check for replies
+            if (!reply.profiles) return null;
+
+            return (
+              <div key={reply.id} className="p-2 rounded bg-white/5">
+                <div className="flex items-center gap-2 mb-1">
+                  {reply.profiles.avatar_url ? (
+                    <img
+                      src={reply.profiles.avatar_url}
+                      className="w-5 h-5 rounded-full"
+                      alt={reply.profiles.username}
+                    />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <UserIcon className="w-3 h-3 text-purple-300" />
+                    </div>
+                  )}
+                  <span className="text-xs font-medium text-white">
+                    {reply.profiles.username}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(reply.created_at).toLocaleDateString()}
+                  </span>
+                  {(reply.user_id === currentUserId || isOwner) && (
+                    <button
+                      onClick={() => onDelete(reply.id)}
+                      className="ml-auto p-1 text-gray-400 hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-300 whitespace-pre-wrap">
+                  {reply.content}
+                </p>
               </div>
-              <p className="text-xs text-gray-300 whitespace-pre-wrap">
-                {reply.content}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
