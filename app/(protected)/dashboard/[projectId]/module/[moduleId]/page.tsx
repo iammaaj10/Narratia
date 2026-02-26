@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { notificationHelpers } from "@/lib/notifications/createNotification";
 import {
   ArrowLeft,
   PlusCircle,
@@ -106,7 +107,6 @@ export default function ModuleDetailPage() {
       if (projectData) {
         setIsOwner(projectData.owner_id === user.id);
 
-        
         if (projectData.is_team) {
           console.log("📊 Loading team members for project:", projectId);
 
@@ -356,6 +356,7 @@ export default function ModuleDetailPage() {
       {showCreatePhase && (
         <CreatePhaseModal
           moduleId={moduleId}
+          projectId={projectId} // ← Make sure this is here
           teamMembers={teamMembers}
           onClose={() => setShowCreatePhase(false)}
           onSuccess={() => {
@@ -371,11 +372,13 @@ export default function ModuleDetailPage() {
 // Create Phase Modal Component
 function CreatePhaseModal({
   moduleId,
+  projectId, // Make sure this is passed
   teamMembers,
   onClose,
   onSuccess,
 }: {
   moduleId: string;
+  projectId: string; // Add this
   teamMembers: TeamMember[];
   onClose: () => void;
   onSuccess: () => void;
@@ -393,22 +396,43 @@ function CreatePhaseModal({
 
     setLoading(true);
 
-    const { error } = await supabase.from("phases").insert({
-      module_id: moduleId,
-      title: title.trim(),
-      description: description.trim() || null,
-      assigned_to: assignedTo || null,
-      content: "",
-    });
-
-    setLoading(false);
+    const { data: newPhase, error } = await supabase
+      .from("phases")
+      .insert({
+        module_id: moduleId,
+        title: title.trim(),
+        description: description.trim() || null,
+        assigned_to: assignedTo || null,
+        content: "",
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error("❌ Phase creation error:", error);
       alert(`Failed to create phase: ${error.message}`);
+      setLoading(false);
       return;
     }
 
+    console.log("✅ Phase created:", newPhase);
+
+    // Send notification if assigned to someone
+    if (assignedTo && newPhase) {
+      console.log("📧 Sending assignment notification to:", assignedTo);
+
+      await notificationHelpers.phaseAssignment(
+        assignedTo,
+        title.trim(),
+        projectId,
+        moduleId,
+        newPhase.id,
+      );
+
+      console.log("✅ Notification sent");
+    }
+
+    setLoading(false);
     onSuccess();
   };
 
@@ -443,7 +467,6 @@ function CreatePhaseModal({
             />
           </div>
 
-          {/* Assign Writer */}
           {teamMembers.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
