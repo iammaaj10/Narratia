@@ -193,11 +193,12 @@ export default function DashboardLayout({
             <>
               <div className="mb-8 flex items-center justify-between">
                 <div className="space-y-1">
-                   <NotificationBell />
+                   
                   <h2 className="text-3xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     Welcome back, {profile.username}
                   </h2>
                   <p className="text-gray-400 text-sm">{profile.email}</p>
+                 
                 </div>
                 
                 <ProfileAvatar
@@ -206,9 +207,10 @@ export default function DashboardLayout({
                     setProfile((p) => p && { ...p, avatar_url: url })
                   }
                 />
+                
               </div>
 
-              
+               <NotificationBell />
               <IncomingInvites />
             </>
           )}
