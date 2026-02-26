@@ -513,6 +513,10 @@ Press Ctrl/Cmd + S to save manually at any time."
               phaseId={phaseId}
               currentUserId={currentUserId}
               isOwner={isOwner}
+              projectId={projectId}
+              moduleId={moduleId}
+              phaseTitle={phase?.title || ""}
+              assignedTo={phase?.assigned_to || null}
             />
           </div>
         )}

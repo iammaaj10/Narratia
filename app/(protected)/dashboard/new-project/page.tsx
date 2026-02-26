@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { notificationHelpers } from "@/lib/notifications/createNotification";
 import { useRouter } from "next/navigation";
 
-const MAX_TEAM_SIZE = 4; // including owner
+const MAX_TEAM_SIZE = 4;
 
 export default function NewProjectPage() {
   const [title, setTitle] = useState("");
@@ -19,7 +20,6 @@ export default function NewProjectPage() {
   const addInvite = () => {
     if (!inviteEmail.trim()) return;
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inviteEmail)) {
       alert("Please enter a valid email address");
@@ -63,9 +63,6 @@ export default function NewProjectPage() {
         return;
       }
 
-      console.log("📝 Creating project for user:", user.id);
-      console.log("User email:", user.email);
-
       // 1️⃣ Create project
       const { data: project, error: projectError } = await supabase
         .from("projects")
@@ -79,23 +76,14 @@ export default function NewProjectPage() {
         .single();
 
       if (projectError) {
-        console.error("❌ Project creation error:", {
-          message: projectError.message,
-          details: projectError.details,
-          hint: projectError.hint,
-          code: projectError.code,
-        });
+        console.error("❌ Project creation error:", projectError);
         alert(`Failed to create project: ${projectError.message}`);
         setLoading(false);
         return;
       }
 
-      console.log("✅ Project created:", project.id);
-
       // 2️⃣ Insert owner as member (team only)
       if (isTeam) {
-        console.log("👤 Adding owner as member...");
-
         const { error: ownerError } = await supabase
           .from("project_members")
           .insert({
@@ -108,28 +96,14 @@ export default function NewProjectPage() {
           });
 
         if (ownerError) {
-          console.error("❌ Owner insert error:", {
-            message: ownerError.message,
-            details: ownerError.details,
-            hint: ownerError.hint,
-            code: ownerError.code,
-          });
+          console.error("❌ Owner insert error:", ownerError);
           alert(`Failed to add owner: ${ownerError.message}`);
           setLoading(false);
           return;
         }
 
-        console.log("✅ Owner added");
-
         // 3️⃣ Insert invited writers
         if (invites.length > 0) {
-          console.log("========================================");
-          console.log("📧 INVITATION DEBUG START");
-          console.log("========================================");
-          console.log("User ID:", user.id);
-          console.log("Project ID:", project.id);
-          console.log("Invites array:", invites);
-
           const rows = invites.map((email) => ({
             project_id: project.id,
             invited_email: email.toLowerCase(),
@@ -139,34 +113,40 @@ export default function NewProjectPage() {
             invited_by: user.id,
           }));
 
-          console.log("📧 Rows BEFORE insert:");
-          console.log(JSON.stringify(rows, null, 2));
-
-          const { data: insertedData, error: inviteError } = await supabase
+          const { error: inviteError } = await supabase
             .from("project_members")
-            .insert(rows)
-            .select("id, project_id, invited_email, user_id, role, status, created_at");
-
-          console.log("📧 Data AFTER insert (what Supabase returned):");
-          console.log(JSON.stringify(insertedData, null, 2));
-          console.log("📧 Insert error:", inviteError);
-          console.log("========================================");
-          console.log("📧 INVITATION DEBUG END");
-          console.log("========================================");
+            .insert(rows);
 
           if (inviteError) {
-            console.error("❌ Invite error:", {
-              message: inviteError.message,
-              details: inviteError.details,
-              hint: inviteError.hint,
-              code: inviteError.code,
-            });
+            console.error("❌ Invite error:", inviteError);
             alert(`Failed to send invites: ${inviteError.message}`);
             setLoading(false);
             return;
           }
 
-          console.log("✅ Invites sent successfully");
+          // Send notifications to invited users
+          for (const email of invites) {
+            const { data: invitedUser } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("email", email.toLowerCase())
+              .single();
+
+            if (invitedUser) {
+              const { data: ownerProfile } = await supabase
+                .from("profiles")
+                .select("username")
+                .eq("id", user.id)
+                .single();
+
+              await notificationHelpers.projectInvite(
+                invitedUser.id,
+                title.trim(),
+                ownerProfile?.username || user.email || "Someone",
+                project.id
+              );
+            }
+          }
         }
       }
 
@@ -183,7 +163,7 @@ export default function NewProjectPage() {
   return (
     <div className="p-12">
       <div className="max-w-2xl mx-auto space-y-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 to-white bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
           Create New Story
         </h2>
 
@@ -212,7 +192,6 @@ export default function NewProjectPage() {
             />
           </div>
 
-          {/* Project Type */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">
               Project Type
@@ -222,7 +201,7 @@ export default function NewProjectPage() {
                 onClick={() => setIsTeam(false)}
                 className={`flex-1 py-4 rounded-xl border transition-all ${
                   !isTeam
-                    ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 text-white"
+                    ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 text-white"
                     : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
                 }`}
               >
@@ -236,7 +215,7 @@ export default function NewProjectPage() {
                 onClick={() => setIsTeam(true)}
                 className={`flex-1 py-4 rounded-xl border transition-all ${
                   isTeam
-                    ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 text-white"
+                    ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50 text-white"
                     : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
                 }`}
               >
@@ -248,7 +227,6 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          {/* 👥 Invite Writers (Team only) */}
           {isTeam && (
             <div className="space-y-4 rounded-xl border border-purple-500/20 bg-purple-500/5 p-6">
               <div className="flex items-center justify-between">
@@ -268,13 +246,12 @@ export default function NewProjectPage() {
                 />
                 <button
                   onClick={addInvite}
-                  className="px-6 py-2 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 hover:shadow-lg hover:shadow-purple-500/25 transition-all font-medium"
+                  className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-lg hover:shadow-purple-500/25 transition-all font-medium"
                 >
                   Add
                 </button>
               </div>
 
-              {/* Invited list */}
               {invites.length > 0 && (
                 <div className="space-y-2">
                   {invites.map((email) => (
@@ -303,7 +280,7 @@ export default function NewProjectPage() {
           <button
             disabled={loading}
             onClick={handleCreate}
-            className="w-full bg-gradient-to-br from-indigo-600 to-purple-600 py-4 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-4 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating..." : "Create Story"}
           </button>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { notificationHelpers } from "@/lib/notifications/createNotification";
 import {
   MessageSquare,
   Send,
@@ -31,12 +32,20 @@ type CommentsPanelProps = {
   phaseId: string;
   currentUserId: string;
   isOwner: boolean;
+  projectId: string; // Add this
+  moduleId: string;  // Add this
+  phaseTitle: string; // Add this
+  assignedTo: string | null; // Add this
 };
 
 export default function CommentsPanel({
   phaseId,
   currentUserId,
   isOwner,
+  projectId,
+  moduleId,
+  phaseTitle,
+  assignedTo,
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -48,7 +57,6 @@ export default function CommentsPanel({
   useEffect(() => {
     loadComments();
 
-    // Subscribe to real-time updates
     const channel = supabase
       .channel(`comments:${phaseId}`)
       .on(
@@ -99,7 +107,6 @@ export default function CommentsPanel({
         return;
       }
 
-      // Organize comments into threads
       const topLevel: Comment[] = [];
       const repliesMap = new Map<string, Comment[]>();
 
@@ -114,7 +121,6 @@ export default function CommentsPanel({
         }
       });
 
-      // Attach replies to parent comments
       topLevel.forEach((comment) => {
         comment.replies = repliesMap.get(comment.id) || [];
       });
@@ -130,18 +136,41 @@ export default function CommentsPanel({
   const addComment = async () => {
     if (!newComment.trim()) return;
 
-    const { error } = await supabase.from("comments").insert({
-      phase_id: phaseId,
-      user_id: currentUserId,
-      content: newComment.trim(),
-      parent_id: null,
-      resolved: false,
-    });
+    const { data: newCommentData, error } = await supabase
+      .from("comments")
+      .insert({
+        phase_id: phaseId,
+        user_id: currentUserId,
+        content: newComment.trim(),
+        parent_id: null,
+        resolved: false,
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error("❌ Error adding comment:", error);
       alert("Failed to add comment");
       return;
+    }
+
+    // Send notification to assigned writer (if not commenting on own phase)
+    if (assignedTo && assignedTo !== currentUserId) {
+      const { data: currentUser } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", currentUserId)
+        .single();
+
+      await notificationHelpers.newComment(
+        assignedTo,
+        currentUser?.username || "Someone",
+        phaseTitle,
+        projectId,
+        moduleId,
+        phaseId,
+        newCommentData.id
+      );
     }
 
     setNewComment("");
@@ -151,18 +180,42 @@ export default function CommentsPanel({
   const addReply = async (parentId: string) => {
     if (!replyContent.trim()) return;
 
-    const { error } = await supabase.from("comments").insert({
-      phase_id: phaseId,
-      user_id: currentUserId,
-      content: replyContent.trim(),
-      parent_id: parentId,
-      resolved: false,
-    });
+    const { data: replyData, error } = await supabase
+      .from("comments")
+      .insert({
+        phase_id: phaseId,
+        user_id: currentUserId,
+        content: replyContent.trim(),
+        parent_id: parentId,
+        resolved: false,
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error("❌ Error adding reply:", error);
       alert("Failed to add reply");
       return;
+    }
+
+    // Notify the person being replied to
+    const parentComment = comments.find(c => c.id === parentId);
+    if (parentComment && parentComment.user_id !== currentUserId) {
+      const { data: currentUser } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", currentUserId)
+        .single();
+
+      await notificationHelpers.newComment(
+        parentComment.user_id,
+        currentUser?.username || "Someone",
+        phaseTitle,
+        projectId,
+        moduleId,
+        phaseId,
+        replyData.id
+      );
     }
 
     setReplyContent("");
@@ -208,7 +261,6 @@ export default function CommentsPanel({
 
   return (
     <div className="h-full flex flex-col bg-white/[0.02] border-l border-white/10">
-      {/* Header */}
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -227,7 +279,6 @@ export default function CommentsPanel({
           </button>
         </div>
 
-        {/* New comment input */}
         <div className="flex gap-2">
           <input
             type="text"
@@ -247,7 +298,6 @@ export default function CommentsPanel({
         </div>
       </div>
 
-      {/* Comments list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {loading ? (
           <div className="text-center text-gray-400 py-8">
@@ -282,7 +332,7 @@ export default function CommentsPanel({
   );
 }
 
-// Comment Item Component
+// CommentItem component remains the same as before...
 function CommentItem({
   comment,
   currentUserId,
@@ -320,7 +370,6 @@ function CommentItem({
           : "bg-white/5 border-white/10"
       }`}
     >
-      {/* Comment header */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
           {comment.profiles.avatar_url ? (
@@ -346,7 +395,6 @@ function CommentItem({
           </span>
         </div>
 
-        {/* Actions menu */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -384,12 +432,10 @@ function CommentItem({
         </div>
       </div>
 
-      {/* Comment content */}
       <p className="text-sm text-gray-300 mb-2 whitespace-pre-wrap">
         {comment.content}
       </p>
 
-      {/* Reply button */}
       {!comment.resolved && (
         <button
           onClick={() => onReply(comment.id)}
@@ -400,7 +446,6 @@ function CommentItem({
         </button>
       )}
 
-      {/* Reply input */}
       {replyTo === comment.id && (
         <div className="mt-3 flex gap-2">
           <input
@@ -428,7 +473,6 @@ function CommentItem({
         </div>
       )}
 
-      {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-3 pl-6 space-y-2 border-l-2 border-purple-500/20">
           {comment.replies.map((reply) => (
