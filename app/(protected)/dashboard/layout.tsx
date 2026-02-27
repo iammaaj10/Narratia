@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase/client";
 import ProfileAvatar from "./components/ProfileAvatar";
 import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
+import Link from "next/link";
+import { Home, BarChart3 } from "lucide-react";
 
 import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
 
@@ -172,6 +174,13 @@ export default function DashboardLayout({
               </button>
             );
           })}
+          <Link
+            href="/dashboard/stats"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span>Statistics</span>
+          </Link>
         </nav>
 
         {/* Footer */}
@@ -193,24 +202,21 @@ export default function DashboardLayout({
             <>
               <div className="mb-8 flex items-center justify-between">
                 <div className="space-y-1">
-                   
                   <h2 className="text-3xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     Welcome back, {profile.username}
                   </h2>
                   <p className="text-gray-400 text-sm">{profile.email}</p>
-                 
                 </div>
-                
+
                 <ProfileAvatar
                   profile={profile}
                   onAvatarUpdate={(url) =>
                     setProfile((p) => p && { ...p, avatar_url: url })
                   }
                 />
-                
               </div>
 
-               <NotificationBell />
+              <NotificationBell />
               <IncomingInvites />
             </>
           )}

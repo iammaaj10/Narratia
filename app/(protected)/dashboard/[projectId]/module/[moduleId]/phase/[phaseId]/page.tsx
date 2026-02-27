@@ -181,81 +181,109 @@ export default function WritingEditorPage() {
 
   // Save content to database
   const saveContent = async (contentToSave?: string) => {
-    if (isSavingRef.current) {
-      console.log("⏭️ Save already in progress, skipping");
-      return;
-    }
+  if (isSavingRef.current) {
+    console.log("⏭️ Save already in progress, skipping");
+    return;
+  }
 
-    const finalContent = contentToSave !== undefined ? contentToSave : content;
+  const finalContent = contentToSave !== undefined ? contentToSave : content;
 
-    if (finalContent === lastSavedContentRef.current) {
-      console.log("⏭️ Content unchanged, skipping save");
-      return;
-    }
+  if (finalContent === lastSavedContentRef.current) {
+    console.log("⏭️ Content unchanged, skipping save");
+    return;
+  }
 
-    isSavingRef.current = true;
-    setSaveStatus("saving");
+  isSavingRef.current = true;
+  setSaveStatus("saving");
 
-    console.log("💾 Saving content...", {
-      length: finalContent.length,
-      phaseId,
-    });
+  console.log("💾 Saving content...", {
+    length: finalContent.length,
+    phaseId,
+  });
 
-    try {
-      const { error } = await supabase
-        .from("phases")
-        .update({
-          content: finalContent,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", phaseId);
+  // Calculate word counts for session tracking BEFORE updating lastSavedContentRef
+  const previousWordCount = lastSavedContentRef.current
+    .trim()
+    .split(/\s+/)
+    .filter((w: string) => w.length > 0).length;
+  
+  const currentWordCount = finalContent
+    .trim()
+    .split(/\s+/)
+    .filter((w: string) => w.length > 0).length;
+  
+  const wordsAdded = Math.max(0, currentWordCount - previousWordCount);
 
-      if (error) {
-        console.error("❌ Save error:", error);
-        setSaveStatus("error");
-        setTimeout(() => setSaveStatus("idle"), 3000);
-        return;
-      }
+  try {
+    const { error } = await supabase
+      .from("phases")
+      .update({
+        content: finalContent,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", phaseId);
 
-      console.log("✅ Content saved successfully");
-      lastSavedContentRef.current = finalContent;
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-
-      // Save version snapshot if significant change (every 50 words or 5 minutes)
-      const wordCount = finalContent
-        .trim()
-        .split(/\s+/)
-        .filter((w) => w.length > 0).length;
-      const now = Date.now();
-      const timeSinceLastVersion = now - lastVersionSave;
-      const shouldSaveVersion =
-        timeSinceLastVersion > 5 * 60 * 1000 || wordCount % 50 === 0; // 5 minutes or every 50 words
-
-      if (shouldSaveVersion && wordCount > 0) {
-        console.log("📸 Saving version snapshot...");
-        const { error: versionError } = await supabase
-          .from("phase_versions")
-          .insert({
-            phase_id: phaseId,
-            content: finalContent,
-            word_count: wordCount,
-            created_by: currentUserId,
-          });
-
-        if (!versionError) {
-          setLastVersionSave(now);
-          console.log("✅ Version saved");
-        }
-      }
-    } catch (err) {
-      console.error("❌ Unexpected save error:", err);
+    if (error) {
+      console.error("❌ Save error:", error);
       setSaveStatus("error");
       setTimeout(() => setSaveStatus("idle"), 3000);
-    } finally {
-      isSavingRef.current = false;
+      return;
     }
-  };
+
+    console.log("✅ Content saved successfully");
+    lastSavedContentRef.current = finalContent;
+    setSaveStatus("saved");
+    
+    // Track writing session if words were added
+    if (wordsAdded > 0) {
+      try {
+        console.log(`📝 Tracking session: +${wordsAdded} words`);
+        await supabase.rpc('track_writing_session', {
+          p_user_id: currentUserId,
+          p_phase_id: phaseId,
+          p_words_written: wordsAdded
+        });
+      } catch (sessionErr) {
+        // Don't fail the main save if session tracking fails
+        console.error("⚠️ Failed to track writing session:", sessionErr);
+      }
+    }
+    
+    setTimeout(() => setSaveStatus("idle"), 2000);
+
+    // Save version snapshot if significant change (every 50 words or 5 minutes)
+    const wordCount = currentWordCount;
+    const now = Date.now();
+    const timeSinceLastVersion = now - lastVersionSave;
+    const shouldSaveVersion =
+      timeSinceLastVersion > 5 * 60 * 1000 || wordCount % 50 === 0; // 5 minutes or every 50 words
+
+    if (shouldSaveVersion && wordCount > 0) {
+      console.log("📸 Saving version snapshot...");
+      const { error: versionError } = await supabase
+        .from("phase_versions")
+        .insert({
+          phase_id: phaseId,
+          content: finalContent,
+          word_count: wordCount,
+          created_by: currentUserId,
+        });
+
+      if (!versionError) {
+        setLastVersionSave(now);
+        console.log("✅ Version saved");
+      } else {
+        console.error("❌ Version save error:", versionError);
+      }
+    }
+  } catch (err) {
+    console.error("❌ Unexpected save error:", err);
+    setSaveStatus("error");
+    setTimeout(() => setSaveStatus("idle"), 3000);
+  } finally {
+    isSavingRef.current = false;
+  }
+};
 
   const handleRestoreVersion = (versionContent: string) => {
     setContent(versionContent);
