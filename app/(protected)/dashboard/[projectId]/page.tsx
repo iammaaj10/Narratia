@@ -11,6 +11,7 @@ import {
   FolderOpen,
   ArrowLeft,
   Share2,
+  MessageCircle,
 } from "lucide-react";
 import ExportModal from "./module/[moduleId]/phase/[phaseId]/components/ExportModal";
 import ShareSettingsModal from "../components/ShareSettingsModal";
@@ -241,6 +242,16 @@ export default function ProjectDetailPage() {
             >
               <Share2 className="w-5 h-5" />
               Share Story
+            </button>
+
+            {/* Reader Comments Button (show notification badge if pending) */}
+            <button
+              onClick={() => router.push(`/dashboard/${projectId}/comments`)}
+              className="flex items-center gap-2 px-5 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all relative"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Reader Comments
+              {/* Add pending badge here if you want */}
             </button>
 
             {/* Export Button */}
