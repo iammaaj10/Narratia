@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Download, BookOpen, Users, PlusCircle, FolderOpen, ArrowLeft } from "lucide-react";
+import {
+  Download,
+  BookOpen,
+  Users,
+  PlusCircle,
+  FolderOpen,
+  ArrowLeft,
+  Share2,
+} from "lucide-react";
 import ExportModal from "./module/[moduleId]/phase/[phaseId]/components/ExportModal";
+import ShareSettingsModal from "../components/ShareSettingsModal";
 
 type Project = {
   id: string;
@@ -12,6 +21,9 @@ type Project = {
   description: string | null;
   is_team: boolean;
   owner_id: string;
+  is_public: boolean;
+  slug: string | null;
+  view_count: number;
 };
 
 type Member = {
@@ -42,6 +54,7 @@ export default function ProjectDetailPage() {
   const [isOwner, setIsOwner] = useState(false);
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showShareSettings, setShowShareSettings] = useState(false);
 
   useEffect(() => {
     loadProjectData();
@@ -78,25 +91,36 @@ export default function ProjectDetailPage() {
       setIsOwner(projectData.owner_id === user.id);
 
       // Load team members (if team project)
+      // Load team members (if team project)
       if (projectData.is_team) {
-        const { data: membersData } = await supabase
+        // First get the member records
+        const { data: memberRecords } = await supabase
           .from("project_members")
-          .select(
-            `
-            id,
-            role,
-            profiles!inner (
-              username,
-              avatar_url
-            )
-          `,
-          )
+          .select("id, role, user_id")
           .eq("project_id", projectId)
-          .eq("status", "accepted");
+          .eq("status", "accepted")
+          .not("user_id", "is", null);
 
-        setMembers((membersData || []) as unknown as Member[]);
+        if (memberRecords && memberRecords.length > 0) {
+          // Then get their profiles separately
+          const userIds = memberRecords.map((m) => m.user_id);
+
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, username, avatar_url")
+            .in("id", userIds);
+
+          // Combine them
+          const combined = memberRecords.map((member) => ({
+            id: member.id,
+            role: member.role,
+            profiles:
+              profilesData?.find((p) => p.id === member.user_id) || null,
+          }));
+
+          setMembers(combined as unknown as Member[]);
+        }
       }
-
       // Load modules
       const { data: modulesData } = await supabase
         .from("modules")
@@ -142,7 +166,7 @@ export default function ProjectDetailPage() {
 
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-linear-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-3">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-3">
               {project.title}
             </h1>
             {project.description && (
@@ -210,6 +234,15 @@ export default function ProjectDetailPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Share Button */}
+            <button
+              onClick={() => setShowShareSettings(true)}
+              className="flex items-center gap-2 px-5 py-3 bg-green-500/20 text-green-300 rounded-xl hover:bg-green-500/30 transition-all"
+            >
+              <Share2 className="w-5 h-5" />
+              Share Story
+            </button>
+
             {/* Export Button */}
             <button
               onClick={() => setShowExportModal(true)}
@@ -296,6 +329,16 @@ export default function ProjectDetailPage() {
           projectId={projectId}
           projectTitle={project.title}
           onClose={() => setShowExportModal(false)}
+        />
+      )}
+
+      {/* Share Settings Modal */}
+      {showShareSettings && project && (
+        <ShareSettingsModal
+          projectId={projectId}
+          project={project}
+          onClose={() => setShowShareSettings(false)}
+          onUpdate={() => loadProjectData()}
         />
       )}
     </div>
