@@ -307,7 +307,7 @@ export default function ModuleDetailPage() {
 
                     {/* Assigned Writer */}
                     {phase.profiles && (
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2 text-sm text-gray-800">
                         <User className="w-4 h-4" />
                         <span>Assigned to: {phase.profiles.username}</span>
                       </div>
@@ -475,7 +475,7 @@ function CreatePhaseModal({
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-500 focus:outline-none focus:border-purple-500/50"
               >
                 <option value="">Unassigned</option>
                 {teamMembers.map((member) => {
