@@ -1,5 +1,12 @@
 import jsPDF from "jspdf";
-import { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, Packer } from "docx";
+import {
+  Document,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+  Packer,
+} from "docx";
 import { saveAs } from "file-saver";
 
 type Phase = {
@@ -20,9 +27,22 @@ type ExportData = {
   modules: Module[];
 };
 
-// ============================================
-// EXPORT AS PDF
-// ============================================
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/h[1-6]>/gi, "\n\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\n\n\n+/g, "\n\n")
+    .trim();
+}
+
 export const exportAsPDF = (data: ExportData) => {
   const doc = new jsPDF();
   let yPosition = 20;
@@ -79,7 +99,11 @@ export const exportAsPDF = (data: ExportData) => {
       // Phase title
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text(`${moduleIndex + 1}.${phaseIndex + 1} ${phase.title}`, margin + 5, yPosition);
+      doc.text(
+        `${moduleIndex + 1}.${phaseIndex + 1} ${phase.title}`,
+        margin + 5,
+        yPosition,
+      );
       yPosition += 8;
 
       if (phase.description) {
@@ -94,14 +118,15 @@ export const exportAsPDF = (data: ExportData) => {
       if (phase.content) {
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
-        const contentLines = doc.splitTextToSize(phase.content, 165);
-        
+        const plainContent = htmlToPlainText(phase.content);
+        const contentLines = doc.splitTextToSize(plainContent, 165);
+
         contentLines.forEach((line: string) => {
           checkPageBreak();
           doc.text(line, margin + 5, yPosition);
           yPosition += lineHeight;
         });
-        
+
         yPosition += 10;
       }
     });
@@ -132,7 +157,7 @@ export const exportAsDOCX = async (data: ExportData) => {
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
-    })
+    }),
   );
 
   // Project description
@@ -146,7 +171,7 @@ export const exportAsDOCX = async (data: ExportData) => {
           }),
         ],
         spacing: { after: 400 },
-      })
+      }),
     );
   }
 
@@ -164,7 +189,7 @@ export const exportAsDOCX = async (data: ExportData) => {
         ],
         heading: HeadingLevel.HEADING_1,
         spacing: { before: 400, after: 200 },
-      })
+      }),
     );
 
     if (module.description) {
@@ -173,12 +198,12 @@ export const exportAsDOCX = async (data: ExportData) => {
           children: [
             new TextRun({
               text: module.description,
-              italics: true,  // italics goes inside TextRun, not Paragraph
+              italics: true, // italics goes inside TextRun, not Paragraph
               size: 22,
             }),
           ],
           spacing: { after: 200 },
-        })
+        }),
       );
     }
 
@@ -196,7 +221,7 @@ export const exportAsDOCX = async (data: ExportData) => {
           ],
           heading: HeadingLevel.HEADING_2,
           spacing: { before: 300, after: 100 },
-        })
+        }),
       );
 
       if (phase.description) {
@@ -205,18 +230,20 @@ export const exportAsDOCX = async (data: ExportData) => {
             children: [
               new TextRun({
                 text: phase.description,
-                italics: true,  // italics goes inside TextRun
+                italics: true, // italics goes inside TextRun
                 size: 20,
               }),
             ],
             spacing: { after: 100 },
-          })
+          }),
         );
       }
 
       // Phase content
       if (phase.content) {
-        const paragraphs = phase.content.split("\n\n");
+        const plainContent = htmlToPlainText(phase.content);
+        const paragraphs = plainContent.split("\n\n");
+
         paragraphs.forEach((para) => {
           if (para.trim()) {
             children.push(
@@ -228,7 +255,7 @@ export const exportAsDOCX = async (data: ExportData) => {
                   }),
                 ],
                 spacing: { after: 200 },
-              })
+              }),
             );
           }
         });
@@ -286,8 +313,8 @@ export const exportAsTXT = (data: ExportData) => {
 
       if (phase.content) {
         // Indent content properly
-        const contentLines = phase.content.split('\n');
-        contentLines.forEach(line => {
+        const contentLines = phase.content.split("\n");
+        contentLines.forEach((line) => {
           content += `  ${line}\n`;
         });
         content += "\n";
@@ -322,7 +349,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
-    })
+    }),
   );
 
   // Project description with styling
@@ -338,7 +365,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
           }),
         ],
         spacing: { after: 400 },
-      })
+      }),
     );
   }
 
@@ -354,7 +381,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
       ],
       alignment: AlignmentType.CENTER,
       spacing: { after: 300 },
-    })
+    }),
   );
 
   // Modules and phases
@@ -372,7 +399,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
         ],
         heading: HeadingLevel.HEADING_1,
         spacing: { before: 400, after: 200 },
-      })
+      }),
     );
 
     if (module.description) {
@@ -388,7 +415,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
             }),
           ],
           spacing: { after: 200 },
-        })
+        }),
       );
     }
 
@@ -410,7 +437,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
           bullet: {
             level: 0, // Bullet point
           },
-        })
+        }),
       );
 
       if (phase.description) {
@@ -426,12 +453,14 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
               }),
             ],
             spacing: { after: 100 },
-          })
+          }),
         );
       }
 
       // Phase content
       if (phase.content) {
+        const plainContent = htmlToPlainText(phase.content);
+        const contentLines = plainContent.split("\n");
         const paragraphs = phase.content.split("\n\n");
         paragraphs.forEach((para) => {
           if (para.trim()) {
@@ -445,7 +474,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
                   }),
                 ],
                 spacing: { after: 200 },
-              })
+              }),
             );
           }
         });
@@ -466,7 +495,7 @@ export const exportAsDOCXEnhanced = async (data: ExportData) => {
       ],
       alignment: AlignmentType.CENTER,
       spacing: { before: 400 },
-    })
+    }),
   );
 
   // Create document
