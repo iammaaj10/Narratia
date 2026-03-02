@@ -436,7 +436,7 @@ export default function TeamManagementPage() {
                             member.profiles?.username || member.invited_email
                           )
                         }
-                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                        className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-500"
                       >
                         <option value="editor">Editor</option>
                         <option value="viewer">Viewer</option>
