@@ -301,7 +301,7 @@ export default function WritingEditorPage() {
             onClick={() =>
               router.push(`/dashboard/${projectId}/module/${moduleId}`)
             }
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
             Go Back to Module
           </button>
@@ -311,7 +311,7 @@ export default function WritingEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
       {/* Header */}
       <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-6 py-4">
