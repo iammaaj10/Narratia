@@ -74,7 +74,6 @@ export default function ProjectDetailPage() {
         return;
       }
 
-      // Load project
       const { data: projectData, error: projectError } = await supabase
         .from("projects")
         .select("*")
@@ -91,10 +90,7 @@ export default function ProjectDetailPage() {
       setProject(projectData);
       setIsOwner(projectData.owner_id === user.id);
 
-      // Load team members (if team project)
-      // Load team members (if team project)
       if (projectData.is_team) {
-        // First get the member records
         const { data: memberRecords } = await supabase
           .from("project_members")
           .select("id, role, user_id")
@@ -103,7 +99,6 @@ export default function ProjectDetailPage() {
           .not("user_id", "is", null);
 
         if (memberRecords && memberRecords.length > 0) {
-          // Then get their profiles separately
           const userIds = memberRecords.map((m) => m.user_id);
 
           const { data: profilesData } = await supabase
@@ -111,7 +106,6 @@ export default function ProjectDetailPage() {
             .select("id, username, avatar_url")
             .in("id", userIds);
 
-          // Combine them
           const combined = memberRecords.map((member) => ({
             id: member.id,
             role: member.role,
@@ -122,7 +116,7 @@ export default function ProjectDetailPage() {
           setMembers(combined as unknown as Member[]);
         }
       }
-      // Load modules
+
       const { data: modulesData } = await supabase
         .from("modules")
         .select("*")
@@ -155,7 +149,6 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="p-12 space-y-8">
-      {/* Header */}
       <div>
         <button
           onClick={() => router.push("/dashboard")}
@@ -180,7 +173,6 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      {/* Team Members */}
       {project.is_team && members.length > 0 && (
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -226,7 +218,6 @@ export default function ProjectDetailPage() {
         </div>
       )}
 
-      {/* Modules Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -234,8 +225,19 @@ export default function ProjectDetailPage() {
             <h2 className="text-2xl font-bold text-white">Story Modules</h2>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Share Button */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Team Management Button - ONLY shows for team projects AND owner */}
+            {project.is_team && isOwner && (
+              <button
+                onClick={() => router.push(`/dashboard/${projectId}/team`)}
+                className="flex items-center gap-2 px-5 py-3 bg-purple-500/20 text-purple-300 rounded-xl hover:bg-purple-500/30 transition-all"
+              >
+                <Users className="w-5 h-5" />
+                Manage Team
+              </button>
+            )}
+
+            {/* Share Story Button */}
             <button
               onClick={() => setShowShareSettings(true)}
               className="flex items-center gap-2 px-5 py-3 bg-green-500/20 text-green-300 rounded-xl hover:bg-green-500/30 transition-all"
@@ -244,14 +246,13 @@ export default function ProjectDetailPage() {
               Share Story
             </button>
 
-            {/* Reader Comments Button (show notification badge if pending) */}
+            {/* Reader Comments Button */}
             <button
               onClick={() => router.push(`/dashboard/${projectId}/comments`)}
-              className="flex items-center gap-2 px-5 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all relative"
+              className="flex items-center gap-2 px-5 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all"
             >
               <MessageCircle className="w-5 h-5" />
-              Reader Comments
-              {/* Add pending badge here if you want */}
+              Comments
             </button>
 
             {/* Export Button */}
@@ -263,7 +264,7 @@ export default function ProjectDetailPage() {
               Export
             </button>
 
-            {/* Create Module Button */}
+            {/* Create Module Button - ONLY owner can see */}
             {isOwner && (
               <button
                 onClick={() => setShowCreateModule(true)}
@@ -276,7 +277,6 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Modules Grid */}
         {modules.length === 0 ? (
           <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
             <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -322,7 +322,6 @@ export default function ProjectDetailPage() {
         )}
       </div>
 
-      {/* Create Module Modal */}
       {showCreateModule && (
         <CreateModuleModal
           projectId={projectId}
@@ -334,7 +333,6 @@ export default function ProjectDetailPage() {
         />
       )}
 
-      {/* Export Modal */}
       {showExportModal && project && (
         <ExportModal
           projectId={projectId}
@@ -343,7 +341,6 @@ export default function ProjectDetailPage() {
         />
       )}
 
-      {/* Share Settings Modal */}
       {showShareSettings && project && (
         <ShareSettingsModal
           projectId={projectId}
@@ -356,7 +353,6 @@ export default function ProjectDetailPage() {
   );
 }
 
-// Create Module Modal Component
 function CreateModuleModal({
   projectId,
   onClose,
