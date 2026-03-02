@@ -119,7 +119,12 @@ export default function DashboardLayout({
       icon: PlusCircle,
       path: "/dashboard/new-project",
     },
-    { id: "stats", label: "Statistics", icon: BarChart3, path: "/dashboard/stats" },
+    {
+      id: "stats",
+      label: "Statistics",
+      icon: BarChart3,
+      path: "/dashboard/stats",
+    },
   ];
 
   const handleNavigation = (path: string, id: string) => {
@@ -143,26 +148,28 @@ export default function DashboardLayout({
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Sidebar - Desktop & Mobile */}
-      <aside className={`
+      <aside
+        className={`
         fixed lg:static inset-y-0 left-0 z-50
         w-72 border-r border-white/5 backdrop-blur-xl bg-black/90 lg:bg-black/20
         transform transition-transform duration-300 ease-in-out
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         flex flex-col
-      `}>
+      `}
+      >
         {/* Mobile Header */}
         <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
+            {/* <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
               <Sparkles className="w-5 h-5 text-white" />
-            </div>
+            </div> */}
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
               Narratia
             </h1>
@@ -178,9 +185,9 @@ export default function DashboardLayout({
         {/* Desktop Logo */}
         <div className="hidden lg:block p-8 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
+            {/* <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
               <Sparkles className="w-5 h-5 text-white" />
-            </div>
+            </div> */}
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
               Narratia
             </h1>
@@ -199,7 +206,7 @@ export default function DashboardLayout({
                 onClick={() => handleNavigation(item.path, item.id)}
                 className={`w-full group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white shadow-lg shadow-purple-500/10 border border-white/10"
+                    ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 text-white shadow-lg shadow-purple-500/10 border border-white/10"
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -235,7 +242,7 @@ export default function DashboardLayout({
             >
               <Menu className="w-6 h-6 text-gray-400" />
             </button>
-            
+
             {profile && (
               <ProfileAvatar
                 profile={profile}
@@ -274,10 +281,9 @@ export default function DashboardLayout({
                 </h2>
                 <p className="text-gray-400 text-sm">{profile.email}</p>
               </div>
-
+              <NotificationBell />
               {/* Notification Components */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                <NotificationBell />
                 <IncomingInvites />
               </div>
             </>
@@ -285,9 +291,7 @@ export default function DashboardLayout({
 
           {/* Content Container */}
           <div className="bg-white/[0.02] backdrop-blur-xl rounded-xl sm:rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
-            <div className="p-4 sm:p-6 lg:p-8">
-              {children}
-            </div>
+            <div className="p-4 sm:p-6 lg:p-8">{children}</div>
           </div>
         </div>
       </main>

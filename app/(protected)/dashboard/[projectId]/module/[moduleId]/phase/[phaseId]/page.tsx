@@ -15,6 +15,8 @@ import {
   FileText,
   MessageSquare,
   History,
+  Menu,
+  X,
 } from "lucide-react";
 
 type Phase = {
@@ -55,6 +57,7 @@ export default function WritingEditorPage() {
   const [isOwner, setIsOwner] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [lastVersionSave, setLastVersionSave] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -249,6 +252,7 @@ export default function WritingEditorPage() {
     setContent(versionContent);
     updateCounts(versionContent);
     saveContent(versionContent);
+    setShowVersionHistory(false);
   };
 
   const handleManualSave = () => {
@@ -279,7 +283,7 @@ export default function WritingEditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 px-4">
         <div className="text-center">
           <FileText className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
           <div className="text-gray-400">Loading editor...</div>
@@ -290,7 +294,7 @@ export default function WritingEditorPage() {
 
   if (!phase || !canEdit) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-3">Access Denied</h2>
@@ -301,7 +305,7 @@ export default function WritingEditorPage() {
             onClick={() =>
               router.push(`/dashboard/${projectId}/module/${moduleId}`)
             }
-            className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
             Go Back to Module
           </button>
@@ -311,12 +315,106 @@ export default function WritingEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Slide-out Menu */}
+      <div className={`
+        fixed top-0 right-0 h-full w-80 z-50
+        bg-black/95 backdrop-blur-xl border-l border-white/10
+        transform transition-transform duration-300 ease-in-out lg:hidden
+        ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
+      `}>
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-white">Editor Menu</h3>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+        
+        <div className="p-4 space-y-4">
+          <div className="bg-white/5 rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-400">Words:</span>
+              <span className="text-white font-medium">{wordCount.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-400">Characters:</span>
+              <span className="text-white font-medium">{charCount.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+            <span className="text-sm text-gray-400">Status:</span>
+            <div className="flex items-center gap-2">
+              {saveStatus === "saving" && (
+                <>
+                  <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
+                  <span className="text-sm text-yellow-400">Saving...</span>
+                </>
+              )}
+              {saveStatus === "saved" && (
+                <>
+                  <Check className="w-4 h-4 text-green-400" />
+                  <span className="text-sm text-green-400">Saved</span>
+                </>
+              )}
+              {saveStatus === "error" && (
+                <>
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <span className="text-sm text-red-400">Error</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={handleManualSave}
+            disabled={saveStatus === "saving" || content === lastSavedContentRef.current}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span className="text-sm">Save Now</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setShowComments(!showComments);
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span className="text-sm">{showComments ? "Hide" : "Show"} Comments</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setShowVersionHistory(true);
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all"
+          >
+            <History className="w-4 h-4" />
+            <span className="text-sm">Version History</span>
+          </button>
+        </div>
+      </div>
+
       {/* Header */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
               <button
                 onClick={() => {
                   if (content !== lastSavedContentRef.current) {
@@ -324,23 +422,26 @@ export default function WritingEditorPage() {
                   }
                   router.push(`/dashboard/${projectId}/module/${moduleId}`);
                 }}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-1 sm:gap-2 text-gray-400 hover:text-white transition-colors flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm">Back</span>
+                <span className="text-xs sm:text-sm hidden xs:inline">Back</span>
               </button>
 
-              <div className="border-l border-white/10 pl-4">
-                <h1 className="text-lg font-semibold text-white">
+              <div className="border-l border-white/10 pl-2 sm:pl-4 min-w-0">
+                <h1 className="text-sm sm:text-lg font-semibold text-white truncate">
                   {phase.title}
                 </h1>
                 {module && (
-                  <p className="text-xs text-gray-400">{module.title}</p>
+                  <p className="text-xs text-gray-400 truncate hidden xs:block">
+                    {module.title}
+                  </p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            {/* Desktop Controls */}
+            <div className="hidden lg:flex items-center gap-6">
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span className="font-medium">
                   {wordCount.toLocaleString()} words
@@ -398,32 +499,64 @@ export default function WritingEditorPage() {
                 <span className="text-sm">Save</span>
               </button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden flex items-center gap-2">
+              <div className="flex items-center gap-1 text-xs text-gray-400">
+                <span className="font-medium">{wordCount.toLocaleString()}w</span>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex h-[calc(100vh-80px)]">
-        <div className={`flex-1 ${showComments ? "" : "max-w-7xl mx-auto"}`}>
-          {phase.description && (
-            <div className="px-6 pt-6">
-              <div className="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <p className="text-sm text-blue-300">
-                  <strong>Phase Description:</strong> {phase.description}
-                </p>
-              </div>
-            </div>
-          )}
+      {/* Phase Description - Mobile Optimized */}
+      {phase.description && (
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <p className="text-xs sm:text-sm text-blue-300">
+              <strong className="block sm:inline mb-1 sm:mb-0">Phase Description:</strong>{" "}
+              {phase.description}
+            </p>
+          </div>
+        </div>
+      )}
 
-          <RichTextEditor
-            content={content}
-            onChange={handleContentChange}
-            placeholder="Start writing your story..."
-          />
+      {/* Main content */}
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)]">
+        <div className={`flex-1 ${showComments ? 'lg:max-w-[calc(100%-384px)]' : ''}`}>
+          <div className="h-full overflow-y-auto">
+            <RichTextEditor
+              content={content}
+              onChange={handleContentChange}
+              placeholder="Start writing your story..."
+            />
+          </div>
         </div>
 
+        {/* Comments Panel - Mobile/Desktop */}
         {showComments && (
-          <div className="w-96 h-full">
+          <div className={`
+            ${showComments ? 'fixed lg:relative inset-0 z-40 lg:z-auto' : ''}
+            w-full lg:w-96 h-full
+            bg-black/95 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none
+            overflow-y-auto
+          `}>
+            <div className="lg:hidden sticky top-0 bg-black/50 backdrop-blur-sm border-b border-white/10 p-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">Comments</h3>
+              <button
+                onClick={() => setShowComments(false)}
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
             <CommentsPanel
               phaseId={phaseId}
               currentUserId={currentUserId}
