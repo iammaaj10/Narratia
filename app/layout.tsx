@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Narratia",
   description: "Collaborative storytelling platform",
   icons: {
-    icon: '/logo.png',  // Just added this line
+    icon: '/logo1.png',  
   },
 };
 
