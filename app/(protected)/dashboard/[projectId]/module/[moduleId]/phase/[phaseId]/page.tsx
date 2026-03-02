@@ -279,7 +279,7 @@ export default function WritingEditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
         <div className="text-center">
           <FileText className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
           <div className="text-gray-400">Loading editor...</div>
@@ -290,7 +290,7 @@ export default function WritingEditorPage() {
 
   if (!phase || !canEdit) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-950 via-purple-950/20 to-slate-950">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-3">Access Denied</h2>

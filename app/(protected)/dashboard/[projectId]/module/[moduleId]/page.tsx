@@ -501,7 +501,7 @@ function CreatePhaseModal({
           <button
             onClick={handleCreate}
             disabled={loading}
-            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
+            className="flex-1 px-4 py-3 rounded-xl bg-linear-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Phase"}
           </button>

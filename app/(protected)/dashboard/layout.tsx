@@ -7,8 +7,7 @@ import ProfileAvatar from "./components/ProfileAvatar";
 import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
 import Link from "next/link";
-import { Home, BarChart3 } from "lucide-react";
-
+import { Home, BarChart3, Menu, X } from "lucide-react";
 import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
 
 type Profile = {
@@ -26,6 +25,7 @@ export default function DashboardLayout({
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -119,12 +119,19 @@ export default function DashboardLayout({
       icon: PlusCircle,
       path: "/dashboard/new-project",
     },
+    { id: "stats", label: "Statistics", icon: BarChart3, path: "/dashboard/stats" },
   ];
+
+  const handleNavigation = (path: string, id: string) => {
+    setActiveTab(id);
+    router.push(path);
+    setIsMobileMenuOpen(false);
+  };
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
-        <div className="text-center">
+        <div className="text-center px-4">
           <Sparkles className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
           <p className="text-gray-400">Loading your profile...</p>
         </div>
@@ -134,10 +141,42 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
-      {/* Sidebar */}
-      <aside className="w-72 border-r border-white/5 backdrop-blur-xl bg-black/20 flex flex-col">
-        {/* Logo */}
-        <div className="p-8 border-b border-white/5">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop & Mobile */}
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        w-72 border-r border-white/5 backdrop-blur-xl bg-black/90 lg:bg-black/20
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        flex flex-col
+      `}>
+        {/* Mobile Header */}
+        <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
+              Narratia
+            </h1>
+          </div>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Desktop Logo */}
+        <div className="hidden lg:block p-8 border-b border-white/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
               <Sparkles className="w-5 h-5 text-white" />
@@ -149,7 +188,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-6 space-y-2">
+        <nav className="flex-1 p-4 lg:p-6 space-y-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -157,10 +196,7 @@ export default function DashboardLayout({
             return (
               <button
                 key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  router.push(item.path);
-                }}
+                onClick={() => handleNavigation(item.path, item.id)}
                 className={`w-full group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
                     ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white shadow-lg shadow-purple-500/10 border border-white/10"
@@ -174,17 +210,10 @@ export default function DashboardLayout({
               </button>
             );
           })}
-          <Link
-            href="/dashboard/stats"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
-          >
-            <BarChart3 className="w-5 h-5" />
-            <span>Statistics</span>
-          </Link>
         </nav>
 
         {/* Footer */}
-        <div className="p-6 border-t border-white/5">
+        <div className="p-4 lg:p-6 border-t border-white/5">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-all duration-200 group"
@@ -196,11 +225,33 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto p-8">
+      <main className="flex-1 overflow-auto min-h-screen">
+        {/* Mobile Header */}
+        <div className="lg:hidden sticky top-0 z-30 bg-black/50 backdrop-blur-xl border-b border-white/5 p-4">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              <Menu className="w-6 h-6 text-gray-400" />
+            </button>
+            
+            {profile && (
+              <ProfileAvatar
+                profile={profile}
+                onAvatarUpdate={(url) =>
+                  setProfile((p) => p && { ...p, avatar_url: url })
+                }
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
           {profile && (
             <>
-              <div className="mb-8 flex items-center justify-between">
+              {/* Desktop Welcome Section */}
+              <div className="hidden lg:flex mb-8 items-center justify-between">
                 <div className="space-y-1">
                   <h2 className="text-3xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                     Welcome back, {profile.username}
@@ -216,13 +267,27 @@ export default function DashboardLayout({
                 />
               </div>
 
-              <NotificationBell />
-              <IncomingInvites />
+              {/* Mobile Welcome Section */}
+              <div className="lg:hidden mb-6 space-y-4">
+                <h2 className="text-2xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  Hi, {profile.username}
+                </h2>
+                <p className="text-gray-400 text-sm">{profile.email}</p>
+              </div>
+
+              {/* Notification Components */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                <NotificationBell />
+                <IncomingInvites />
+              </div>
             </>
           )}
 
-          <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl border border-white/5 shadow-2xl">
-            {children}
+          {/* Content Container */}
+          <div className="bg-white/[0.02] backdrop-blur-xl rounded-xl sm:rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
+            <div className="p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
           </div>
         </div>
       </main>
