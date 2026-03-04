@@ -6,6 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
+import AIToolbar from "./AIToolbar";
 import {
   Bold,
   Italic,
@@ -23,7 +24,7 @@ import {
   Link as LinkIcon,
   Code,
 } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type RichTextEditorProps = {
   content: string;
@@ -36,37 +37,40 @@ export default function RichTextEditor({
   onChange,
   placeholder = "Start writing your story...",
 }: RichTextEditorProps) {
+  const [selectedText, setSelectedText] = useState("");
+  
   const editor = useEditor({
-  immediatelyRender: false, // ← Add this line
-  extensions: [
-    StarterKit.configure({
-      heading: {
-        levels: [1, 2, 3],
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Underline,
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class:
+            "text-purple-400 underline hover:text-purple-300 cursor-pointer",
+        },
+      }),
+      Placeholder.configure({
+        placeholder,
+      }),
+      CharacterCount,
+    ],
+    content,
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6",
       },
-    }),
-    Underline,
-    Link.configure({
-      openOnClick: false,
-      HTMLAttributes: {
-        class: "text-purple-400 underline hover:text-purple-300 cursor-pointer",
-      },
-    }),
-    Placeholder.configure({
-      placeholder,
-    }),
-    CharacterCount,
-  ],
-  content,
-  editorProps: {
-    attributes: {
-      class:
-        "prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6",
     },
-  },
-  onUpdate: ({ editor }) => {
-    onChange(editor.getHTML());
-  },
-});
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+  });
 
   // Update editor content when prop changes (for loading saved content)
   useEffect(() => {
@@ -74,6 +78,23 @@ export default function RichTextEditor({
       editor.commands.setContent(content);
     }
   }, [content, editor]);
+
+  // Track selected text
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateSelection = () => {
+      const { from, to } = editor.state.selection;
+      const text = editor.state.doc.textBetween(from, to, " ");
+      setSelectedText(text);
+    };
+
+    editor.on("selectionUpdate", updateSelection);
+
+    return () => {
+      editor.off("selectionUpdate", updateSelection);
+    };
+  }, [editor]);
 
   const setLink = useCallback(() => {
     if (!editor) return;
@@ -91,6 +112,18 @@ export default function RichTextEditor({
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
+  const handleAIInsert = (text: string) => {
+    if (editor) {
+      editor.chain().focus().insertContent(text).run();
+    }
+  };
+
+  const handleAIReplace = (text: string) => {
+    if (editor) {
+      editor.chain().focus().deleteSelection().insertContent(text).run();
+    }
+  };
+
   if (!editor) {
     return null;
   }
@@ -100,12 +133,22 @@ export default function RichTextEditor({
       {/* Toolbar */}
       <div className="border-b border-white/10 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-1 p-2 flex-wrap">
+          {/* AI Toolbar */}
+          <AIToolbar
+            selectedText={selectedText}
+            fullContent={content}
+            onInsert={handleAIInsert}
+            onReplace={handleAIReplace}
+          />
+
           {/* Text Formatting */}
           <div className="flex items-center gap-1 pr-2 border-r border-white/10">
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("bold") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("bold")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Bold (Ctrl+B)"
             >
@@ -114,7 +157,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("italic") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("italic")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Italic (Ctrl+I)"
             >
@@ -123,7 +168,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("underline") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("underline")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Underline (Ctrl+U)"
             >
@@ -132,7 +179,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleStrike().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("strike") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("strike")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Strikethrough"
             >
@@ -143,7 +192,9 @@ export default function RichTextEditor({
           {/* Headings */}
           <div className="flex items-center gap-1 px-2 border-r border-white/10">
             <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run()
+              }
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
                 editor.isActive("heading", { level: 1 })
                   ? "bg-purple-500/20 text-purple-300"
@@ -154,7 +205,9 @@ export default function RichTextEditor({
               <Heading1 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
                 editor.isActive("heading", { level: 2 })
                   ? "bg-purple-500/20 text-purple-300"
@@ -165,7 +218,9 @@ export default function RichTextEditor({
               <Heading2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 3 }).run()
+              }
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
                 editor.isActive("heading", { level: 3 })
                   ? "bg-purple-500/20 text-purple-300"
@@ -182,7 +237,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("bulletList") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("bulletList")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Bullet List"
             >
@@ -206,7 +263,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("blockquote") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("blockquote")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Quote"
             >
@@ -215,7 +274,9 @@ export default function RichTextEditor({
             <button
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("codeBlock") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("codeBlock")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Code Block"
             >
@@ -235,7 +296,9 @@ export default function RichTextEditor({
             <button
               onClick={setLink}
               className={`p-2 rounded hover:bg-white/10 transition-colors ${
-                editor.isActive("link") ? "bg-purple-500/20 text-purple-300" : "text-gray-400"
+                editor.isActive("link")
+                  ? "bg-purple-500/20 text-purple-300"
+                  : "text-gray-400"
               }`}
               title="Add Link"
             >
@@ -265,12 +328,8 @@ export default function RichTextEditor({
 
           {/* Word Count */}
           <div className="ml-auto flex items-center gap-4 px-4 text-sm text-gray-400">
-            <div>
-              {editor.storage.characterCount.words()} words
-            </div>
-            <div>
-              {editor.storage.characterCount.characters()} characters
-            </div>
+            <div>{editor.storage.characterCount.words()} words</div>
+            <div>{editor.storage.characterCount.characters()} characters</div>
           </div>
         </div>
       </div>
@@ -284,7 +343,7 @@ export default function RichTextEditor({
       <style jsx global>{`
         .ProseMirror {
           color: #e5e7eb;
-          font-family: 'Georgia', serif;
+          font-family: "Georgia", serif;
           line-height: 1.8;
         }
 
@@ -355,7 +414,7 @@ export default function RichTextEditor({
           color: #c084fc;
           padding: 0.2rem 0.4rem;
           border-radius: 0.25rem;
-          font-family: 'Courier New', monospace;
+          font-family: "Courier New", monospace;
           font-size: 0.9em;
         }
 
