@@ -7,6 +7,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
 import AIToolbar from "./AIToolbar";
+
 import {
   Bold,
   Italic,
@@ -54,7 +55,7 @@ export default function RichTextEditor({
           class:
             "text-purple-400 underline hover:text-purple-300 cursor-pointer",
         },
-      }),
+      }).extend({name: 'customlink'}),
       Placeholder.configure({
         placeholder,
       }),
