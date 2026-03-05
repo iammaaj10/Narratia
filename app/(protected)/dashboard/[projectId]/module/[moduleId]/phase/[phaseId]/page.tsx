@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import VersionHistory from "./components/VersionHistory";
 import CommentsPanel from "./components/CommentsPanel";
 import RichTextEditor from "./components/RichTextEditor";
+import AIWritingPartner from "./components/AIWritingPartner";
 import {
   ArrowLeft,
   Save,
@@ -17,6 +18,7 @@ import {
   History,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 
 type Phase = {
@@ -58,6 +60,8 @@ export default function WritingEditorPage() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [lastVersionSave, setLastVersionSave] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showAIPartner, setShowAIPartner] = useState(false);
+  const [fullStoryContext, setFullStoryContext] = useState("");
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -140,9 +144,11 @@ export default function WritingEditorPage() {
   };
 
   const updateCounts = (html: string) => {
-    // Strip HTML tags for word count
-    const plainText = html.replace(/<[^>]*>/g, ' ');
-    const words = plainText.trim().split(/\s+/).filter((w) => w.length > 0);
+    const plainText = html.replace(/<[^>]*>/g, " ");
+    const words = plainText
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 0);
     setWordCount(words.length);
     setCharCount(plainText.length);
   };
@@ -174,10 +180,12 @@ export default function WritingEditorPage() {
     isSavingRef.current = true;
     setSaveStatus("saving");
 
-    // Strip HTML for word count
-    const plainText = finalContent.replace(/<[^>]*>/g, ' ');
-    const previousPlainText = lastSavedContentRef.current.replace(/<[^>]*>/g, ' ');
-    
+    const plainText = finalContent.replace(/<[^>]*>/g, " ");
+    const previousPlainText = lastSavedContentRef.current.replace(
+      /<[^>]*>/g,
+      " "
+    );
+
     const previousWordCount = previousPlainText
       .trim()
       .split(/\s+/)
@@ -209,7 +217,6 @@ export default function WritingEditorPage() {
       lastSavedContentRef.current = finalContent;
       setSaveStatus("saved");
 
-      // Track writing session
       if (wordsAdded > 0) {
         try {
           await supabase.rpc("track_writing_session", {
@@ -224,7 +231,6 @@ export default function WritingEditorPage() {
 
       setTimeout(() => setSaveStatus("idle"), 2000);
 
-      // Version snapshot
       const now = Date.now();
       const timeSinceLastVersion = now - lastVersionSave;
       const shouldSaveVersion =
@@ -260,6 +266,55 @@ export default function WritingEditorPage() {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     saveContent();
+  };
+
+  const loadFullStoryContext = async () => {
+    try {
+      const { data: allModules } = await supabase
+        .from("modules")
+        .select("id, title")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: true });
+
+      if (!allModules) return "";
+
+      let context = "";
+
+      for (const module of allModules) {
+        const { data: modulePh } = await supabase
+          .from("phases")
+          .select("title, content")
+          .eq("module_id", module.id)
+          .order("created_at", { ascending: true });
+
+        if (modulePh) {
+          context += `\n\n=== ${module.title} ===\n`;
+          modulePh.forEach((p) => {
+            context += `\n${p.title}:\n${stripHTML(p.content)}\n`;
+          });
+        }
+      }
+
+      return context;
+    } catch (err) {
+      console.error("Error loading context:", err);
+      return "";
+    }
+  };
+
+  const stripHTML = (html: string): string => {
+    return html
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .trim();
+  };
+
+  const handleOpenAIPartner = async () => {
+    const context = await loadFullStoryContext();
+    setFullStoryContext(context);
+    setShowAIPartner(true);
+    setIsMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -318,21 +373,23 @@ export default function WritingEditorPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Slide-out Menu */}
-      <div className={`
+      <div
+        className={`
         fixed top-0 right-0 h-full w-80 z-50
-        bg-black/95 backdrop-blur-xl border-l border-white/10
+        bg-gray-900 backdrop-blur-xl border-l border-white/10
         transform transition-transform duration-300 ease-in-out lg:hidden
-        ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
-      `}>
+        ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
+      `}
+      >
         <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Editor Menu</h3>
+          <h3 className="text-lg font-semibold text-white">Editor Tools</h3>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
             className="p-2 rounded-lg hover:bg-white/10 transition-colors"
@@ -340,50 +397,59 @@ export default function WritingEditorPage() {
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
-        
-        <div className="p-4 space-y-4">
-          <div className="bg-white/5 rounded-lg p-4 space-y-3">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-400">Words:</span>
-              <span className="text-white font-medium">{wordCount.toLocaleString()}</span>
+
+        <div className="p-4 space-y-3">
+          {/* Stats */}
+          <div className="bg-white/5 rounded-xl p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-400">Words</span>
+              <span className="text-white font-semibold">
+                {wordCount.toLocaleString()}
+              </span>
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-400">Characters:</span>
-              <span className="text-white font-medium">{charCount.toLocaleString()}</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-400">Characters</span>
+              <span className="text-white font-semibold">
+                {charCount.toLocaleString()}
+              </span>
+            </div>
+            <div className="pt-3 border-t border-white/10">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-400">Status</span>
+                <div className="flex items-center gap-2">
+                  {saveStatus === "saving" && (
+                    <>
+                      <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
+                      <span className="text-sm text-yellow-400">Saving...</span>
+                    </>
+                  )}
+                  {saveStatus === "saved" && (
+                    <>
+                      <Check className="w-4 h-4 text-green-400" />
+                      <span className="text-sm text-green-400">Saved</span>
+                    </>
+                  )}
+                  {saveStatus === "error" && (
+                    <>
+                      <AlertCircle className="w-4 h-4 text-red-400" />
+                      <span className="text-sm text-red-400">Error</span>
+                    </>
+                  )}
+                  {saveStatus === "idle" && (
+                    <span className="text-sm text-gray-400">Ready</span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-            <span className="text-sm text-gray-400">Status:</span>
-            <div className="flex items-center gap-2">
-              {saveStatus === "saving" && (
-                <>
-                  <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
-                  <span className="text-sm text-yellow-400">Saving...</span>
-                </>
-              )}
-              {saveStatus === "saved" && (
-                <>
-                  <Check className="w-4 h-4 text-green-400" />
-                  <span className="text-sm text-green-400">Saved</span>
-                </>
-              )}
-              {saveStatus === "error" && (
-                <>
-                  <AlertCircle className="w-4 h-4 text-red-400" />
-                  <span className="text-sm text-red-400">Error</span>
-                </>
-              )}
-            </div>
-          </div>
-
+          {/* Action Buttons */}
           <button
-            onClick={handleManualSave}
-            disabled={saveStatus === "saving" || content === lastSavedContentRef.current}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50"
+            onClick={handleOpenAIPartner}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
-            <Save className="w-4 h-4" />
-            <span className="text-sm">Save Now</span>
+            <Sparkles className="w-5 h-5" />
+            <span>AI Writing Partner</span>
           </button>
 
           <button
@@ -391,10 +457,10 @@ export default function WritingEditorPage() {
               setShowComments(!showComments);
               setIsMobileMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all"
           >
-            <MessageSquare className="w-4 h-4" />
-            <span className="text-sm">{showComments ? "Hide" : "Show"} Comments</span>
+            <MessageSquare className="w-5 h-5" />
+            <span>{showComments ? "Hide" : "Show"} Comments</span>
           </button>
 
           <button
@@ -402,10 +468,21 @@ export default function WritingEditorPage() {
               setShowVersionHistory(true);
               setIsMobileMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-500/20 text-cyan-300 rounded-xl hover:bg-cyan-500/30 transition-all"
           >
-            <History className="w-4 h-4" />
-            <span className="text-sm">Version History</span>
+            <History className="w-5 h-5" />
+            <span>Version History</span>
+          </button>
+
+          <button
+            onClick={handleManualSave}
+            disabled={
+              saveStatus === "saving" || content === lastSavedContentRef.current
+            }
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 text-purple-300 rounded-xl hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Save className="w-5 h-5" />
+            <span>Save Now</span>
           </button>
         </div>
       </div>
@@ -413,8 +490,9 @@ export default function WritingEditorPage() {
       {/* Header */}
       <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left: Back button and title */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
               <button
                 onClick={() => {
                   if (content !== lastSavedContentRef.current) {
@@ -422,18 +500,18 @@ export default function WritingEditorPage() {
                   }
                   router.push(`/dashboard/${projectId}/module/${moduleId}`);
                 }}
-                className="flex items-center gap-1 sm:gap-2 text-gray-400 hover:text-white transition-colors flex-shrink-0"
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-xs sm:text-sm hidden xs:inline">Back</span>
+                <span className="text-sm hidden sm:inline">Back</span>
               </button>
 
-              <div className="border-l border-white/10 pl-2 sm:pl-4 min-w-0">
-                <h1 className="text-sm sm:text-lg font-semibold text-white truncate">
+              <div className="border-l border-white/10 pl-3 min-w-0 flex-1">
+                <h1 className="text-base sm:text-lg font-semibold text-white truncate">
                   {phase.title}
                 </h1>
                 {module && (
-                  <p className="text-xs text-gray-400 truncate hidden xs:block">
+                  <p className="text-xs text-gray-400 truncate hidden sm:block">
                     {module.title}
                   </p>
                 )}
@@ -441,20 +519,20 @@ export default function WritingEditorPage() {
             </div>
 
             {/* Desktop Controls */}
-            <div className="hidden lg:flex items-center gap-6">
-              <div className="flex items-center gap-4 text-sm text-gray-400">
-                <span className="font-medium">
-                  {wordCount.toLocaleString()} words
-                </span>
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Word Count */}
+              <div className="flex items-center gap-3 text-sm text-gray-400 px-3 py-2 bg-white/5 rounded-lg">
+                <span className="font-medium">{wordCount.toLocaleString()}w</span>
                 <span className="text-gray-600">•</span>
-                <span>{charCount.toLocaleString()} chars</span>
+                <span>{charCount.toLocaleString()}c</span>
               </div>
 
-              <div className="flex items-center gap-2 min-w-[100px]">
+              {/* Save Status */}
+              <div className="flex items-center gap-2 min-w-[90px] px-3 py-2 bg-white/5 rounded-lg">
                 {saveStatus === "saving" && (
                   <>
                     <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
-                    <span className="text-sm text-yellow-400">Saving...</span>
+                    <span className="text-sm text-yellow-400">Saving</span>
                   </>
                 )}
                 {saveStatus === "saved" && (
@@ -469,45 +547,58 @@ export default function WritingEditorPage() {
                     <span className="text-sm text-red-400">Error</span>
                   </>
                 )}
+                {saveStatus === "idle" && (
+                  <span className="text-sm text-gray-400">Ready</span>
+                )}
               </div>
 
+              {/* AI Partner Button */}
+              <button
+                onClick={handleOpenAIPartner}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm font-medium">AI Partner</span>
+              </button>
+
+              {/* Comments Button */}
               <button
                 onClick={() => setShowComments(!showComments)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span className="text-sm">{showComments ? "Hide" : "Show"} Comments</span>
+                <span className="text-sm">{showComments ? "Hide" : "Show"}</span>
               </button>
 
+              {/* Version History Button */}
               <button
                 onClick={() => setShowVersionHistory(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all"
               >
                 <History className="w-4 h-4" />
-                <span className="text-sm">History</span>
               </button>
 
+              {/* Save Button */}
               <button
                 onClick={handleManualSave}
                 disabled={
                   saveStatus === "saving" ||
                   content === lastSavedContentRef.current
                 }
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
-                <span className="text-sm">Save</span>
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="flex items-center gap-1 text-xs text-gray-400">
-                <span className="font-medium">{wordCount.toLocaleString()}w</span>
+            {/* Mobile: Word count + Menu */}
+            <div className="lg:hidden flex items-center gap-3">
+              <div className="text-xs text-gray-400 font-medium">
+                {wordCount.toLocaleString()}w
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
               >
                 <Menu className="w-5 h-5 text-gray-400" />
               </button>
@@ -516,39 +607,47 @@ export default function WritingEditorPage() {
         </div>
       </div>
 
-      {/* Phase Description - Mobile Optimized */}
+      {/* Phase Description */}
       {phase.description && (
-        <div className="px-4 sm:px-6 pt-4 sm:pt-6">
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs sm:text-sm text-blue-300">
-              <strong className="block sm:inline mb-1 sm:mb-0">Phase Description:</strong>{" "}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+          <div className="p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <p className="text-sm text-blue-300">
+              <strong className="font-semibold">Description:</strong>{" "}
               {phase.description}
             </p>
           </div>
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)]">
-        <div className={`flex-1 ${showComments ? 'lg:max-w-[calc(100%-384px)]' : ''}`}>
-          <div className="h-full overflow-y-auto">
-            <RichTextEditor
-              content={content}
-              onChange={handleContentChange}
-              placeholder="Start writing your story..."
-            />
-          </div>
+      {/* Main Editor Area */}
+      <div className="flex h-[calc(100vh-160px)]">
+        <div className={`flex-1 ${showComments ? "lg:pr-96" : ""}`}>
+          <RichTextEditor
+            content={content}
+            onChange={handleContentChange}
+            placeholder="Start writing your story..."
+          />
         </div>
 
-        {/* Comments Panel - Mobile/Desktop */}
+        {/* Comments Panel - Desktop */}
         {showComments && (
-          <div className={`
-            ${showComments ? 'fixed lg:relative inset-0 z-40 lg:z-auto' : ''}
-            w-full lg:w-96 h-full
-            bg-black/95 lg:bg-transparent backdrop-blur-xl lg:backdrop-blur-none
-            overflow-y-auto
-          `}>
-            <div className="lg:hidden sticky top-0 bg-black/50 backdrop-blur-sm border-b border-white/10 p-4 flex items-center justify-between">
+          <div className="hidden lg:block fixed right-0 top-[80px] w-96 h-[calc(100vh-80px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto">
+            <CommentsPanel
+              phaseId={phaseId}
+              currentUserId={currentUserId}
+              isOwner={isOwner}
+              projectId={projectId}
+              moduleId={moduleId}
+              phaseTitle={phase?.title || ""}
+              assignedTo={phase?.assigned_to || null}
+            />
+          </div>
+        )}
+
+        {/* Comments Panel - Mobile Overlay */}
+        {showComments && (
+          <div className="lg:hidden fixed inset-0 z-40 bg-gray-900">
+            <div className="sticky top-0 bg-gray-800 border-b border-white/10 p-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Comments</h3>
               <button
                 onClick={() => setShowComments(false)}
@@ -570,6 +669,7 @@ export default function WritingEditorPage() {
         )}
       </div>
 
+      {/* Version History Modal */}
       {showVersionHistory && (
         <VersionHistory
           phaseId={phaseId}
@@ -577,6 +677,17 @@ export default function WritingEditorPage() {
           isOwner={isOwner}
           onRestore={handleRestoreVersion}
           onClose={() => setShowVersionHistory(false)}
+        />
+      )}
+
+      {/* AI Writing Partner */}
+      {showAIPartner && (
+        <AIWritingPartner
+          phaseId={phaseId}
+          phaseTitle={phase?.title || ""}
+          currentContent={content}
+          fullStoryContext={fullStoryContext}
+          onClose={() => setShowAIPartner(false)}
         />
       )}
     </div>
