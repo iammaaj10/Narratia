@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { 
-  PlusCircle, 
-  Search, 
-  Filter, 
-  Archive, 
+import { Sparkles } from "lucide-react";
+import {
+  PlusCircle,
+  Search,
+  Filter,
+  Archive,
   ArchiveRestore,
   SortAsc,
-  Trash2
+  Trash2,
 } from "lucide-react";
 
 type Project = {
@@ -33,7 +34,7 @@ export default function DashboardPage() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>("");
-  
+
   // Filters and search
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
@@ -59,10 +60,12 @@ export default function DashboardPage() {
 
     setCurrentUserId(user.id);
 
-    // 1️⃣ Solo projects (owner) - now includes archived, created_at, updated_at
+    // 1️⃣ Solo projects (owner)
     const { data: ownedProjects } = await supabase
       .from("projects")
-      .select("id, title, description, is_team, owner_id, archived, created_at, updated_at")
+      .select(
+        "id, title, description, is_team, owner_id, archived, created_at, updated_at"
+      )
       .eq("owner_id", user.id);
 
     // 2️⃣ Team projects (accepted member)
@@ -89,12 +92,8 @@ export default function DashboardPage() {
       memberProjects?.map((m: any) => m.project).filter(Boolean) ?? [];
 
     // 3️⃣ Merge + remove duplicates
-    const allProjects = [
-      ...(ownedProjects ?? []),
-      ...teamProjects,
-    ].filter(
-      (p, index, self) =>
-        index === self.findIndex((x) => x.id === p.id)
+    const allProjects = [...(ownedProjects ?? []), ...teamProjects].filter(
+      (p, index, self) => index === self.findIndex((x) => x.id === p.id)
     );
 
     setProjects(allProjects);
@@ -105,20 +104,22 @@ export default function DashboardPage() {
     let filtered = [...projects];
 
     // Filter by archived status
-    filtered = filtered.filter(p => showArchived ? p.archived : !p.archived);
+    filtered = filtered.filter((p) =>
+      showArchived ? p.archived : !p.archived
+    );
 
     // Filter by type
     if (filterBy === "solo") {
-      filtered = filtered.filter(p => !p.is_team);
+      filtered = filtered.filter((p) => !p.is_team);
     } else if (filterBy === "team") {
-      filtered = filtered.filter(p => p.is_team);
+      filtered = filtered.filter((p) => p.is_team);
     }
 
     // Search by title or description
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        p =>
+        (p) =>
           p.title.toLowerCase().includes(query) ||
           p.description?.toLowerCase().includes(query)
       );
@@ -128,9 +129,13 @@ export default function DashboardPage() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "newest":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
         case "oldest":
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return (
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
         case "name-asc":
           return a.title.localeCompare(b.title);
         case "name-desc":
@@ -143,7 +148,11 @@ export default function DashboardPage() {
     setFilteredProjects(filtered);
   };
 
-  const toggleArchive = async (projectId: string, currentArchived: boolean, e: React.MouseEvent) => {
+  const toggleArchive = async (
+    projectId: string,
+    currentArchived: boolean,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
 
     const { error } = await supabase
@@ -157,16 +166,25 @@ export default function DashboardPage() {
       return;
     }
 
-    // Update local state
-    setProjects(projects.map(p => 
-      p.id === projectId ? { ...p, archived: !currentArchived } : p
-    ));
+    setProjects(
+      projects.map((p) =>
+        p.id === projectId ? { ...p, archived: !currentArchived } : p
+      )
+    );
   };
 
-  const deleteProject = async (projectId: string, projectTitle: string, e: React.MouseEvent) => {
+  const deleteProject = async (
+    projectId: string,
+    projectTitle: string,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
 
-    if (!confirm(`Are you sure you want to delete "${projectTitle}"? This action cannot be undone and will delete all modules and phases.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${projectTitle}"? This action cannot be undone and will delete all modules and phases.`
+      )
+    ) {
       return;
     }
 
@@ -181,7 +199,7 @@ export default function DashboardPage() {
       return;
     }
 
-    setProjects(projects.filter(p => p.id !== projectId));
+    setProjects(projects.filter((p) => p.id !== projectId));
     alert("Project deleted successfully!");
   };
 
@@ -207,14 +225,24 @@ export default function DashboardPage() {
           </h1>
 
           <p className="text-gray-400 text-lg max-w-md mx-auto">
-            Your stories will appear here. Start creating your first masterpiece!
+            Your stories will appear here. Start creating your first
+            masterpiece!
           </p>
 
-          <div className="pt-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <button
+              onClick={() => router.push("/dashboard/outline-generator")}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-5 h-5" />
+              AI Outline Generator
+            </button>
+
             <button
               onClick={() => router.push("/dashboard/new-project")}
-              className="px-8 py-4 bg-linear-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105"
+              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
             >
+              <PlusCircle className="w-5 h-5" />
               Create Your First Story
             </button>
           </div>
@@ -227,22 +255,34 @@ export default function DashboardPage() {
   return (
     <div className="p-12">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Your Stories</h1>
           <p className="text-gray-400 text-sm">
-            {filteredProjects.length} {filteredProjects.length === 1 ? 'story' : 'stories'}
-            {showArchived && ' (archived)'}
+            {filteredProjects.length}{" "}
+            {filteredProjects.length === 1 ? "story" : "stories"}
+            {showArchived && " (archived)"}
           </p>
         </div>
 
-        <button
-          onClick={() => router.push("/dashboard/new-project")}
-          className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:scale-105 transition"
-        >
-          <PlusCircle className="w-5 h-5" />
-          New Story
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => router.push("/dashboard/outline-generator")}
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+          >
+            <Sparkles className="w-5 h-5" />
+            AI Outline Generator
+          </button>
+
+          <button
+            onClick={() => router.push("/dashboard/new-project")}
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+          >
+            <PlusCircle className="w-5 h-5" />
+            New Story
+          </button>
+        </div>
       </div>
 
       {/* Filters Bar */}
@@ -299,7 +339,11 @@ export default function DashboardPage() {
               : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
           }`}
         >
-          {showArchived ? <ArchiveRestore className="w-5 h-5" /> : <Archive className="w-5 h-5" />}
+          {showArchived ? (
+            <ArchiveRestore className="w-5 h-5" />
+          ) : (
+            <Archive className="w-5 h-5" />
+          )}
           {showArchived ? "Show Active" : "Show Archived"}
         </button>
       </div>
@@ -311,9 +355,7 @@ export default function DashboardPage() {
           <h3 className="text-xl font-semibold text-gray-400 mb-2">
             No projects found
           </h3>
-          <p className="text-gray-500">
-            Try adjusting your search or filters
-          </p>
+          <p className="text-gray-500">Try adjusting your search or filters</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -334,7 +376,9 @@ export default function DashboardPage() {
                 {isOwner && (
                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10">
                     <button
-                      onClick={(e) => toggleArchive(project.id, project.archived, e)}
+                      onClick={(e) =>
+                        toggleArchive(project.id, project.archived, e)
+                      }
                       className="p-2 rounded-lg bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 transition-all"
                       title={project.archived ? "Unarchive" : "Archive"}
                     >
@@ -345,7 +389,9 @@ export default function DashboardPage() {
                       )}
                     </button>
                     <button
-                      onClick={(e) => deleteProject(project.id, project.title, e)}
+                      onClick={(e) =>
+                        deleteProject(project.id, project.title, e)
+                      }
                       className="p-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all"
                       title="Delete project"
                     >
@@ -379,7 +425,10 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="mt-4 text-xs text-gray-500">
-                  Updated {new Date(project.updated_at || project.created_at).toLocaleDateString()}
+                  Updated{" "}
+                  {new Date(
+                    project.updated_at || project.created_at
+                  ).toLocaleDateString()}
                 </div>
               </div>
             );

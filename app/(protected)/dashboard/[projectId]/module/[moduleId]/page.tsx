@@ -11,6 +11,7 @@ import {
   User,
   Edit,
   Trash2,
+  Film,
 } from "lucide-react";
 
 type Module = {
@@ -251,20 +252,36 @@ export default function ModuleDetailPage() {
             <h2 className="text-2xl font-bold text-white">Phases / Episodes</h2>
           </div>
 
+           {isOwner && phases.length > 0 && (
+          <button
+            onClick={() =>
+              router.push(
+                `/dashboard/${projectId}/module/${moduleId}/screenplay`,
+              )
+            }
+            className=" flex items-center gap-2 px-5 py-3 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+          >
+            <Film className="w-5 h-5" />
+            Convert to Screenplay
+          </button>
+        )}
+
           {isOwner && (
             <button
               onClick={() => setShowCreatePhase(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
             >
               <PlusCircle className="w-5 h-5" />
               Create Phase
             </button>
           )}
         </div>
+        {/* Convert to Screenplay Button */}
+       
 
         {/* Phases List */}
         {phases.length === 0 ? (
-          <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
+          <div className=" text-center py-16 rounded-xl border border-dashed border-white/20">
             <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">
               No phases yet
