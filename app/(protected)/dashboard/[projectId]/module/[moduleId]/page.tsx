@@ -12,6 +12,7 @@ import {
   Edit,
   Trash2,
   Film,
+  Heart,
 } from "lucide-react";
 
 type Module = {
@@ -64,21 +65,14 @@ export default function ModuleDetailPage() {
     try {
       setLoading(true);
 
-      // Check session
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log("🔐 Session:", sessionData.session ? "EXISTS" : "MISSING");
-
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (!user) {
-        console.error("❌ No user found");
         router.push("/login");
         return;
       }
-
-      console.log("✅ User ID:", user.id);
 
       // Load module
       const { data: moduleData, error: moduleError } = await supabase
@@ -86,8 +80,6 @@ export default function ModuleDetailPage() {
         .select("*")
         .eq("id", moduleId)
         .single();
-
-      console.log("📊 Module query:", { data: moduleData, error: moduleError });
 
       if (moduleError) {
         console.error("❌ Module error:", moduleError);
@@ -109,38 +101,22 @@ export default function ModuleDetailPage() {
         setIsOwner(projectData.owner_id === user.id);
 
         if (projectData.is_team) {
-          console.log("📊 Loading team members for project:", projectId);
-
-          // Get all accepted members
-          const { data: membersData, error: membersError } = await supabase
+          const { data: membersData } = await supabase
             .from("project_members")
             .select("user_id, role")
             .eq("project_id", projectId)
             .eq("status", "accepted")
             .not("user_id", "is", null);
 
-          console.log("👥 Raw members data:", membersData);
-
-          if (membersError) {
-            console.error("❌ Members error:", membersError);
-          } else if (membersData && membersData.length > 0) {
-            // Get user IDs
+          if (membersData && membersData.length > 0) {
             const userIds = membersData.map((m) => m.user_id);
 
-            console.log("🔍 User IDs to fetch profiles for:", userIds);
-
-            // Fetch profiles for all members
-            const { data: profilesData, error: profilesError } = await supabase
+            const { data: profilesData } = await supabase
               .from("profiles")
               .select("id, username, avatar_url")
               .in("id", userIds);
 
-            console.log("👤 Profiles fetched:", profilesData);
-
-            if (profilesError) {
-              console.error("❌ Profiles error:", profilesError);
-            } else if (profilesData) {
-              // Combine members with their profiles
+            if (profilesData) {
               const combined = userIds
                 .map((userId) => {
                   const profile = profilesData.find((p) => p.id === userId);
@@ -149,15 +125,10 @@ export default function ModuleDetailPage() {
                     profiles: profile || null,
                   };
                 })
-                .filter((m) => m.profiles !== null); // Only keep members with valid profiles
-
-              console.log("✅ Final combined team members:", combined);
-              console.log("✅ Team members count:", combined.length);
+                .filter((m) => m.profiles !== null);
 
               setTeamMembers(combined as TeamMember[]);
             }
-          } else {
-            console.log("⚠️ No team members found");
           }
         }
       }
@@ -177,7 +148,7 @@ export default function ModuleDetailPage() {
             username,
             avatar_url
           )
-        `,
+        `
         )
         .eq("module_id", moduleId)
         .order("created_at", { ascending: true });
@@ -246,42 +217,60 @@ export default function ModuleDetailPage() {
 
       {/* Phases Section */}
       <div>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2">
             <FileText className="w-6 h-6 text-purple-400" />
             <h2 className="text-2xl font-bold text-white">Phases / Episodes</h2>
           </div>
 
-           {isOwner && phases.length > 0 && (
-          <button
-            onClick={() =>
-              router.push(
-                `/dashboard/${projectId}/module/${moduleId}/screenplay`,
-              )
-            }
-            className=" flex items-center gap-2 px-5 py-3 bg-linear-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
-          >
-            <Film className="w-5 h-5" />
-            Convert to Screenplay
-          </button>
-        )}
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            {/* Emotion Heatmap */}
+            {isOwner && phases.length > 0 && (
+              <button
+                onClick={() =>
+                  router.push(
+                    `/dashboard/${projectId}/module/${moduleId}/emotions`
+                  )
+                }
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-pink-500/25 transition-all"
+              >
+                <Heart className="w-5 h-5" />
+                Emotion Heatmap
+              </button>
+            )}
 
-          {isOwner && (
-            <button
-              onClick={() => setShowCreatePhase(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-            >
-              <PlusCircle className="w-5 h-5" />
-              Create Phase
-            </button>
-          )}
+            {/* Convert to Screenplay */}
+            {isOwner && phases.length > 0 && (
+              <button
+                onClick={() =>
+                  router.push(
+                    `/dashboard/${projectId}/module/${moduleId}/screenplay`
+                  )
+                }
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+              >
+                <Film className="w-5 h-5" />
+                Convert to Screenplay
+              </button>
+            )}
+
+            {/* Create Phase */}
+            {isOwner && (
+              <button
+                onClick={() => setShowCreatePhase(true)}
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              >
+                <PlusCircle className="w-5 h-5" />
+                Create Phase
+              </button>
+            )}
+          </div>
         </div>
-        {/* Convert to Screenplay Button */}
-       
 
         {/* Phases List */}
         {phases.length === 0 ? (
-          <div className=" text-center py-16 rounded-xl border border-dashed border-white/20">
+          <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
             <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">
               No phases yet
@@ -292,7 +281,7 @@ export default function ModuleDetailPage() {
             {isOwner && (
               <button
                 onClick={() => setShowCreatePhase(true)}
-                className="px-6 py-3 bg-linear-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
                 Create First Phase
               </button>
@@ -324,7 +313,7 @@ export default function ModuleDetailPage() {
 
                     {/* Assigned Writer */}
                     {phase.profiles && (
-                      <div className="flex items-center gap-2 text-sm text-gray-800">
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
                         <User className="w-4 h-4" />
                         <span>Assigned to: {phase.profiles.username}</span>
                       </div>
@@ -343,7 +332,7 @@ export default function ModuleDetailPage() {
                     <button
                       onClick={() =>
                         router.push(
-                          `/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`,
+                          `/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`
                         )
                       }
                       className="p-2 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all"
@@ -373,7 +362,7 @@ export default function ModuleDetailPage() {
       {showCreatePhase && (
         <CreatePhaseModal
           moduleId={moduleId}
-          projectId={projectId} // ← Make sure this is here
+          projectId={projectId}
           teamMembers={teamMembers}
           onClose={() => setShowCreatePhase(false)}
           onSuccess={() => {
@@ -389,13 +378,13 @@ export default function ModuleDetailPage() {
 // Create Phase Modal Component
 function CreatePhaseModal({
   moduleId,
-  projectId, // Make sure this is passed
+  projectId,
   teamMembers,
   onClose,
   onSuccess,
 }: {
   moduleId: string;
-  projectId: string; // Add this
+  projectId: string;
   teamMembers: TeamMember[];
   onClose: () => void;
   onSuccess: () => void;
@@ -432,21 +421,15 @@ function CreatePhaseModal({
       return;
     }
 
-    console.log("✅ Phase created:", newPhase);
-
     // Send notification if assigned to someone
     if (assignedTo && newPhase) {
-      console.log("📧 Sending assignment notification to:", assignedTo);
-
       await notificationHelpers.phaseAssignment(
         assignedTo,
         title.trim(),
         projectId,
         moduleId,
-        newPhase.id,
+        newPhase.id
       );
-
-      console.log("✅ Notification sent");
     }
 
     setLoading(false);
@@ -492,7 +475,7 @@ function CreatePhaseModal({
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-500 focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
               >
                 <option value="">Unassigned</option>
                 {teamMembers.map((member) => {
@@ -518,7 +501,7 @@ function CreatePhaseModal({
           <button
             onClick={handleCreate}
             disabled={loading}
-            className="flex-1 px-4 py-3 rounded-xl bg-linear-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
+            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Phase"}
           </button>

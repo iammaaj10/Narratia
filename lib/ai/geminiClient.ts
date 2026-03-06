@@ -221,3 +221,81 @@ Screenplay:`;
     throw new Error(`Failed to convert to screenplay: ${error.message}`);
   }
 }
+
+// ============================================
+// AI FEATURE: Emotion Analysis
+// ============================================
+export async function analyzeEmotions(
+  phases: { title: string; content: string }[]
+): Promise<{
+  overall: string;
+  emotions: {
+    phaseTitle: string;
+    primaryEmotion: string;
+    emotionIcon: string;
+    intensity: number;
+    secondaryEmotions: string[];
+    keyMoments: string[];
+    analysis: string;
+  }[];
+  pacingInsights: string[];
+  recommendations: string[];
+}> {
+  // Combine all phases for analysis
+  const storyContent = phases
+    .map((p, i) => `\n\n=== PHASE ${i + 1}: ${p.title} ===\n${p.content}`)
+    .join("\n");
+
+  const prompt = `You are a professional story analyst specializing in emotional pacing and reader experience.
+
+Analyze the emotional journey of this story. For each phase/chapter, identify:
+1. Primary emotion (joy, sadness, fear, anger, surprise, anticipation, trust, disgust, or neutral)
+2. Emotion intensity (0-100)
+3. Secondary emotions present
+4. Key emotional moments
+5. Brief analysis
+
+Story to analyze:
+${storyContent}
+
+Provide your analysis in the following JSON format (RETURN ONLY VALID JSON, NO MARKDOWN):
+{
+  "overall": "Brief 2-sentence summary of the story's emotional arc",
+  "emotions": [
+    {
+      "phaseTitle": "Phase/Chapter title",
+      "primaryEmotion": "joy|sadness|fear|anger|surprise|anticipation|trust|disgust|neutral",
+      "emotionIcon": "😊|😢|😱|😡|😲|🤔|🤝|🤢|😐",
+      "intensity": 0-100,
+      "secondaryEmotions": ["emotion1", "emotion2"],
+      "keyMoments": ["moment1", "moment2"],
+      "analysis": "Brief analysis of emotional journey in this phase"
+    }
+  ],
+  "pacingInsights": [
+    "Insight about emotional pacing issue or strength"
+  ],
+  "recommendations": [
+    "Specific recommendation for improvement"
+  ]
+}`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+
+    // Clean the response - remove markdown code blocks if present
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith("```json")) {
+      cleanedResponse = cleanedResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (cleanedResponse.startsWith("```")) {
+      cleanedResponse = cleanedResponse.replace(/```\n?/g, "");
+    }
+
+    const data = JSON.parse(cleanedResponse);
+    return data;
+  } catch (error: any) {
+    console.error("❌ Emotion analysis error:", error);
+    throw new Error(`Failed to analyze emotions: ${error.message}`);
+  }
+}
