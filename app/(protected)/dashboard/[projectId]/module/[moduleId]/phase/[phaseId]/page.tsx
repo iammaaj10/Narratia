@@ -7,6 +7,7 @@ import VersionHistory from "./components/VersionHistory";
 import CommentsPanel from "./components/CommentsPanel";
 import RichTextEditor from "./components/RichTextEditor";
 import AIWritingPartner from "./components/AIWritingPartner";
+import FocusModeEditor from "./components/FocusModeEditor";
 import {
   ArrowLeft,
   Save,
@@ -19,6 +20,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Maximize,
 } from "lucide-react";
 
 type Phase = {
@@ -62,6 +64,7 @@ export default function WritingEditorPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAIPartner, setShowAIPartner] = useState(false);
   const [fullStoryContext, setFullStoryContext] = useState("");
+  const [showFocusMode, setShowFocusMode] = useState(false);
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -445,6 +448,14 @@ export default function WritingEditorPage() {
 
           {/* Action Buttons */}
           <button
+            onClick={() => setShowFocusMode(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+          >
+            <Maximize className="w-5 h-5" />
+            <span>Focus Mode</span>
+          </button>
+
+          <button
             onClick={handleOpenAIPartner}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
@@ -552,13 +563,22 @@ export default function WritingEditorPage() {
                 )}
               </div>
 
+              {/* Focus Mode Button */}
+              <button
+                onClick={() => setShowFocusMode(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+              >
+                <Maximize className="w-4 h-4" />
+                <span className="text-sm font-medium">Focus</span>
+              </button>
+
               {/* AI Partner Button */}
               <button
                 onClick={handleOpenAIPartner}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
                 <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">AI Partner</span>
+                <span className="text-sm font-medium">AI</span>
               </button>
 
               {/* Comments Button */}
@@ -567,7 +587,6 @@ export default function WritingEditorPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span className="text-sm">{showComments ? "Hide" : "Show"}</span>
               </button>
 
               {/* Version History Button */}
@@ -688,6 +707,17 @@ export default function WritingEditorPage() {
           currentContent={content}
           fullStoryContext={fullStoryContext}
           onClose={() => setShowAIPartner(false)}
+        />
+      )}
+
+      {/* Focus Mode */}
+      {showFocusMode && (
+        <FocusModeEditor
+          content={content}
+          onChange={handleContentChange}
+          onExit={() => setShowFocusMode(false)}
+          wordCount={wordCount}
+          charCount={charCount}
         />
       )}
     </div>
