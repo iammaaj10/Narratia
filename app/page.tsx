@@ -432,7 +432,7 @@ export default function Page() {
             <Reveal className="text-center mb-20">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">
                 Everything you need to{" "}
-                <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                   build stories
                 </span>
               </h2>
@@ -455,17 +455,17 @@ export default function Page() {
         </section>
 
         {/* How It Works */}
-        <section className="py-28 px-6 bg-gradient-to-b from-gray-900 to-gray-950 relative overflow-hidden">
+        <section className="py-28 px-6 bg-linear-to-b from-gray-900 to-gray-950 relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none opacity-30">
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
-            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-indigo-500 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-purple-500 to-transparent" />
           </div>
 
           <div className="max-w-6xl mx-auto">
             <Reveal className="text-center mb-20">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">
                 From idea to epic in{" "}
-                <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-linearient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
                   three steps
                 </span>
               </h2>
@@ -473,7 +473,7 @@ export default function Page() {
             </Reveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-20 relative">
-              <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-px bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0" />
+              <div className="hidden md:block absolute top-8 left-1/6 right-1/6 h-px bg-linear-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0" />
               {[
                 { step: "01", title: "Create your project", description: "Start a new story project. Choose solo writing or invite your team." },
                 { step: "02", title: "Structure your story", description: "Break it into arcs and chapters. Organize your narrative flow." },
@@ -511,7 +511,7 @@ export default function Page() {
             <Reveal delay={120}>
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
                 Ready to start your{" "}
-                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient glow-text">
+                <span className="bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient glow-text">
                   epic story?
                 </span>
               </h2>
@@ -527,13 +527,13 @@ export default function Page() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                 <MagneticButton
                   onClick={() => router.push("/register")}
-                  className="group relative w-full sm:w-auto px-14 py-6 text-lg font-bold text-white rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 animate-pulse-glow shadow-2xl"
+                  className="group relative w-full sm:w-auto px-14 py-6 text-lg font-bold text-white rounded-2xl overflow-hidden bg-linear-to-r from-indigo-600 to-purple-600 animate-pulse-glow shadow-2xl"
                 >
                   <span className="relative z-10 flex items-center gap-3">
                     Get started for free
                     <span className="inline-block group-hover:translate-x-2 transition-transform duration-500">→</span>
                   </span>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent skew-x-12" />
                 </MagneticButton>
               </div>
             </Reveal>
