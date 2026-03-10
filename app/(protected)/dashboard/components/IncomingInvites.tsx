@@ -189,7 +189,7 @@ export default function IncomingInvites() {
   }
 
   return (
-    <div className="mb-8 rounded-xl border border-purple-500/20 bg-gradient-to-r from-purple-500/5 to-pink-500/5 p-6 backdrop-blur-sm">
+    <div className="mb-8 rounded-xl border border-purple-500/20 bg-linear-to-r from-purple-500/5 to-pink-500/5 p-6 backdrop-blur-sm">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></span>
         Team Invitations ({invites.length})
