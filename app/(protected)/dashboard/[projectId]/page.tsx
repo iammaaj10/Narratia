@@ -133,7 +133,7 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-gray-400">Loading project...</div>
       </div>
     );
@@ -141,187 +141,201 @@ export default function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="p-12 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-gray-400">Project not found</div>
       </div>
     );
   }
 
   return (
-    <div className="p-12 space-y-8">
-      <div>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
-        </button>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-12">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {/* Header */}
+        <div>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 sm:mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm sm:text-base">Back to Dashboard</span>
+          </button>
 
-        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-2 sm:mb-3">
               {project.title}
             </h1>
             {project.description && (
-              <p className="text-gray-400 text-lg">{project.description}</p>
+              <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-3 sm:mb-4">
+                {project.description}
+              </p>
             )}
-            <div className="mt-4 inline-flex px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 text-sm">
+            <div className="inline-flex px-3 py-1.5 rounded-full bg-purple-500/10 text-purple-300 text-xs sm:text-sm font-medium">
               {project.is_team ? "Team Project" : "Solo Project"}
             </div>
           </div>
         </div>
-      </div>
 
-      {project.is_team && members.length > 0 && (
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="w-5 h-5 text-purple-400" />
-            <h2 className="text-lg font-semibold text-white">Team Members</h2>
-            <span className="text-sm text-gray-400">({members.length})</span>
-          </div>
+        {/* Team Members Section */}
+        {project.is_team && members.length > 0 && (
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+              <h2 className="text-base sm:text-lg font-semibold text-white">
+                Team Members
+              </h2>
+              <span className="text-xs sm:text-sm text-gray-400">
+                ({members.length})
+              </span>
+            </div>
 
-          <div className="flex flex-wrap gap-3">
-            {members.map((member) => {
-              if (!member.profiles) return null;
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {members.map((member) => {
+                if (!member.profiles) return null;
 
-              return (
-                <div
-                  key={member.id}
-                  className="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/5 border border-white/10"
-                >
-                  {member.profiles.avatar_url ? (
-                    <img
-                      src={member.profiles.avatar_url}
-                      className="w-8 h-8 rounded-full"
-                      alt={member.profiles.username}
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {member.profiles.username[0].toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-sm font-medium text-white">
-                      {member.profiles.username}
-                    </div>
-                    <div className="text-xs text-gray-400 capitalize">
-                      {member.role}
+                return (
+                  <div
+                    key={member.id}
+                    className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    {member.profiles.avatar_url ? (
+                      <img
+                        src={member.profiles.avatar_url}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full"
+                        alt={member.profiles.username}
+                      />
+                    ) : (
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span className="text-white text-xs sm:text-sm font-semibold">
+                          {member.profiles.username[0].toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-xs sm:text-sm font-medium text-white">
+                        {member.profiles.username}
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-gray-400 capitalize">
+                        {member.role}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-purple-400" />
-            <h2 className="text-2xl font-bold text-white">Story Modules</h2>
-          </div>
-
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Team Management Button - ONLY shows for team projects AND owner */}
-            {project.is_team && isOwner && (
-              <button
-                onClick={() => router.push(`/dashboard/${projectId}/team`)}
-                className="flex items-center gap-2 px-5 py-3 bg-purple-500/20 text-purple-300 rounded-xl hover:bg-purple-500/30 transition-all"
-              >
-                <Users className="w-5 h-5" />
-                Manage Team
-              </button>
-            )}
-
-            {/* Share Story Button */}
-            <button
-              onClick={() => setShowShareSettings(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-green-500/20 text-green-300 rounded-xl hover:bg-green-500/30 transition-all"
-            >
-              <Share2 className="w-5 h-5" />
-              Share Story
-            </button>
-
-            {/* Reader Comments Button */}
-            <button
-              onClick={() => router.push(`/dashboard/${projectId}/comments`)}
-              className="flex items-center gap-2 px-5 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Comments
-            </button>
-
-            {/* Export Button */}
-            <button
-              onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all"
-            >
-              <Download className="w-5 h-5" />
-              Export
-            </button>
-
-            {/* Create Module Button - ONLY owner can see */}
-            {isOwner && (
-              <button
-                onClick={() => setShowCreateModule(true)}
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-              >
-                <PlusCircle className="w-5 h-5" />
-                Create Module
-              </button>
-            )}
-          </div>
-        </div>
-
-        {modules.length === 0 ? (
-          <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
-            <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">
-              No modules yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Start organizing your story by creating modules
-            </p>
-            {isOwner && (
-              <button
-                onClick={() => setShowCreateModule(true)}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-              >
-                Create First Module
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {modules.map((module) => (
-              <div
-                key={module.id}
-                onClick={() =>
-                  router.push(`/dashboard/${projectId}/module/${module.id}`)
-                }
-                className="cursor-pointer p-6 rounded-xl bg-white/[0.03] border border-white/10 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 transition-all group"
-              >
-                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-300 transition-colors">
-                  {module.title}
-                </h3>
-                {module.description && (
-                  <p className="text-sm text-gray-400 line-clamp-3">
-                    {module.description}
-                  </p>
-                )}
-                <div className="mt-4 text-xs text-gray-500">
-                  Created {new Date(module.created_at).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         )}
+
+        {/* Story Modules Section */}
+        <div>
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
+                Story Modules
+              </h2>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2 sm:gap-3">
+              {/* Team Management Button */}
+              {project.is_team && isOwner && (
+                <button
+                  onClick={() => router.push(`/dashboard/${projectId}/team`)}
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-purple-500/20 text-purple-300 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium hover:bg-purple-500/30 transition-all"
+                >
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="whitespace-nowrap">Manage Team</span>
+                </button>
+              )}
+
+              {/* Share Story Button */}
+              <button
+                onClick={() => setShowShareSettings(true)}
+                className="flex items-center justify-center lg:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-green-500/20 text-green-300 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium hover:bg-green-500/30 transition-all"
+              >
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">Share Story</span>
+              </button>
+
+              {/* Reader Comments Button */}
+              <button
+                onClick={() => router.push(`/dashboard/${projectId}/comments`)}
+                className="flex items-center justify-center lg:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-blue-500/20 text-blue-300 rounded-lg sm:rounded-xl text-sm sm:text-base font-medium hover:bg-blue-500/30 transition-all"
+              >
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">Comments</span>
+              </button>
+
+              {/* Export Button */}
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="flex items-center justify-center lg:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all"
+              >
+                <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="whitespace-nowrap">Export</span>
+              </button>
+
+              {/* Create Module Button */}
+              {isOwner && (
+                <button
+                  onClick={() => setShowCreateModule(true)}
+                  className="flex items-center justify-center lg:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all sm:col-span-2 lg:col-span-1"
+                >
+                  <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="whitespace-nowrap">Create Module</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Modules List */}
+          {modules.length === 0 ? (
+            <div className="text-center py-12 sm:py-16 rounded-xl border border-dashed border-white/20">
+              <FolderOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-400 mb-2">
+                No modules yet
+              </h3>
+              <p className="text-sm sm:text-base text-gray-500 mb-6 px-4">
+                Start organizing your story by creating modules
+              </p>
+              {isOwner && (
+                <button
+                  onClick={() => setShowCreateModule(true)}
+                  className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                >
+                  Create First Module
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {modules.map((module) => (
+                <div
+                  key={module.id}
+                  onClick={() =>
+                    router.push(`/dashboard/${projectId}/module/${module.id}`)
+                  }
+                  className="cursor-pointer p-5 sm:p-6 rounded-xl bg-white/[0.03] border border-white/10 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 transition-all group"
+                >
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-purple-300 transition-colors break-words">
+                    {module.title}
+                  </h3>
+                  {module.description && (
+                    <p className="text-xs sm:text-sm text-gray-400 line-clamp-3 mb-3">
+                      {module.description}
+                    </p>
+                  )}
+                  <div className="text-[10px] sm:text-xs text-gray-500">
+                    Created {new Date(module.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Modals */}
       {showCreateModule && (
         <CreateModuleModal
           projectId={projectId}
@@ -393,8 +407,8 @@ function CreateModuleModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl border border-white/10 p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-white mb-6">
+      <div className="bg-gray-900 rounded-2xl border border-white/10 p-6 sm:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
           Create New Module
         </h2>
 
@@ -408,7 +422,7 @@ function CreateModuleModal({
               placeholder="e.g., Season 1, Act 1, Beginning"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
             />
           </div>
 
@@ -420,22 +434,22 @@ function CreateModuleModal({
               placeholder="Brief description of this module"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[100px] resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[100px] resize-none"
             />
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-all"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl border border-white/10 text-sm sm:text-base text-gray-300 hover:bg-white/5 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={loading}
-            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Module"}
           </button>

@@ -177,7 +177,7 @@ export default function ModuleDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-gray-400">Loading module...</div>
       </div>
     );
@@ -185,177 +185,183 @@ export default function ModuleDetailPage() {
 
   if (!module) {
     return (
-      <div className="p-12 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-gray-400">Module not found</div>
       </div>
     );
   }
 
   return (
-    <div className="p-12 space-y-8">
-      {/* Header */}
-      <div>
-        <button
-          onClick={() => router.push(`/dashboard/${projectId}`)}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Project
-        </button>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-12">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+        {/* Header */}
+        <div>
+          <button
+            onClick={() => router.push(`/dashboard/${projectId}`)}
+            className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 sm:mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm sm:text-base">Back to Project</span>
+          </button>
 
-        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-purple-100 to-white bg-clip-text text-transparent mb-2 sm:mb-3">
               {module.title}
             </h1>
             {module.description && (
-              <p className="text-gray-400 text-lg">{module.description}</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Phases Section */}
-      <div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <FileText className="w-6 h-6 text-purple-400" />
-            <h2 className="text-2xl font-bold text-white">Phases / Episodes</h2>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3">
-            {/* Emotion Heatmap */}
-            {isOwner && phases.length > 0 && (
-              <button
-                onClick={() =>
-                  router.push(
-                    `/dashboard/${projectId}/module/${moduleId}/emotions`
-                  )
-                }
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-pink-500/25 transition-all"
-              >
-                <Heart className="w-5 h-5" />
-                Emotion Heatmap
-              </button>
-            )}
-
-            {/* Convert to Screenplay */}
-            {isOwner && phases.length > 0 && (
-              <button
-                onClick={() =>
-                  router.push(
-                    `/dashboard/${projectId}/module/${moduleId}/screenplay`
-                  )
-                }
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
-              >
-                <Film className="w-5 h-5" />
-                Convert to Screenplay
-              </button>
-            )}
-
-            {/* Create Phase */}
-            {isOwner && (
-              <button
-                onClick={() => setShowCreatePhase(true)}
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-              >
-                <PlusCircle className="w-5 h-5" />
-                Create Phase
-              </button>
+              <p className="text-gray-400 text-sm sm:text-base lg:text-lg">
+                {module.description}
+              </p>
             )}
           </div>
         </div>
 
-        {/* Phases List */}
-        {phases.length === 0 ? (
-          <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
-            <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">
-              No phases yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Create phases to organize your story episodes
-            </p>
+        {/* Phases Section */}
+        <div>
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
+                Phases / Episodes
+              </h2>
+            </div>
+
+            {/* Action Buttons */}
             {isOwner && (
-              <button
-                onClick={() => setShowCreatePhase(true)}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
-              >
-                Create First Phase
-              </button>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
+                {/* Emotion Heatmap */}
+                {phases.length > 0 && (
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/${projectId}/module/${moduleId}/emotions`
+                      )
+                    }
+                    className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-pink-500/25 transition-all"
+                  >
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="whitespace-nowrap">Emotion Heatmap</span>
+                  </button>
+                )}
+
+                {/* Convert to Screenplay */}
+                {phases.length > 0 && (
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/${projectId}/module/${moduleId}/screenplay`
+                      )
+                    }
+                    className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+                  >
+                    <Film className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="whitespace-nowrap">Convert to Screenplay</span>
+                  </button>
+                )}
+
+                {/* Create Phase */}
+                <button
+                  onClick={() => setShowCreatePhase(true)}
+                  className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                >
+                  <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="whitespace-nowrap">Create Phase</span>
+                </button>
+              </div>
             )}
           </div>
-        ) : (
-          <div className="space-y-4">
-            {phases.map((phase, index) => (
-              <div
-                key={phase.id}
-                className="p-6 rounded-xl bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition-all group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-semibold">
-                        Phase {index + 1}
-                      </span>
-                      <h3 className="text-xl font-semibold text-white">
-                        {phase.title}
-                      </h3>
-                    </div>
 
-                    {phase.description && (
-                      <p className="text-sm text-gray-400 mb-3">
-                        {phase.description}
-                      </p>
-                    )}
-
-                    {/* Assigned Writer */}
-                    {phase.profiles && (
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <User className="w-4 h-4" />
-                        <span>Assigned to: {phase.profiles.username}</span>
+          {/* Phases List */}
+          {phases.length === 0 ? (
+            <div className="text-center py-12 sm:py-16 rounded-xl border border-dashed border-white/20">
+              <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-400 mb-2">
+                No phases yet
+              </h3>
+              <p className="text-sm sm:text-base text-gray-500 mb-6 px-4">
+                Create phases to organize your story episodes
+              </p>
+              {isOwner && (
+                <button
+                  onClick={() => setShowCreatePhase(true)}
+                  className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                >
+                  Create First Phase
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3 sm:space-y-4">
+              {phases.map((phase, index) => (
+                <div
+                  key={phase.id}
+                  className="p-4 sm:p-6 rounded-xl bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition-all group"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                        <span className="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-semibold whitespace-nowrap">
+                          Phase {index + 1}
+                        </span>
+                        <h3 className="text-lg sm:text-xl font-semibold text-white break-words">
+                          {phase.title}
+                        </h3>
                       </div>
-                    )}
 
-                    {/* Word Count */}
-                    <div className="mt-2 text-xs text-gray-500">
-                      {phase.content
-                        ? `${phase.content.split(" ").filter((w) => w.length > 0).length} words`
-                        : "No content yet"}
+                      {phase.description && (
+                        <p className="text-sm text-gray-400 mb-3 break-words">
+                          {phase.description}
+                        </p>
+                      )}
+
+                      {/* Assigned Writer */}
+                      {phase.profiles && (
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400 mb-2">
+                          <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">
+                            Assigned to: {phase.profiles.username}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Word Count */}
+                      <div className="text-xs text-gray-500">
+                        {phase.content
+                          ? `${phase.content.split(" ").filter((w) => w.length > 0).length} words`
+                          : "No content yet"}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`
-                        )
-                      }
-                      className="p-2 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-
-                    {isOwner && (
+                    {/* Actions */}
+                    <div className="flex sm:flex-col items-center gap-2 self-end sm:self-auto">
                       <button
-                        onClick={() => deletePhase(phase.id)}
-                        className="p-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all"
-                        title="Delete"
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`
+                          )
+                        }
+                        className="p-2 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all"
+                        title="Edit"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Edit className="w-4 h-4" />
                       </button>
-                    )}
+
+                      {isOwner && (
+                        <button
+                          onClick={() => deletePhase(phase.id)}
+                          className="p-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Create Phase Modal */}
@@ -438,8 +444,10 @@ function CreatePhaseModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl border border-white/10 p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-white mb-6">Create New Phase</h2>
+      <div className="bg-gray-900 rounded-2xl border border-white/10 p-6 sm:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
+          Create New Phase
+        </h2>
 
         <div className="space-y-4 mb-6">
           <div>
@@ -451,7 +459,7 @@ function CreatePhaseModal({
               placeholder="e.g., Episode 1, Chapter 1"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
             />
           </div>
 
@@ -463,7 +471,7 @@ function CreatePhaseModal({
               placeholder="Brief description of this phase"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[80px] resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[80px] resize-none"
             />
           </div>
 
@@ -475,7 +483,7 @@ function CreatePhaseModal({
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-purple-500/50"
               >
                 <option value="">Unassigned</option>
                 {teamMembers.map((member) => {
@@ -491,17 +499,17 @@ function CreatePhaseModal({
           )}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-all"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl border border-white/10 text-sm sm:text-base text-gray-300 hover:bg-white/5 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={loading}
-            className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Phase"}
           </button>
