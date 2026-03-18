@@ -365,7 +365,7 @@ export default function Page() {
                 Where stories are
               </h1>
               <h1 className="hero-line-3 text-5xl md:text-6xl lg:text-7xl font-extrabold mb-8 leading-tight glow-text">
-                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
+                <span className="bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient">
                   <Typewriter words={["built together", "born epic", "brought to life", "imagined boldly"]} />
                 </span>
               </h1>
@@ -377,7 +377,7 @@ export default function Page() {
 
               <div className="hero-line-5 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                 <MagneticButton
-                  className="relative w-full sm:w-auto px-10 py-5 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl overflow-hidden group animate-pulse-glow shadow-2xl"
+                  className="relative w-full sm:w-auto px-10 py-5 text-base font-semibold text-white bg-linear-to-r from-indigo-600 to-purple-600 rounded-xl overflow-hidden group animate-pulse-glow shadow-2xl"
                   onClick={() => router.push("/register")}
                 >
                   <span className="relative z-10">Start writing for free</span>
