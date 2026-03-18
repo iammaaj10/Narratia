@@ -39,6 +39,7 @@ export default function RichTextEditor({
   placeholder = "Start writing your story...",
 }: RichTextEditorProps) {
   const [selectedText, setSelectedText] = useState("");
+  const [isEditorReady, setIsEditorReady] = useState(false);
   
   const editor = useEditor({
     immediatelyRender: false,
@@ -55,13 +56,13 @@ export default function RichTextEditor({
           class:
             "text-purple-400 underline hover:text-purple-300 cursor-pointer",
         },
-      }).extend({name: 'customlink'}),
+      }),
       Placeholder.configure({
         placeholder,
       }),
       CharacterCount,
     ],
-    content,
+    content: content || "", // Set initial content
     editorProps: {
       attributes: {
         class:
@@ -71,14 +72,28 @@ export default function RichTextEditor({
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    onCreate: ({ editor }) => {
+      // Set content again when editor is created to ensure it's loaded
+      if (content) {
+        editor.commands.setContent(content);
+      }
+      setIsEditorReady(true);
+    },
   });
 
-  // Update editor content when prop changes (for loading saved content)
+  // CRITICAL FIX: Update editor content when prop changes
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+    if (editor && isEditorReady && content !== undefined) {
+      const currentContent = editor.getHTML();
+      
+      // Only update if content is different and not empty
+      // This prevents infinite loops while ensuring content loads
+      if (content !== currentContent) {
+        console.log("📝 Updating editor content, length:", content.length);
+        editor.commands.setContent(content || "");
+      }
     }
-  }, [content, editor]);
+  }, [content, editor, isEditorReady]);
 
   // Track selected text
   useEffect(() => {
@@ -126,7 +141,11 @@ export default function RichTextEditor({
   };
 
   if (!editor) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-gray-400">Loading editor...</div>
+      </div>
+    );
   }
 
   return (
