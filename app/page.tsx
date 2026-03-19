@@ -13,37 +13,37 @@ function AnimatedSphere() {
   
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = clock.getElapsedTime() * 0.2;
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.3;
+      meshRef.current.rotation.x = clock.getElapsedTime() * 0.15;
+      meshRef.current.rotation.y = clock.getElapsedTime() * 0.25;
     }
   });
 
   return (
-    <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-      <Sphere ref={meshRef} args={[1, 100, 100]} scale={2.5}>
+    <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.5}>
+      <Sphere ref={meshRef} args={[1, 100, 100]} scale={2.2}>
         <MeshDistortMaterial
-          color="#8b5cf6"
+          color="#6366f1"
           attach="material"
-          distort={0.4}
-          speed={2}
-          roughness={0.2}
-          metalness={0.8}
+          distort={0.35}
+          speed={1.5}
+          roughness={0.3}
+          metalness={0.7}
         />
       </Sphere>
     </Float>
   );
 }
 
-// --- Floating Particles (FIXED) ---
+// --- Floating Particles ---
 function FloatingParticles() {
-  const count = 200;
+  const count = 150;
   
   const positions = useMemo(() => {
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      positions[i * 3] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
     }
     return positions;
   }, [count]);
@@ -52,7 +52,7 @@ function FloatingParticles() {
 
   useFrame(({ clock }) => {
     if (particlesRef.current) {
-      particlesRef.current.rotation.y = clock.getElapsedTime() * 0.05;
+      particlesRef.current.rotation.y = clock.getElapsedTime() * 0.03;
     }
   });
 
@@ -65,10 +65,10 @@ function FloatingParticles() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.05}
-        color="#a855f7"
+        size={0.04}
+        color="#818cf8"
         transparent
-        opacity={0.6}
+        opacity={0.5}
         sizeAttenuation
       />
     </points>
@@ -79,57 +79,27 @@ function FloatingParticles() {
 function Scene3D() {
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={0.8} />
       <spotLight
-        position={[0, 10, 0]}
-        angle={0.3}
+        position={[0, 15, 0]}
+        angle={0.25}
         penumbra={1}
-        intensity={1}
-        castShadow
+        intensity={0.8}
       />
       <AnimatedSphere />
       <FloatingParticles />
       <Stars
         radius={100}
         depth={50}
-        count={5000}
-        factor={4}
+        count={3000}
+        factor={3}
         saturation={0}
         fade
-        speed={1}
+        speed={0.8}
       />
       <Environment preset="night" />
     </>
-  );
-}
-
-// --- 3D Card Component ---
-function Card3D({ children, delay = 0, className = "" }: any) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, rotateX: -15 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{
-        duration: 0.8,
-        delay,
-        type: "spring",
-        stiffness: 100,
-      }}
-      whileHover={{
-        scale: 1.05,
-        rotateY: 5,
-        rotateX: 5,
-        z: 50,
-        transition: { duration: 0.3 },
-      }}
-      className={`perspective-1000 ${className}`}
-      style={{
-        transformStyle: "preserve-3d",
-      }}
-    >
-      {children}
-    </motion.div>
   );
 }
 
@@ -138,7 +108,6 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    let start = 0;
     const duration = 2000;
     const startTime = Date.now();
     
@@ -156,8 +125,8 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   return <span>{count}{suffix}</span>;
 }
 
-// --- Feature Card with 3D Effect ---
-function FeatureCard3D({ icon, title, description, index }: any) {
+// --- Feature Card ---
+function FeatureCard({ icon, title, description, index }: any) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -168,9 +137,9 @@ function FeatureCard3D({ icon, title, description, index }: any) {
     
     cardRef.current.style.transform = `
       perspective(1000px)
-      rotateY(${x * 20}deg)
-      rotateX(${-y * 20}deg)
-      translateZ(30px)
+      rotateY(${x * 8}deg)
+      rotateX(${-y * 8}deg)
+      translateZ(10px)
     `;
   };
 
@@ -187,9 +156,10 @@ function FeatureCard3D({ icon, title, description, index }: any) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.8, z: -100 }}
-      animate={{ opacity: 1, scale: 1, z: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.15 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       <div
         ref={cardRef}
@@ -197,28 +167,28 @@ function FeatureCard3D({ icon, title, description, index }: any) {
         onMouseLeave={handleMouseLeave}
         style={{
           transformStyle: "preserve-3d",
-          transition: "transform 0.3s ease-out",
+          transition: "transform 0.2s ease-out",
         }}
-        className="group relative p-8 rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-gray-900/90 to-indigo-900/40 backdrop-blur-xl overflow-hidden cursor-pointer h-full"
+        className="group relative p-6 sm:p-8 rounded-2xl border border-indigo-500/20 bg-gray-900/50 backdrop-blur-sm hover:border-indigo-500/40 overflow-hidden h-full"
       >
-        {/* Glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Subtle gradient overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Content */}
-        <div className="relative z-10" style={{ transform: "translateZ(50px)" }}>
-          <div className="text-6xl mb-6 transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">
+        <div className="relative z-10">
+          <div className="text-4xl sm:text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
             {icon}
           </div>
-          <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-indigo-300 transition-colors">
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 group-hover:text-indigo-300 transition-colors duration-300">
             {title}
           </h3>
-          <p className="text-gray-300 leading-relaxed group-hover:text-white transition-colors">
+          <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
             {description}
           </p>
         </div>
 
-        {/* Bottom glow line */}
-        <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-700" />
+        {/* Bottom accent */}
+        <div className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500" />
       </div>
     </motion.div>
   );
@@ -227,85 +197,57 @@ function FeatureCard3D({ icon, title, description, index }: any) {
 // --- Main Landing Page ---
 export default function Page() {
   const [scrollY, setScrollY] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("mousemove", handleMouseMove);
-    
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         * {
           scroll-behavior: smooth;
-          font-family: 'Orbitron', sans-serif;
+          font-family: 'Inter', sans-serif;
         }
 
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-
-        @keyframes gradient-x {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 15s ease infinite;
-        }
-
-        @keyframes float-slow {
+        @keyframes float-gentle {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          50% { transform: translateY(-10px); }
         }
 
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite;
+        .animate-float-gentle {
+          animation: float-gentle 4s ease-in-out infinite;
         }
 
-        @keyframes pulse-glow {
+        @keyframes glow-pulse {
           0%, 100% { 
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5),
-                        0 0 60px rgba(139, 92, 246, 0.3),
-                        inset 0 0 30px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
           }
           50% { 
-            box-shadow: 0 0 50px rgba(139, 92, 246, 0.8),
-                        0 0 100px rgba(139, 92, 246, 0.5),
-                        inset 0 0 50px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
           }
         }
 
-        .glow-intense {
-          animation: pulse-glow 3s ease-in-out infinite;
+        .glow-button {
+          animation: glow-pulse 2s ease-in-out infinite;
         }
 
-        .glass-morphism {
-          background: rgba(17, 25, 40, 0.75);
-          backdrop-filter: blur(16px) saturate(180%);
-          -webkit-backdrop-filter: blur(16px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.125);
+        .glass-card {
+          background: rgba(17, 24, 39, 0.6);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(99, 102, 241, 0.1);
         }
       `}</style>
 
-      <div className="min-h-screen bg-black overflow-hidden relative">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black overflow-hidden relative">
         {/* 3D Background */}
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-0 opacity-60">
           <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
             <Suspense fallback={null}>
               <Scene3D />
@@ -313,245 +255,230 @@ export default function Page() {
                 enableZoom={false}
                 enablePan={false}
                 autoRotate
-                autoRotateSpeed={0.5}
+                autoRotateSpeed={0.3}
               />
             </Suspense>
           </Canvas>
         </div>
 
-        {/* Cursor Follower Glow */}
-        <div
-          className="fixed w-96 h-96 rounded-full pointer-events-none z-50 mix-blend-screen"
-          style={{
-            background: `radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)`,
-            left: mousePosition.x - 192,
-            top: mousePosition.y - 192,
-            transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-          }}
-        />
+        {/* Gradient Overlays */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
+        </div>
 
         {/* Navigation */}
         <motion.nav
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+          transition={{ duration: 0.6 }}
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
             scrollY > 50
-              ? "glass-morphism shadow-2xl shadow-indigo-500/20"
+              ? "glass-card shadow-lg"
               : "bg-transparent"
           }`}
         >
-          <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-              <motion.a
-                href="/"
-                className="flex items-center gap-3 group"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xl glow-intense transform group-hover:rotate-12 transition-transform">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16 sm:h-20">
+              <a href="/" className="flex items-center gap-3 group">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg transform group-hover:scale-105 transition-transform">
                   N
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent">
-                  NARRATIA
+                <span className="text-xl sm:text-2xl font-semibold text-white">
+                  Narratia
                 </span>
-              </motion.a>
+              </a>
 
-              <div className="flex items-center gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05, rotateZ: 2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="hidden sm:block px-6 py-3 text-sm font-semibold text-white hover:text-indigo-300 transition-all rounded-xl hover:bg-white/5"
+              <div className="flex items-center gap-3 sm:gap-4">
+                <button
+                  className="hidden sm:block px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white transition-colors"
                   onClick={() => router.push("/login")}
                 >
-                  SIGN IN
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, rotateZ: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-6 py-3 text-sm font-bold text-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-xl glow-intense"
+                  Sign in
+                </button>
+                <button
+                  className="px-5 sm:px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-500 hover:to-purple-500 transition-all shadow-lg shadow-indigo-500/25"
                   onClick={() => router.push("/register")}
                 >
-                  START FREE
-                </motion.button>
+                  Get Started
+                </button>
               </div>
             </div>
           </div>
         </motion.nav>
 
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20">
+        <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 sm:pt-32 pb-16 sm:pb-20">
           <div className="relative z-10 max-w-6xl mx-auto text-center">
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ duration: 1, type: "spring", bounce: 0.5 }}
-              className="inline-flex items-center gap-3 px-6 py-3 glass-morphism rounded-full text-sm font-bold text-indigo-300 mb-12 glow-intense"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full text-sm font-medium text-indigo-300 mb-8"
             >
-              <span className="relative flex h-3 w-3">
+              <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
               </span>
-              AI-POWERED STORYTELLING REVOLUTION
+              AI-Powered Storytelling Platform
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
             >
               <span className="text-white">Where stories evolve</span>
               <br />
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x">
-                 into experiences.
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                into experiences.
               </span>
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-base sm:text-lg md:text-xl text-gray-400 mb-10 max-w-3xl mx-auto leading-relaxed"
             >
               Experience the future of storytelling with immersive collaboration,
               AI-powered insights, and real-time team synchronization.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
             >
-              <motion.button
-                whileHover={{ scale: 1.1, rotateZ: 2 }}
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={() => router.push("/register")}
-                className="group relative px-12 py-5 text-lg font-black text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl overflow-hidden glow-intense"
+                className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all shadow-xl shadow-indigo-500/30 glow-button"
               >
-                <span className="relative z-10">ENTER THE MATRIX</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              </motion.button>
+                Start Writing for Free
+              </button>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-12 py-5 text-lg font-bold text-white glass-morphism rounded-2xl border border-indigo-500/50 hover:border-indigo-400 transition-all"
-              >
-                WATCH DEMO ▶
-              </motion.button>
+              <button className="w-full sm:w-auto px-8 py-4 text-base font-semibold text-white glass-card rounded-xl hover:bg-white/5 transition-all">
+                Watch Demo →
+              </button>
             </motion.div>
 
             {/* Stats */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto"
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto"
             >
               {[
-                { icon: "⭐", value: 10, suffix: "K+", label: "ACTIVE WRITERS" },
-                { icon: "📚", value: 50, suffix: "K+", label: "STORIES CREATED" },
-                { icon: "🚀", value: 99, suffix: "%", label: "SATISFACTION" },
+                { icon: "✨", value: 10, suffix: "K+", label: "Active Writers" },
+                { icon: "📚", value: 50, suffix: "K+", label: "Stories Created" },
+                { icon: "⚡", value: 99, suffix: "%", label: "Satisfaction" },
               ].map((stat, i) => (
-                <Card3D key={i} delay={1 + i * 0.1}>
-                  <div className="glass-morphism p-8 rounded-2xl border border-indigo-500/30 text-center">
-                    <div className="text-5xl mb-4 animate-float-slow">{stat.icon}</div>
-                    <div className="text-4xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                      <Counter target={stat.value} suffix={stat.suffix} />
-                    </div>
-                    <div className="text-sm text-gray-400 font-bold">{stat.label}</div>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
+                  className="glass-card p-6 sm:p-8 rounded-xl text-center"
+                >
+                  <div className="text-3xl sm:text-4xl mb-3 animate-float-gentle">{stat.icon}</div>
+                  <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                    <Counter target={stat.value} suffix={stat.suffix} />
                   </div>
-                </Card3D>
+                  <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
+                </motion.div>
               ))}
             </motion.div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section className="relative py-32 px-6">
+        <section className="relative py-20 sm:py-32 px-4 sm:px-6">
           <div className="max-w-7xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-20"
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
             >
-              <h2 className="text-5xl md:text-6xl font-black text-white mb-6">
-                QUANTUM-POWERED{" "}
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                Everything you need to{" "}
                 <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  FEATURES
+                  build stories
                 </span>
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Next-generation tools that bend reality to your creative will
+              <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto">
+                Powerful tools designed for writers who think big
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
                   icon: "🎭",
-                  title: "STORY ARCS",
+                  title: "Story Arcs",
                   description:
                     "Organize your narrative into well defined arcs with clear progression and structure",
                 },
                 {
-                  icon: "🤖",
-                  title: "AI CO-PILOT",
+                  icon: "✍️",
+                  title: "AI Co-Pilot",
                   description:
                     "Real-time AI assistance that understands your vision and enhances every word.",
                 },
                 {
                   icon: "⚡",
-                  title: "QUANTUM SYNC",
+                  title: "Team Collaboration",
                   description:
-                    "Instant collaboration across dimensions with zero-latency team synchronization.",
+                    "Instant collaboration with zero-latency team synchronization and real-time editing.",
                 },
                 {
-                  icon: "🌌",
-                  title: "REALITY EXPORT",
+                  icon: "📖",
+                  title: "Multi-Format Export",
                   description:
-                    "Transform your stories into any format: books, scripts, or screen play",
+                    "Transform your stories into any format: books, scripts, or screenplays",
                 },
               ].map((feature, index) => (
-                <FeatureCard3D key={index} {...feature} index={index} />
+                <FeatureCard key={index} {...feature} index={index} />
               ))}
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="relative py-32 px-6">
+        <section className="relative py-20 sm:py-32 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.6 }}
             >
-              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">
-                READY TO{" "}
-                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x">
-                  TRANSCEND REALITY?
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                Ready to start your{" "}
+                <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  epic story?
                 </span>
               </h2>
-              <p className="text-2xl text-gray-300 mb-12 leading-relaxed max-w-3xl mx-auto">
-                Join the revolution. Your epic story awaits in the quantum realm.
+              <p className="text-lg sm:text-xl text-gray-400 mb-10 leading-relaxed max-w-2xl mx-auto">
+                Join thousands of writers building their worlds on Narratia. Free to start, scales with your ambition.
               </p>
 
-              <motion.button
-                whileHover={{ scale: 1.1, rotate: 2 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => router.push("/register")}
-                className="px-16 py-6 text-xl font-black text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl glow-intense"
+                className="px-10 sm:px-12 py-4 sm:py-5 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl hover:from-indigo-500 hover:to-purple-500 transition-all shadow-2xl shadow-indigo-500/30 glow-button"
               >
-                LAUNCH INTO NARRATIA →
-              </motion.button>
+                Get Started for Free →
+              </button>
             </motion.div>
           </div>
         </section>
+
+        {/* Footer Spacer */}
+        <div className="h-20" />
       </div>
     </>
   );
