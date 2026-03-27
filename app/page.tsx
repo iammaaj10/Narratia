@@ -14,9 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
 
-// -------------------------------------------------------------------
-// BOOK ANIMATION — Three.js imperative (runs before page is visible)
-// -------------------------------------------------------------------
+
 function BookAnimation({ onComplete }: { onComplete: () => void }) {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -570,9 +568,7 @@ function BookAnimation({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-// -------------------------------------------------------------------
-// ORIGINAL 3D BACKGROUND — unchanged
-// -------------------------------------------------------------------
+
 function AnimatedSphere() {
   const meshRef = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
@@ -656,9 +652,7 @@ function Scene3D() {
   );
 }
 
-// -------------------------------------------------------------------
-// ORIGINAL Counter — unchanged
-// -------------------------------------------------------------------
+
 function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -681,9 +675,7 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   );
 }
 
-// -------------------------------------------------------------------
-// ORIGINAL FeatureCard — unchanged
-// -------------------------------------------------------------------
+
 function FeatureCard({ icon, title, description, index }: any) {
   const cardRef = useRef<HTMLDivElement>(null);
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -733,9 +725,6 @@ function FeatureCard({ icon, title, description, index }: any) {
   );
 }
 
-// -------------------------------------------------------------------
-// MAIN PAGE — original content, zero changes
-// -------------------------------------------------------------------
 export default function Page() {
   const [scrollY, setScrollY] = useState(0);
   const [bookDone, setBookDone] = useState(false);
@@ -898,18 +887,7 @@ export default function Page() {
           {/* Hero Section */}
           <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 sm:pt-32 pb-16 sm:pb-20">
             <div className="relative z-10 max-w-6xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full text-sm font-medium text-indigo-300 mb-8"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
-                </span>
-                AI-Powered Storytelling Platform
-              </motion.div>
+             
 
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
@@ -1103,7 +1081,7 @@ export default function Page() {
               {/* Footer Bottom */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-indigo-500/10">
                 <p className="text-sm text-gray-600">
-                  © 2026 Narratia Inc. All rights reserved.
+                  © 2026 Narratia Inc. All rights reserved by <span className="font-bold">Maaj Bhadgaonkar</span>
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
                   {[
