@@ -1230,7 +1230,7 @@ export default function Page() {
               className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
               style={{ opacity: Math.max(0, 1 - scrollY / 200) }}
             >
-              <div className="w-[1px] h-10 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+              <div className="w-[1px] h-10 bg-linear-to-b from-transparent via-white/20 to-transparent" />
               <div className="w-1 h-1 rounded-full bg-white/25" style={{ animation: "floatGentle 2s ease-in-out infinite" }} />
             </motion.div>
           </section>
@@ -1238,7 +1238,7 @@ export default function Page() {
           {/* ── FEATURES SECTION ──────────────────────────────── */}
           <section className="relative py-24 sm:py-36 px-4 sm:px-6">
             {/* Subtle section divider */}
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+            <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-white/[0.06] to-transparent" />
 
             <div className="max-w-7xl mx-auto">
               <motion.div
@@ -1284,7 +1284,7 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
+            <div className="absolute bottom-0 inset-x-0 h-px bg-linear-to-r from-transparent via-white/[0.05] to-transparent" />
           </section>
 
           {/* ── CTA SECTION ───────────────────────────────────── */}
