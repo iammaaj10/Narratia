@@ -258,7 +258,7 @@ export default function CommentsPanel({
     : comments.filter((c) => !c.resolved);
 
   return (
-    <div className="h-full flex flex-col bg-white/[0.02] border-l border-white/10">
+    <div className="h-full flex flex-col bg-white/[0.02] border-l border-white/10 ">
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -372,7 +372,7 @@ function CommentItem({
           : "bg-white/5 border-white/10"
       }`}
     >
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-2 ">
         <div className="flex items-center gap-2">
           {comment.profiles.avatar_url ? (
             <img

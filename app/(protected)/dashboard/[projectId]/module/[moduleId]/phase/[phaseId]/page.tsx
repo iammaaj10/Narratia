@@ -650,7 +650,7 @@ export default function WritingEditorPage() {
 
         {/* Comments Panel - Desktop */}
         {showComments && (
-          <div className="hidden lg:block fixed right-0 top-[80px] w-96 h-[calc(100vh-80px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto">
+          <div className="hidden lg:block fixed right-0 top-[120px] w-96 h-[calc(100vh-80px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto ">
             <CommentsPanel
               phaseId={phaseId}
               currentUserId={currentUserId}

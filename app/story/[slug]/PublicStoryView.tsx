@@ -151,7 +151,7 @@ export default function PublicStoryView({ project, modules }: Props) {
   const readingTime = Math.ceil(totalWords / 200); // 200 words per minute
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="min-h-screen bg-linear-to-b from-slate-950 via-purple-950/20 to-slate-950">
       {/* Header */}
       <header className="border-b border-white/10 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">

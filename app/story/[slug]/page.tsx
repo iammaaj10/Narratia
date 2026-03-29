@@ -49,7 +49,7 @@ export default function PublicStoryPage() {
     try {
       setLoading(true);
 
-      console.log("🔍 Looking for slug:", slug);
+      console.log(" Looking for slug:", slug);
 
       // Fetch public project - simpler query first
       const { data: projectData, error: projectError } = await supabase
@@ -59,11 +59,11 @@ export default function PublicStoryPage() {
         .eq("is_public", true)
         .single();
 
-      console.log("📦 Project data:", projectData);
-      console.log("❌ Project error:", projectError);
+      console.log(" Project data:", projectData);
+      console.log(" Project error:", projectError);
 
       if (projectError || !projectData) {
-        console.error("❌ Project not found");
+        console.error(" Project not found");
         setNotFound(true);
         setLoading(false);
         return;
@@ -76,7 +76,7 @@ export default function PublicStoryPage() {
         .eq("id", projectData.owner_id)
         .single();
 
-      console.log("👤 Owner profile:", ownerProfile);
+      console.log(" Owner profile:", ownerProfile);
 
       // Combine project with profile
       const fullProject: Project = {
@@ -112,7 +112,7 @@ export default function PublicStoryPage() {
         .eq("project_id", projectData.id)
         .order("created_at", { ascending: true });
 
-      console.log("📚 Modules:", modulesData);
+      console.log("Modules:", modulesData);
 
       // Fetch phases for each module
       const modulesWithPhases = await Promise.all(
@@ -130,10 +130,10 @@ export default function PublicStoryPage() {
         })
       );
 
-      console.log("📖 Modules with phases:", modulesWithPhases);
+      console.log(" Modules with phases:", modulesWithPhases);
       setModules(modulesWithPhases);
     } catch (err) {
-      console.error("❌ Error loading story:", err);
+      console.error(" Error loading story:", err);
       setNotFound(true);
     } finally {
       setLoading(false);
