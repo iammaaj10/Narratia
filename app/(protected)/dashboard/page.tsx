@@ -392,7 +392,7 @@ export default function DashboardPage() {
                       onClick={(e) =>
                         deleteProject(project.id, project.title, e)
                       }
-                      className="p-2 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all"
+                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
                       title="Delete project"
                     >
                       <Trash2 className="w-4 h-4" />
