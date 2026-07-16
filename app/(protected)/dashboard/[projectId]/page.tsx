@@ -156,7 +156,7 @@ export default function ProjectDetailPage() {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="pb-12"
@@ -187,11 +187,11 @@ export default function ProjectDetailPage() {
                 </div>
               )}
             </motion.div>
-            
+
             <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2">
               {project.title}
             </motion.h1>
-            
+
             {project.description && (
               <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-gray-400 text-base lg:text-lg max-w-3xl leading-relaxed">
                 {project.description}
@@ -210,7 +210,7 @@ export default function ProjectDetailPage() {
                 Team
               </button>
             )}
-            
+
             <button
               onClick={() => setShowShareSettings(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white transition-all group"
@@ -239,7 +239,7 @@ export default function ProjectDetailPage() {
 
         {/* Team Members Section */}
         {project.is_team && members.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -254,7 +254,7 @@ export default function ProjectDetailPage() {
                 </span>
               </div>
               {isOwner && (
-                <button 
+                <button
                   onClick={() => router.push(`/dashboard/${projectId}/team`)}
                   className="text-sm text-purple-400 hover:text-purple-300 font-medium"
                 >
@@ -325,7 +325,7 @@ export default function ProjectDetailPage() {
 
           {/* Modules List */}
           {modules.length === 0 ? (
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="text-center py-20 rounded-3xl border border-dashed border-white/20 bg-white/[0.01]"
@@ -362,7 +362,7 @@ export default function ProjectDetailPage() {
                     className="group cursor-pointer flex flex-col h-48 p-6 rounded-3xl bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgb(168,85,247,0.1)] transition-all overflow-hidden relative"
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                    
+
                     <div className="flex items-start justify-between mb-4 z-10">
                       <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-purple-500/20 group-hover:border-purple-500/30 group-hover:text-purple-300 transition-colors">
                         <FolderOpen className="w-5 h-5 text-gray-400 group-hover:text-purple-300 transition-colors" />
@@ -386,7 +386,7 @@ export default function ProjectDetailPage() {
                         </p>
                       )}
                     </div>
-                    
+
                     <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 font-medium z-10">
                       <Calendar className="w-3.5 h-3.5" />
                       {new Date(module.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -472,14 +472,14 @@ function CreateModuleModal({
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -552,4 +552,4 @@ function CreateModuleModal({
       </motion.div>
     </motion.div>
   );
-}
+}

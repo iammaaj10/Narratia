@@ -221,19 +221,19 @@ export default function DashboardPage() {
   // Empty state (no projects at all)
   if (projects.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center justify-center py-24 px-4 text-center"
       >
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05, rotate: 5 }}
             className="relative w-32 h-32 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl"
           >
             <BookOpen className="w-14 h-14 text-purple-300" />
-            <motion.div 
+            <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               className="absolute -top-3 -right-3"
@@ -358,11 +358,10 @@ export default function DashboardPage() {
           {/* Show Archived Toggle */}
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`flex items-center justify-center gap-2 px-4 py-3 min-w-[140px] rounded-xl text-sm font-medium transition-all ${
-              showArchived
+            className={`flex items-center justify-center gap-2 px-4 py-3 min-w-[140px] rounded-xl text-sm font-medium transition-all ${showArchived
                 ? "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/50"
                 : "bg-white/5 hover:bg-white/10 text-gray-300"
-            }`}
+              }`}
           >
             {showArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
             {showArchived ? "Active" : "Archived"}
@@ -372,7 +371,7 @@ export default function DashboardPage() {
 
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-20 rounded-3xl border border-dashed border-white/10 bg-white/[0.01]"
@@ -386,89 +385,87 @@ export default function DashboardPage() {
           <p className="text-gray-400">Try adjusting your search or filters to find what you're looking for.</p>
         </motion.div>
       ) : (
-        <div 
+        <div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-            {filteredProjects.map((project) => {
-              const isOwner = project.owner_id === currentUserId;
+          {filteredProjects.map((project) => {
+            const isOwner = project.owner_id === currentUserId;
 
-              return (
-                <div
-                  key={project.id}
-                  onClick={() => router.push(`/dashboard/${project.id}`)}
-                  className={`group relative cursor-pointer flex flex-col h-[280px] p-6 sm:p-8 rounded-[2rem] border transition-all duration-300 overflow-hidden hover:-translate-y-1 ${
-                    project.archived
-                      ? "bg-white/[0.02] border-white/5 opacity-60"
-                      : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)]"
+            return (
+              <div
+                key={project.id}
+                onClick={() => router.push(`/dashboard/${project.id}`)}
+                className={`group relative cursor-pointer flex flex-col h-[280px] p-6 sm:p-8 rounded-[2rem] border transition-all duration-300 overflow-hidden hover:-translate-y-1 ${project.archived
+                    ? "bg-white/[0.02] border-white/5 opacity-60"
+                    : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)]"
                   }`}
-                >
-                  {/* Inner ring for depth */}
-                  <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/5 pointer-events-none" />
-                  
-                  {/* Ambient Glow on hover */}
-                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 blur-[50px] group-hover:bg-purple-500/20 transition-colors pointer-events-none rounded-full" />
+              >
+                {/* Inner ring for depth */}
+                <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/5 pointer-events-none" />
 
-                  {/* Top Bar: Badges & Actions */}
-                  <div className="relative z-10 flex items-start justify-between mb-4">
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider ${
-                        project.is_team 
-                          ? "bg-blue-500/10 text-blue-300 border border-blue-500/20" 
-                          : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                {/* Ambient Glow on hover */}
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 blur-[50px] group-hover:bg-purple-500/20 transition-colors pointer-events-none rounded-full" />
+
+                {/* Top Bar: Badges & Actions */}
+                <div className="relative z-10 flex items-start justify-between mb-4">
+                  <div className="flex flex-wrap gap-2">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider ${project.is_team
+                        ? "bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                        : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
                       }`}>
-                        {project.is_team ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
-                        {project.is_team ? "Team" : "Solo"}
+                      {project.is_team ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                      {project.is_team ? "Team" : "Solo"}
+                    </span>
+                    {isOwner && project.is_team && (
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        Owner
                       </span>
-                      {isOwner && project.is_team && (
-                        <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                          Owner
-                        </span>
-                      )}
-                    </div>
-
-                    {isOwner && (
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-md rounded-xl p-1 border border-white/5">
-                        <button
-                          onClick={(e) => toggleArchive(project.id, project.archived, e)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-orange-400 hover:bg-orange-500/20 transition-all"
-                          title={project.archived ? "Unarchive" : "Archive"}
-                        >
-                          {project.archived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
-                        </button>
-                        <button
-                          onClick={(e) => deleteProject(project.id, project.title, e)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/20 transition-all"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className="relative z-10 flex-1 flex flex-col pt-2">
-                    <h3 className="text-2xl font-bold text-white mb-3 line-clamp-2 group-hover:text-purple-300 transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">
-                      {project.description || "No synopsis provided. Click to start writing."}
-                    </p>
-                  </div>
+                  {isOwner && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-md rounded-xl p-1 border border-white/5">
+                      <button
+                        onClick={(e) => toggleArchive(project.id, project.archived, e)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-orange-400 hover:bg-orange-500/20 transition-all"
+                        title={project.archived ? "Unarchive" : "Archive"}
+                      >
+                        {project.archived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={(e) => deleteProject(project.id, project.title, e)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/20 transition-all"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Footer */}
-                  <div className="relative z-10 mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-medium text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5" />
-                      Updated {new Date(project.updated_at || project.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </div>
-                    <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                      <MoreVertical className="w-4 h-4" />
-                    </div>
+                {/* Content */}
+                <div className="relative z-10 flex-1 flex flex-col pt-2">
+                  <h3 className="text-2xl font-bold text-white mb-3 line-clamp-2 group-hover:text-purple-300 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">
+                    {project.description || "No synopsis provided. Click to start writing."}
+                  </p>
+                </div>
+
+                {/* Footer */}
+                <div className="relative z-10 mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-medium text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5" />
+                    Updated {new Date(project.updated_at || project.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                  <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                    <MoreVertical className="w-4 h-4" />
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
         </div>
       )}
     </motion.div>
