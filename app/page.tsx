@@ -163,6 +163,10 @@ export default function Page() {
         .dot-r { background: #ff5f56; border: 1px solid #e0443e; }
         .dot-y { background: #ffbd2e; border: 1px solid #dea123; }
         .dot-g { background: #27c93f; border: 1px solid #1aab29; }
+
+        /* Perspective for 3D elements */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
       `}</style>
 
       {/* ── BACKGROUND ── */}
@@ -201,40 +205,121 @@ export default function Page() {
           {/* Timeline node */}
           <div className="hidden lg:block absolute left-[40px] top-[24px] w-5 h-5 rounded-full border-[3px] border-[#05050A] bg-indigo-500 timeline-glow transform -translate-x-1/2 z-20" />
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-4xl sm:text-6xl lg:text-[5rem] font-extrabold leading-[1.05] tracking-tight text-white mb-6 max-w-4xl outfit">
-              Let's build from here, <br className="hidden sm:block" />
-              <span className="grad-text">word by word.</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-400 max-w-2xl font-normal leading-relaxed mb-10">
-              The complete developer-grade platform for writers. AI-assisted drafting, real-time team collaboration, and seamless multi-format publishing.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
-              <button onClick={() => router.push("/register")} className="btn-primary text-base px-8 py-4 w-full sm:w-auto justify-center">
-                Start writing
-                <ChevronRight />
-              </button>
-              <button onClick={() => router.push("/login")} className="btn-secondary text-base px-8 py-4 w-full sm:w-auto justify-center">
-                Login to Narratia
-              </button>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <h1 className="text-4xl sm:text-6xl lg:text-[5rem] font-extrabold leading-[1.05] tracking-tight text-white mb-6 max-w-4xl outfit">
+                Let's build from here, <br className="hidden sm:block" />
+                <span className="grad-text">word by word.</span>
+              </h1>
+              <p className="text-lg sm:text-xl text-slate-400 max-w-xl font-normal leading-relaxed mb-10">
+                The complete developer-grade platform for writers. AI-assisted drafting, real-time team collaboration, and seamless multi-format publishing.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
+                <button onClick={() => router.push("/register")} className="btn-primary text-base px-8 py-4 w-full sm:w-auto justify-center">
+                  Start writing
+                  <ChevronRight />
+                </button>
+                <button onClick={() => router.push("/login")} className="btn-secondary text-base px-8 py-4 w-full sm:w-auto justify-center">
+                  Login to Narratia
+                </button>
+              </div>
+              
+              {/* Stats */}
+              <div className="flex flex-wrap gap-6 sm:gap-12 border-t border-white/5 pt-8 max-w-2xl">
+                <div>
+                  <div className="text-3xl font-bold text-white mb-1 outfit"><Counter target={2} suffix="M+" /></div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider outfit">Stories Created</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white mb-1 outfit"><Counter target={100} suffix="K+" /></div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider outfit">Active Writers</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white mb-1 outfit"><Counter target={99} suffix=".9%" /></div>
+                  <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider outfit">Reliability</div>
+                </div>
+              </div>
+            </motion.div>
 
-            {/* Stats */}
-            <div className="flex flex-wrap gap-8 sm:gap-16 border-y border-white/5 py-8 mb-8 max-w-3xl">
-              <div>
-                <div className="text-4xl font-bold text-white mb-1 outfit"><Counter target={2} suffix="M+" /></div>
-                <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider outfit">Stories Created</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-white mb-1 outfit"><Counter target={100} suffix="K+" /></div>
-                <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider outfit">Active Writers</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-white mb-1 outfit"><Counter target={99} suffix=".9%" /></div>
-                <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider outfit">Reliability</div>
-              </div>
-            </div>
-          </motion.div>
+            {/* ── UNIQUE HOLOGRAPHIC 3D BOOK ── */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              transition={{ duration: 1, delay: 0.2 }}
+              className="hidden lg:flex relative w-full h-[600px] items-center justify-center"
+              style={{ perspective: 1500 }}
+            >
+              {/* Overall Book Rotation */}
+              <motion.div 
+                animate={{ rotateX: [20, 25, 20], rotateY: [-25, -15, -25], y: [-15, 15, -15] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-[500px] h-[360px] transform-style-3d"
+              >
+                {/* Book Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-indigo-500/15 rounded-full blur-[90px] pointer-events-none" />
+
+                {/* Left Static Stack */}
+                <div className="absolute top-0 right-1/2 w-[250px] h-full bg-[#0B0914]/80 backdrop-blur-md border-y border-l border-white/10 rounded-l-[24px] origin-right flex items-center justify-center overflow-hidden" style={{ transform: "rotateY(-4deg)" }}>
+                  <div className="w-[150%] h-[150%] absolute border-[2px] border-indigo-500/5 rounded-full" style={{ transform: "translate(-20%, -10%)" }} />
+                  <div className="w-[100%] h-[100%] absolute border-[1px] border-purple-500/5 rounded-full" style={{ transform: "translate(-10%, 10%)" }} />
+                </div>
+                <div className="absolute top-0 right-1/2 w-[250px] h-full bg-[#05050A]/90 border-y border-l border-white/5 rounded-l-[24px] origin-right" style={{ transform: "rotateY(-8deg) translateZ(-5px)" }} />
+                <div className="absolute top-0 right-1/2 w-[250px] h-full bg-[#05050A] border-y border-l border-white/5 rounded-l-[24px] origin-right" style={{ transform: "rotateY(-12deg) translateZ(-10px)" }} />
+
+                {/* Right Static Stack */}
+                <div className="absolute top-0 left-1/2 w-[250px] h-full bg-[#0B0914]/80 backdrop-blur-md border-y border-r border-white/10 rounded-r-[24px] origin-left flex items-center justify-center overflow-hidden" style={{ transform: "rotateY(4deg)" }}>
+                  <div className="w-[150%] h-[150%] absolute border-[2px] border-indigo-500/5 rounded-full" style={{ transform: "translate(20%, -10%)" }} />
+                </div>
+                <div className="absolute top-0 left-1/2 w-[250px] h-full bg-[#05050A]/90 border-y border-r border-white/5 rounded-r-[24px] origin-left" style={{ transform: "rotateY(8deg) translateZ(-5px)" }} />
+                <div className="absolute top-0 left-1/2 w-[250px] h-full bg-[#05050A] border-y border-r border-white/5 rounded-r-[24px] origin-left" style={{ transform: "rotateY(12deg) translateZ(-10px)" }} />
+
+                {/* The Spine */}
+                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-6 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-[3px] z-10" />
+                <div className="absolute top-[-20px] bottom-[-20px] left-1/2 -translate-x-1/2 w-12 bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent rounded-[50%] blur-xl z-10" />
+
+                {/* Animated Flipping Pages (Hologram Data) */}
+                {[0, 1, 2, 3].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute top-0 left-1/2 w-[250px] h-full origin-left overflow-hidden flex flex-col justify-center p-8 space-y-6 rounded-r-[24px]"
+                    style={{ 
+                      background: "linear-gradient(to right, rgba(99,102,241,0.15), rgba(168,85,247,0.02))",
+                      border: "1px solid rgba(168,85,247,0.3)",
+                      borderLeft: "none",
+                      backdropFilter: "blur(6px)"
+                    }}
+                    initial={{ rotateY: 3, opacity: 0 }}
+                    animate={{ rotateY: -183, opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: i * 2,
+                    }}
+                  >
+                    {/* Glowing floating symbols on the page */}
+                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shadow-[0_0_30px_rgba(168,85,247,0.5)] text-purple-200">
+                      {i % 2 === 0 ? <Sparkles /> : <Zap />}
+                    </div>
+                    
+                    {/* Data lines representing story being written */}
+                    <div className="space-y-4 w-full">
+                      <div className="h-2 w-full bg-indigo-300/30 rounded-full overflow-hidden relative">
+                        <motion.div className="absolute top-0 bottom-0 left-0 bg-indigo-400/80 w-1/3 rounded-full blur-[2px]" animate={{ x: [-100, 250] }} transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: i * 0.5 }} />
+                      </div>
+                      <div className="h-2 w-5/6 bg-indigo-300/20 rounded-full" />
+                      <div className="h-2 w-4/6 bg-indigo-300/10 rounded-full" />
+                      
+                      <div className="mt-6 relative p-4 rounded-xl border border-pink-500/20 bg-pink-500/10">
+                        <div className="h-2 w-3/4 bg-pink-400/40 rounded-full mb-3" />
+                        <div className="h-2 w-1/2 bg-pink-400/20 rounded-full" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+          </div>
         </section>
 
         {/* ── EDITOR PREVIEW SECTION ── */}
