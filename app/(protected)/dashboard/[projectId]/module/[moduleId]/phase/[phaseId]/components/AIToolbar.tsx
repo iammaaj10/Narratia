@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import {
   Sparkles,
   Wand2,
@@ -24,12 +24,16 @@ type AIToolbarProps = {
   onReplace: (text: string) => void;
 };
 
-export default function AIToolbar({
+export interface AIToolbarRef {
+  triggerAI: (action: "suggest" | "fix" | "expand" | "shorten") => Promise<void>;
+}
+
+const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
   selectedText,
   fullContent,
   onInsert,
   onReplace,
-}: AIToolbarProps) {
+}, ref) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -89,6 +93,10 @@ export default function AIToolbar({
       setLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    triggerAI: handleAIAction
+  }));
 
   const handleAccept = () => {
     if (result) {
@@ -201,4 +209,6 @@ export default function AIToolbar({
       )}
     </>
   );
-}
+});
+
+export default AIToolbar;

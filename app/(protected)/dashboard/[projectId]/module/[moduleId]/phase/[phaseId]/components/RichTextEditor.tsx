@@ -6,7 +6,8 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
-import AIToolbar from "./AIToolbar";
+import AIToolbar, { AIToolbarRef } from "./AIToolbar";
+import { SlashCommand, getSuggestionItems, renderItems } from "./SlashCommandExtension";
 
 import {
   Bold,
@@ -25,7 +26,7 @@ import {
   Link as LinkIcon,
   Code,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
 type RichTextEditorProps = {
   content: string;
@@ -40,6 +41,7 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
   const [selectedText, setSelectedText] = useState("");
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const aiToolbarRef = useRef<AIToolbarRef>(null);
   
   const editor = useEditor({
     immediatelyRender: false,
@@ -61,6 +63,18 @@ export default function RichTextEditor({
         placeholder,
       }),
       CharacterCount,
+      // eslint-disable-next-line react-hooks/refs
+      SlashCommand.configure({
+        suggestion: {
+          items: ({ query }: { query: string }) => getSuggestionItems(query, {
+            handleAIContinue: () => aiToolbarRef.current?.triggerAI("suggest"),
+            handleAIExpand: () => aiToolbarRef.current?.triggerAI("expand"),
+            handleAIShorten: () => aiToolbarRef.current?.triggerAI("shorten"),
+            handleAIFixGrammar: () => aiToolbarRef.current?.triggerAI("fix"),
+          }),
+          render: renderItems,
+        },
+      }),
     ],
     content: content || "", // Set initial content
     editorProps: {
@@ -155,6 +169,7 @@ export default function RichTextEditor({
         <div className="flex items-center gap-1 p-2 flex-wrap">
           {/* AI Toolbar */}
           <AIToolbar
+            ref={aiToolbarRef}
             selectedText={selectedText}
             fullContent={content}
             onInsert={handleAIInsert}
