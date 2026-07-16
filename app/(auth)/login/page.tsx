@@ -39,141 +39,104 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#02020a]">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-600/5 rounded-full blur-[120px]" />
+    <div className="min-h-screen flex bg-[#05050A]">
+      {/* Left Pane - Visual Storytelling */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-[#0A0A10] border-r border-white/5">
+        {/* Subtle abstract gradient */}
+        <div className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl rounded-full" />
         
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPgo8cGF0aCBkPSJNMCAwdjQwTTAgMGg0MCIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDIpIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz4KPC9zdmc+')] opacity-50" />
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full h-full">
+           <Link href="/" className="flex items-center gap-3 w-fit">
+              <div className="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-bold text-xl outfit">
+                N
+              </div>
+              <span className="text-2xl font-bold text-white tracking-tight outfit">
+                Narratia
+              </span>
+           </Link>
+
+           <div className="max-w-md">
+             <h2 className="text-4xl font-bold text-white mb-6 outfit leading-[1.2]">
+               Your story deserves <br />
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">the perfect canvas.</span>
+             </h2>
+             <p className="text-lg text-slate-400 leading-relaxed">
+               Join thousands of writers who have found their voice on the most advanced storytelling platform ever built.
+             </p>
+           </div>
+           
+           <div className="flex items-center gap-4 text-sm text-slate-500">
+              <span>© 2026 Narratia Inc.</span>
+           </div>
+        </div>
       </div>
 
-      {/* Navbar */}
-      <nav className="absolute top-0 w-full p-6 z-20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
-              N
+      {/* Right Pane - Form */}
+      <div className="flex-1 flex items-center justify-center relative">
+         <div className="w-full max-w-[400px] px-6 py-12">
+            <div className="lg:hidden flex items-center gap-2 mb-12">
+              <div className="w-8 h-8 bg-white text-black rounded flex items-center justify-center font-bold text-lg outfit">N</div>
+              <span className="text-xl font-bold text-white tracking-tight outfit">Narratia</span>
             </div>
-            <span className="text-xl font-bold text-white tracking-tight group-hover:text-indigo-200 transition-colors">
-              Narratia
-            </span>
-          </Link>
-          <Link
-            href="/register"
-            className="px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5"
-          >
-            Create an account
-          </Link>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-[420px] px-4"
-      >
-        <div className="relative backdrop-blur-xl bg-black/40 border border-white/10 p-8 sm:p-10 rounded-[2rem] shadow-2xl">
-          {/* Top glow accent */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
-          
-          <div className="mb-10 text-center">
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10 shadow-inner"
-            >
-              <Sparkles className="w-8 h-8 text-purple-400" />
-            </motion.div>
-            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">
-              Welcome back
-            </h1>
-            <p className="text-gray-400 text-sm">
-              Sign in to continue your story
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">
-                Email
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
-                </div>
+            
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-white tracking-tight mb-2 outfit">
+                Welcome back
+              </h1>
+              <p className="text-slate-400 text-sm">
+                Enter your credentials to access your workspace.
+              </p>
+            </div>
+            
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">Email address</label>
                 <input
                   type="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all shadow-inner"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-sm"
                   required
                 />
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Password
-                </label>
-                <Link href="#" className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-slate-300">Password</label>
+                  <Link href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                    Forgot password?
+                  </Link>
                 </div>
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all shadow-inner"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-sm"
                   required
                 />
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white py-3.5 rounded-2xl font-semibold text-sm shadow-[0_0_20px_-5px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_-5px_rgba(168,85,247,0.6)] transition-all disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden mt-8"
-            >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-              <span className="relative flex items-center justify-center gap-2">
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    Sign In
-                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </span>
-            </button>
-          </form>
-          
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-400">
-              Don't have an account?{" "}
-              <Link href="/register" className="font-semibold text-white hover:text-purple-300 transition-colors">
-                Sign up
-              </Link>
-            </p>
-          </div>
-        </div>
-      </motion.div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-white hover:bg-slate-200 text-black rounded-xl py-3.5 font-semibold text-sm transition-colors mt-6 flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+              </button>
+            </form>
+            
+            <div className="mt-8 text-center">
+              <p className="text-sm text-slate-400">
+                Don't have an account?{" "}
+                <Link href="/register" className="font-semibold text-white hover:text-indigo-300 transition-colors">
+                  Create one now
+                </Link>
+              </p>
+            </div>
+         </div>
+      </div>
     </div>
   );
 }
