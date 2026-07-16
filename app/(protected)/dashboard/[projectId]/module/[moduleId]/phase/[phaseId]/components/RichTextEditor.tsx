@@ -163,7 +163,7 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-950">
+    <div className="flex flex-col h-full bg-slate-950 rich-text-editor">
       {/* Toolbar */}
       <div className="border-b border-white/10 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-1 p-2 flex-wrap">
@@ -376,13 +376,13 @@ export default function RichTextEditor({
 
       {/* Editor Styles */}
       <style jsx global>{`
-        .ProseMirror {
+        .rich-text-editor .ProseMirror {
           color: #e5e7eb;
           font-family: "Georgia", serif;
           line-height: 1.8;
         }
 
-        .ProseMirror p.is-editor-empty:first-child::before {
+        .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           float: left;
           color: #6b7280;
@@ -390,11 +390,11 @@ export default function RichTextEditor({
           height: 0;
         }
 
-        .ProseMirror:focus {
+        .rich-text-editor .ProseMirror:focus {
           outline: none;
         }
 
-        .ProseMirror h1 {
+        .rich-text-editor .ProseMirror h1 {
           font-size: 2.5rem;
           font-weight: bold;
           margin-top: 2rem;
@@ -402,7 +402,7 @@ export default function RichTextEditor({
           color: #fff;
         }
 
-        .ProseMirror h2 {
+        .rich-text-editor .ProseMirror h2 {
           font-size: 2rem;
           font-weight: bold;
           margin-top: 1.75rem;
@@ -410,7 +410,7 @@ export default function RichTextEditor({
           color: #fff;
         }
 
-        .ProseMirror h3 {
+        .rich-text-editor .ProseMirror h3 {
           font-size: 1.5rem;
           font-weight: bold;
           margin-top: 1.5rem;
@@ -418,25 +418,25 @@ export default function RichTextEditor({
           color: #fff;
         }
 
-        .ProseMirror ul,
-        .ProseMirror ol {
+        .rich-text-editor .ProseMirror ul,
+        .rich-text-editor .ProseMirror ol {
           padding-left: 1.5rem;
           margin: 1rem 0;
         }
 
-        .ProseMirror ul li {
+        .rich-text-editor .ProseMirror ul li {
           list-style-type: disc;
         }
 
-        .ProseMirror ol li {
+        .rich-text-editor .ProseMirror ol li {
           list-style-type: decimal;
         }
 
-        .ProseMirror li {
+        .rich-text-editor .ProseMirror li {
           margin: 0.5rem 0;
         }
 
-        .ProseMirror blockquote {
+        .rich-text-editor .ProseMirror blockquote {
           border-left: 4px solid #a855f7;
           padding-left: 1rem;
           margin: 1.5rem 0;
@@ -444,7 +444,7 @@ export default function RichTextEditor({
           color: #d1d5db;
         }
 
-        .ProseMirror code {
+        .rich-text-editor .ProseMirror code {
           background-color: rgba(168, 85, 247, 0.1);
           color: #c084fc;
           padding: 0.2rem 0.4rem;
@@ -453,7 +453,7 @@ export default function RichTextEditor({
           font-size: 0.9em;
         }
 
-        .ProseMirror pre {
+        .rich-text-editor .ProseMirror pre {
           background-color: rgba(0, 0, 0, 0.3);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 0.5rem;
@@ -462,42 +462,42 @@ export default function RichTextEditor({
           overflow-x: auto;
         }
 
-        .ProseMirror pre code {
+        .rich-text-editor .ProseMirror pre code {
           background: none;
           color: #e5e7eb;
           padding: 0;
         }
 
-        .ProseMirror hr {
+        .rich-text-editor .ProseMirror hr {
           border: none;
           border-top: 2px solid rgba(168, 85, 247, 0.3);
           margin: 2rem 0;
         }
 
-        .ProseMirror a {
+        .rich-text-editor .ProseMirror a {
           color: #a855f7;
           text-decoration: underline;
           cursor: pointer;
         }
 
-        .ProseMirror a:hover {
+        .rich-text-editor .ProseMirror a:hover {
           color: #c084fc;
         }
 
-        .ProseMirror strong {
+        .rich-text-editor .ProseMirror strong {
           font-weight: bold;
           color: #fff;
         }
 
-        .ProseMirror em {
+        .rich-text-editor .ProseMirror em {
           font-style: italic;
         }
 
-        .ProseMirror u {
+        .rich-text-editor .ProseMirror u {
           text-decoration: underline;
         }
 
-        .ProseMirror s {
+        .rich-text-editor .ProseMirror s {
           text-decoration: line-through;
         }
       `}</style>

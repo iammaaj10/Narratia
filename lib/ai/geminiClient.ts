@@ -299,3 +299,30 @@ Provide your analysis in the following JSON format (RETURN ONLY VALID JSON, NO M
     throw new Error(`Failed to analyze emotions: ${error.message}`);
   }
 }
+
+// ============================================
+// AI FEATURE 7: Quick Emotion Analysis (Zen Mode)
+// ============================================
+export async function analyzeParagraphEmotion(text: string): Promise<string> {
+  if (!text.trim()) return "#9333ea"; // Default purple
+  
+  const prompt = `Analyze the primary emotion of this text snippet in one word (choose exactly one: tension, action, joy, sadness, magic, neutral).
+Text: "${text}"
+Output only the word, nothing else.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const emotion = result.response.text().trim().toLowerCase();
+    
+    // Convert emotion to a hex color
+    if (emotion.includes("tension")) return "#ef4444"; // Red
+    if (emotion.includes("action")) return "#f97316"; // Orange
+    if (emotion.includes("joy")) return "#eab308"; // Yellow
+    if (emotion.includes("sadness")) return "#3b82f6"; // Blue
+    if (emotion.includes("magic")) return "#8b5cf6"; // Purple
+    return "#6366f1"; // Indigo/Neutral
+  } catch (error) {
+    console.error("Emotion check failed:", error);
+    return "#6366f1"; // Fallback color
+  }
+}
