@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import {
   PlusCircle,
   Search,
@@ -12,7 +12,13 @@ import {
   ArchiveRestore,
   SortAsc,
   Trash2,
+  Users,
+  User,
+  Clock,
+  MoreVertical,
+  BookOpen
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Project = {
   id: string;
@@ -200,13 +206,14 @@ export default function DashboardPage() {
     }
 
     setProjects(projects.filter((p) => p.id !== projectId));
-    alert("Project deleted successfully!");
+    // No alert needed for premium UI, just visual update
   };
 
   if (loading) {
     return (
-      <div className="p-12">
-        <div className="text-gray-400">Loading projects...</div>
+      <div className="flex flex-col items-center justify-center py-32">
+        <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
+        <div className="text-gray-400 font-medium">Loading your stories...</div>
       </div>
     );
   }
@@ -214,227 +221,256 @@ export default function DashboardPage() {
   // Empty state (no projects at all)
   if (projects.length === 0) {
     return (
-      <div className="p-12">
-        <div className="text-center space-y-6 py-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/10 mb-4">
-            <PlusCircle className="w-10 h-10 text-purple-300" />
-          </div>
-
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
-            Your Story Dashboard
-          </h1>
-
-          <p className="text-gray-400 text-lg max-w-md mx-auto">
-            Your stories will appear here. Start creating your first
-            masterpiece!
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-            <button
-              onClick={() => router.push("/dashboard/outline-generator")}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center py-24 px-4 text-center"
+      >
+        <div className="relative mb-8">
+          <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full" />
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="relative w-32 h-32 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl"
+          >
+            <BookOpen className="w-14 h-14 text-purple-300" />
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="absolute -top-3 -right-3"
             >
-              <Sparkles className="w-5 h-5" />
-              AI Outline Generator
-            </button>
-
-            <button
-              onClick={() => router.push("/dashboard/new-project")}
-              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
-            >
-              <PlusCircle className="w-5 h-5" />
-              Create Your First Story
-            </button>
-          </div>
+              <Sparkles className="w-8 h-8 text-pink-400" />
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+
+        <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          Your Story Awaits
+        </h1>
+        <p className="text-gray-400 text-lg max-w-md mx-auto mb-10">
+          The blank page is full of possibilities. Start your first masterpiece manually or let AI guide your imagination.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-lg">
+          <button
+            onClick={() => router.push("/dashboard/outline-generator")}
+            className="group relative flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 text-cyan-300 rounded-2xl font-semibold border border-cyan-500/20 transition-all duration-300"
+          >
+            <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            AI Generator
+          </button>
+
+          <button
+            onClick={() => router.push("/dashboard/new-project")}
+            className="group relative flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+          >
+            <PlusCircle className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+            Create Blank
+          </button>
+        </div>
+      </motion.div>
     );
   }
 
   // Projects grid
   return (
-    <div className="p-12">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Your Stories</h1>
-          <p className="text-gray-400 text-sm">
-            {filteredProjects.length}{" "}
-            {filteredProjects.length === 1 ? "story" : "stories"}
-            {showArchived && " (archived)"}
-          </p>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Your Stories</h1>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10">
+              {filteredProjects.length} {filteredProjects.length === 1 ? "Story" : "Stories"}
+            </span>
+            {showArchived && (
+              <span className="px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-300 border border-orange-500/20">
+                Viewing Archived
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={() => router.push("/dashboard/outline-generator")}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-xl font-medium border border-blue-500/20 transition-all group"
           >
-            <Sparkles className="w-5 h-5" />
-            AI Outline Generator
+            <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">AI Outline</span>
+            <span className="sm:hidden">AI</span>
           </button>
 
           <button
             onClick={() => router.push("/dashboard/new-project")}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-500 hover:bg-purple-400 text-white rounded-xl font-medium shadow-lg shadow-purple-500/20 transition-all group"
           >
-            <PlusCircle className="w-5 h-5" />
-            New Story
+            <PlusCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+            <span>New Story</span>
           </button>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="mb-6 flex flex-wrap gap-4">
+      <div className="flex flex-col lg:flex-row gap-4 p-2 rounded-2xl bg-black/20 border border-white/5 backdrop-blur-md">
         {/* Search */}
-        <div className="flex-1 min-w-[300px]">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
-            />
+        <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search your stories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white/5 hover:bg-white/10 border-transparent rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 custom-scrollbar">
+          {/* Filter by type */}
+          <div className="relative min-w-[140px]">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value as FilterOption)}
+              className="w-full bg-white/5 hover:bg-white/10 border-transparent rounded-xl pl-9 pr-8 py-3 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer transition-all"
+            >
+              <option value="all">All Types</option>
+              <option value="solo">Solo Only</option>
+              <option value="team">Team Only</option>
+            </select>
           </div>
-        </div>
 
-        {/* Filter by type */}
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-          <select
-            value={filterBy}
-            onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-            className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-8 py-3 text-white focus:outline-none focus:border-purple-500/50 appearance-none cursor-pointer"
+          {/* Sort */}
+          <div className="relative min-w-[150px]">
+            <SortAsc className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="w-full bg-white/5 hover:bg-white/10 border-transparent rounded-xl pl-9 pr-8 py-3 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer transition-all"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="name-desc">Name (Z-A)</option>
+            </select>
+          </div>
+
+          {/* Show Archived Toggle */}
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`flex items-center justify-center gap-2 px-4 py-3 min-w-[140px] rounded-xl text-sm font-medium transition-all ${
+              showArchived
+                ? "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/50"
+                : "bg-white/5 hover:bg-white/10 text-gray-300"
+            }`}
           >
-            <option value="all">All Projects</option>
-            <option value="solo">Solo Only</option>
-            <option value="team">Team Only</option>
-          </select>
+            {showArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+            {showArchived ? "Active" : "Archived"}
+          </button>
         </div>
-
-        {/* Sort */}
-        <div className="relative">
-          <SortAsc className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-8 py-3 text-white focus:outline-none focus:border-purple-500/50 appearance-none cursor-pointer"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="name-desc">Name (Z-A)</option>
-          </select>
-        </div>
-
-        {/* Show Archived Toggle */}
-        <button
-          onClick={() => setShowArchived(!showArchived)}
-          className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
-            showArchived
-              ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
-              : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
-          }`}
-        >
-          {showArchived ? (
-            <ArchiveRestore className="w-5 h-5" />
-          ) : (
-            <Archive className="w-5 h-5" />
-          )}
-          {showArchived ? "Show Active" : "Show Archived"}
-        </button>
       </div>
 
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
-        <div className="text-center py-16 rounded-xl border border-dashed border-white/20">
-          <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-400 mb-2">
-            No projects found
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center py-20 rounded-3xl border border-dashed border-white/10 bg-white/[0.01]"
+        >
+          <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Search className="w-8 h-8 text-gray-500" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No stories found
           </h3>
-          <p className="text-gray-500">Try adjusting your search or filters</p>
-        </div>
+          <p className="text-gray-400">Try adjusting your search or filters to find what you're looking for.</p>
+        </motion.div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => {
-            const isOwner = project.owner_id === currentUserId;
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+            {filteredProjects.map((project) => {
+              const isOwner = project.owner_id === currentUserId;
 
-            return (
-              <div
-                key={project.id}
-                onClick={() => router.push(`/dashboard/${project.id}`)}
-                className={`cursor-pointer p-6 rounded-2xl border transition-all group relative ${
-                  project.archived
-                    ? "bg-white/[0.01] border-orange-500/20 opacity-60"
-                    : "bg-white/[0.03] border-white/10 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10"
-                }`}
-              >
-                {/* Archive/Delete buttons (Only for owners) */}
-                {isOwner && (
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10">
-                    <button
-                      onClick={(e) =>
-                        toggleArchive(project.id, project.archived, e)
-                      }
-                      className="p-2 rounded-lg bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 transition-all"
-                      title={project.archived ? "Unarchive" : "Archive"}
-                    >
-                      {project.archived ? (
-                        <ArchiveRestore className="w-4 h-4" />
-                      ) : (
-                        <Archive className="w-4 h-4" />
+              return (
+                <div
+                  key={project.id}
+                  onClick={() => router.push(`/dashboard/${project.id}`)}
+                  className={`group relative cursor-pointer flex flex-col h-[280px] p-6 sm:p-8 rounded-[2rem] border transition-all duration-300 overflow-hidden hover:-translate-y-1 ${
+                    project.archived
+                      ? "bg-white/[0.02] border-white/5 opacity-60"
+                      : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10 hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)]"
+                  }`}
+                >
+                  {/* Inner ring for depth */}
+                  <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/5 pointer-events-none" />
+                  
+                  {/* Ambient Glow on hover */}
+                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 blur-[50px] group-hover:bg-purple-500/20 transition-colors pointer-events-none rounded-full" />
+
+                  {/* Top Bar: Badges & Actions */}
+                  <div className="relative z-10 flex items-start justify-between mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider ${
+                        project.is_team 
+                          ? "bg-blue-500/10 text-blue-300 border border-blue-500/20" 
+                          : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                      }`}>
+                        {project.is_team ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                        {project.is_team ? "Team" : "Solo"}
+                      </span>
+                      {isOwner && project.is_team && (
+                        <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                          Owner
+                        </span>
                       )}
-                    </button>
-                    <button
-                      onClick={(e) =>
-                        deleteProject(project.id, project.title, e)
-                      }
-                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
-                      title="Delete project"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-
-                <h3 className="text-xl font-semibold text-white mb-2 pr-20">
-                  {project.title}
-                </h3>
-
-                <p className="text-gray-400 text-sm line-clamp-3 mb-4">
-                  {project.description || "No description"}
-                </p>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="text-xs inline-flex px-3 py-1 rounded-full bg-purple-500/10 text-purple-300">
-                    {project.is_team ? "Team Project" : "Solo Project"}
-                  </div>
-                  {isOwner && (
-                    <div className="text-xs inline-flex px-3 py-1 rounded-full bg-blue-500/10 text-blue-300">
-                      Owner
                     </div>
-                  )}
-                  {project.archived && (
-                    <div className="text-xs inline-flex px-3 py-1 rounded-full bg-orange-500/10 text-orange-300">
-                      Archived
-                    </div>
-                  )}
-                </div>
 
-                <div className="mt-4 text-xs text-gray-500">
-                  Updated{" "}
-                  {new Date(
-                    project.updated_at || project.created_at
-                  ).toLocaleDateString()}
+                    {isOwner && (
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-md rounded-xl p-1 border border-white/5">
+                        <button
+                          onClick={(e) => toggleArchive(project.id, project.archived, e)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-orange-400 hover:bg-orange-500/20 transition-all"
+                          title={project.archived ? "Unarchive" : "Archive"}
+                        >
+                          {project.archived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={(e) => deleteProject(project.id, project.title, e)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/20 transition-all"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10 flex-1 flex flex-col pt-2">
+                    <h3 className="text-2xl font-bold text-white mb-3 line-clamp-2 group-hover:text-purple-300 transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">
+                      {project.description || "No synopsis provided. Click to start writing."}
+                    </p>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="relative z-10 mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-medium text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      Updated {new Date(project.updated_at || project.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                    <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                      <MoreVertical className="w-4 h-4" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

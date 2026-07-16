@@ -9,6 +9,7 @@ import NotificationBell from "./components/NotificationBell";
 import Link from "next/link";
 import { Home, BarChart3, Menu, X } from "lucide-react";
 import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Profile = {
   id: string;
@@ -52,7 +53,7 @@ export default function DashboardLayout({
           .from("profiles")
           .select("username, avatar_url")
           .eq("id", user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid error on no rows
+          .maybeSingle();
 
         // If no profile exists, create one
         if (!data) {
@@ -135,67 +136,83 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+      <div className="flex min-h-screen items-center justify-center bg-[#02020a]">
         <div className="text-center px-4">
-          <Sparkles className="w-12 h-12 text-purple-400 animate-pulse mx-auto mb-4" />
-          <p className="text-gray-400">Loading your profile...</p>
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          >
+            <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+          </motion.div>
+          <p className="text-gray-400">Loading your space...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="flex min-h-screen bg-[#02020a] selection:bg-purple-500/30 selection:text-white">
+      {/* Background glow effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px]" />
+      </div>
+
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar - Desktop & Mobile */}
       <aside
         className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        w-72 border-r border-white/5 backdrop-blur-xl bg-black/90 lg:bg-black/20
-        transform transition-transform duration-300 ease-in-out
+        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50
+        w-72 lg:w-64 lg:h-[calc(100vh-3rem)]
+        lg:ml-6 lg:mr-4
+        bg-[#0a0a1a]/80 backdrop-blur-2xl border-r lg:border border-white/10 lg:rounded-[2rem]
+        transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col
+        flex flex-col shadow-2xl
       `}
       >
         {/* Mobile Header */}
-        <div className="lg:hidden p-4 border-b border-white/5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div> */}
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
+        <div className="lg:hidden p-6 flex items-center justify-between border-b border-white/5">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm">N</span>
+            </div>
+            <h1 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
               Narratia
             </h1>
-          </div>
+          </Link>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="p-2 rounded-xl hover:bg-white/10 transition-colors text-gray-400"
           >
-            <X className="w-6 h-6 text-gray-400" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Desktop Logo */}
-        <div className="hidden lg:block p-8 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            {/* <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div> */}
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
-              Narratia
-            </h1>
+        <div className="hidden lg:flex p-8 items-center gap-3 group cursor-pointer border-b border-white/5" onClick={() => router.push("/")}>
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all group-hover:scale-105">
+            <span className="text-white font-bold text-base">N</span>
           </div>
+          <h1 className="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-300 group-hover:to-purple-300 transition-all">
+            Narratia
+          </h1>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 lg:p-6 space-y-2">
+        <nav className="flex-1 p-4 lg:p-5 space-y-2 overflow-y-auto custom-scrollbar">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -204,95 +221,113 @@ export default function DashboardLayout({
               <button
                 key={item.id}
                 onClick={() => handleNavigation(item.path, item.id)}
-                className={`w-full group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? "bg-linear-to-r from-purple-500/20 to-pink-500/20 text-white shadow-lg shadow-purple-500/10 border border-white/10"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
+                className="w-full relative group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-left outline-none"
               >
-                <Icon
-                  className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-105"}`}
-                />
-                <span className="font-medium">{item.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTabIndicator"
+                    className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/10 border border-purple-500/20 rounded-2xl"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div className={`relative z-10 flex items-center gap-3 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'}`}>
+                  <Icon
+                    className={`w-5 h-5 transition-transform duration-300 ${isActive ? "scale-110 text-purple-400" : "group-hover:scale-110"}`}
+                  />
+                  <span className={`font-medium ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
+                </div>
               </button>
             );
           })}
         </nav>
 
         {/* Footer */}
-        <div className="p-4 lg:p-6 border-t border-white/5">
+        <div className="p-4 lg:p-5 border-t border-white/5">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-all duration-200 group"
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group outline-none"
           >
-            <LogOut className="w-5 h-5 group-hover:scale-105 transition-transform" />
+            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto min-h-screen">
+      <main className="flex-1 min-w-0 flex flex-col min-h-screen relative z-10">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-black/50 backdrop-blur-xl border-b border-white/5 p-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            >
-              <Menu className="w-6 h-6 text-gray-400" />
-            </button>
-
-            {profile && (
-              <ProfileAvatar
-                profile={profile}
-                onAvatarUpdate={(url) =>
-                  setProfile((p) => p && { ...p, avatar_url: url })
-                }
-              />
-            )}
-          </div>
+        <div className="lg:hidden sticky top-0 z-30 bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-white/5 p-4 flex items-center justify-between">
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-2.5 rounded-xl hover:bg-white/10 transition-colors text-gray-400 border border-white/10"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          {profile && (
+            <ProfileAvatar
+              profile={profile}
+              onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
+            />
+          )}
         </div>
 
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-6 lg:pt-0 flex flex-col gap-2">
           {profile && (
-            <>
-              {/* Desktop Welcome Section */}
-              <div className="hidden lg:flex mb-8 items-center justify-between">
+            <div className="space-y-2 relative z-50">
+              {/* Desktop Header */}
+              <div className="hidden lg:flex items-center justify-between">
+                <div className="flex items-baseline gap-3">
+                  <h2 className="text-xl font-bold text-white tracking-tight">
+                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{profile.username}</span>
+                  </h2>
+                  <span className="text-white/20 text-sm">|</span>
+                  <p className="text-gray-400 text-sm">{profile.email}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="scale-90 origin-right">
+                    <NotificationBell />
+                  </div>
+                  <div className="h-6 w-[1px] bg-white/10" />
+                  <div className="scale-90 origin-right">
+                    <ProfileAvatar
+                      profile={profile}
+                      onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Header Additions */}
+              <div className="lg:hidden space-y-2">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                    Welcome back, {profile.username}
+                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                    Hi, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{profile.username}</span>
                   </h2>
                   <p className="text-gray-400 text-sm">{profile.email}</p>
                 </div>
-
-                <ProfileAvatar
-                  profile={profile}
-                  onAvatarUpdate={(url) =>
-                    setProfile((p) => p && { ...p, avatar_url: url })
-                  }
-                />
+                <div className="flex items-center gap-3">
+                  <NotificationBell />
+                </div>
               </div>
-
-              {/* Mobile Welcome Section */}
-              <div className="lg:hidden mb-6 space-y-4">
-                <h2 className="text-2xl font-bold bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  Hi, {profile.username}
-                </h2>
-                <p className="text-gray-400 text-sm">{profile.email}</p>
-              </div>
-              <NotificationBell />
-              {/* Notification Components */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                <IncomingInvites />
-              </div>
-            </>
+              
+              <IncomingInvites />
+            </div>
           )}
 
-          {/* Content Container */}
-          <div className="bg-white/[0.02] backdrop-blur-xl rounded-xl sm:rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
-            <div className="p-4 sm:p-6 lg:p-8">{children}</div>
-          </div>
+          {/* Page Content Container */}
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex-1 bg-[#0a0a1a]/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative flex flex-col"
+          >
+            {/* Subtle inner highlight */}
+            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+            <div className="flex-1 relative z-10 p-5 sm:p-6 lg:p-6">
+              {children}
+            </div>
+          </motion.div>
         </div>
       </main>
     </div>

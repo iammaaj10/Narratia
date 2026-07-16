@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { generateStoryOutline } from "@/lib/ai/geminiClient";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
   Loader2,
@@ -11,7 +12,12 @@ import {
   Download,
   ArrowLeft,
   BookOpen,
+  Wand2,
+  Lightbulb,
+  CheckCircle2,
+  ChevronRight
 } from "lucide-react";
+import Link from "next/link";
 
 export default function OutlineGeneratorPage() {
   const router = useRouter();
@@ -19,6 +25,7 @@ export default function OutlineGeneratorPage() {
   const [outline, setOutline] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleGenerate = async () => {
     if (!idea.trim()) {
@@ -29,6 +36,7 @@ export default function OutlineGeneratorPage() {
     setLoading(true);
     setError("");
     setOutline("");
+    setCopied(false);
 
     try {
       const result = await generateStoryOutline(idea);
@@ -43,7 +51,8 @@ export default function OutlineGeneratorPage() {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(outline);
-    alert("Outline copied to clipboard!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
@@ -89,7 +98,6 @@ export default function OutlineGeneratorPage() {
       }
 
       // Parse outline and create modules/phases
-      // This is a simple parser - you can make it more sophisticated
       const chapters = outline.split(/##\s+/).filter((c) => c.trim());
 
       for (let i = 0; i < chapters.length; i++) {
@@ -119,7 +127,6 @@ export default function OutlineGeneratorPage() {
         }
       }
 
-      alert("Project created successfully!");
       router.push(`/dashboard/${project.id}`);
     } catch (err) {
       console.error("Error creating project:", err);
@@ -128,146 +135,217 @@ export default function OutlineGeneratorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 p-12">
-      <div className="max-w-6xl mx-auto">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="pb-12"
+    >
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="mb-8">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          <Link 
+            href="/dashboard"
+            className="inline-flex items-center text-sm font-medium text-gray-400 hover:text-purple-400 transition-colors mb-4 group"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 mr-1 transform group-hover:-translate-x-1 transition-transform" />
             Back to Dashboard
-          </button>
-
-          <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="w-8 h-8 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">
-              AI Story Outline Generator
-            </h1>
+          </Link>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-white/10 shadow-inner">
+                <Wand2 className="w-7 h-7 text-cyan-400" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                  AI Outline Generator
+                </h1>
+                <p className="text-gray-400 mt-1 max-w-lg">
+                  Transform a rough idea into a structured, chapter-by-chapter outline in seconds.
+                </p>
+              </div>
+            </div>
           </div>
-          <p className="text-gray-400 text-lg">
-            Describe your story idea and let AI create a detailed chapter outline for you
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Input Section */}
-          <div className="space-y-6">
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-purple-400" />
-                Your Story Idea
+          <div className="lg:col-span-5 space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-black/40 border border-white/10 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-md relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-3xl rounded-full pointer-events-none" />
+              
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <Lightbulb className="w-6 h-6 text-yellow-400" />
+                The Spark
               </h2>
 
-              <textarea
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
-                placeholder="Describe your story idea in detail...
+              <div className="space-y-4">
+                <div className="relative group">
+                  <textarea
+                    value={idea}
+                    onChange={(e) => setIdea(e.target.value)}
+                    placeholder="A sci-fi epic where humanity discovers they aren't alone, but the aliens are actually..."
+                    className="w-full h-64 bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none transition-all shadow-inner leading-relaxed"
+                  />
+                </div>
 
-Example: A detective story set in a small coastal town. The main character is Sarah Chen, a young detective who just moved from the city. She investigates a series of mysterious disappearances. The mayor is secretly involved in illegal smuggling operations."
-                className="w-full h-64 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 resize-none"
-              />
-
-              <button
-                onClick={handleGenerate}
-                disabled={loading || !idea.trim()}
-                className="w-full mt-4 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Generating Outline...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Generate Outline
-                  </>
-                )}
-              </button>
+                <button
+                  onClick={handleGenerate}
+                  disabled={loading || !idea.trim()}
+                  className="group relative w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_30px_-5px_rgba(6,182,212,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Summoning Muse...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5" />
+                        Generate Outline
+                      </>
+                    )}
+                  </span>
+                </button>
+              </div>
 
               {error && (
-                <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-red-300 text-sm">{error}</p>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }} 
+                  animate={{ opacity: 1, height: 'auto' }} 
+                  className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                >
+                  <p className="text-red-400 text-sm font-medium">{error}</p>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
 
-            {/* Tips */}
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-blue-300 mb-3">
-                💡 Tips for Better Outlines
+            {/* Tips Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-blue-500/5 border border-blue-500/20 rounded-3xl p-6"
+            >
+              <h3 className="text-base font-bold text-blue-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> Pro Tips
               </h3>
-              <ul className="text-sm text-blue-200 space-y-2">
-                <li>• Include main character details (name, traits)</li>
-                <li>• Describe the central conflict or problem</li>
-                <li>• Mention the setting (time and place)</li>
-                <li>• Add any unique elements or twists</li>
-                <li>• The more detail you provide, the better!</li>
+              <ul className="space-y-3">
+                {[
+                  "Detail main character motives",
+                  "Establish the central conflict",
+                  "Mention the setting/world-building",
+                  "Include key plot twists",
+                  "More detail = richer outlines"
+                ].map((tip, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-blue-200/80">
+                    <ChevronRight className="w-4 h-4 mt-0.5 text-blue-400 shrink-0" />
+                    {tip}
+                  </li>
+                ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
 
           {/* Output Section */}
-          <div className="space-y-6">
-            <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 min-h-[400px]">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-white">
-                  Generated Outline
+          <div className="lg:col-span-7 space-y-6 h-full flex flex-col">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex-1 bg-black/40 border border-white/10 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-md flex flex-col relative min-h-[500px]"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                  <BookOpen className="w-6 h-6 text-purple-400" />
+                  The Blueprint
                 </h2>
 
-                {outline && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleCopy}
-                      className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                      title="Copy to Clipboard"
+                <AnimatePresence>
+                  {outline && !loading && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center gap-2"
                     >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={handleDownload}
-                      className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                      title="Download as Markdown"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
+                      <button
+                        onClick={handleCopy}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-gray-300 transition-all"
+                        title="Copy to Clipboard"
+                      >
+                        {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                        <span className="hidden sm:inline">{copied ? "Copied" : "Copy"}</span>
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-gray-300 transition-all"
+                        title="Download Markdown"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden sm:inline">Download</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="flex-1 relative rounded-2xl overflow-hidden border border-white/5 bg-black/50">
+                {loading ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-10">
+                    <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-6" />
+                    <h3 className="text-xl font-bold text-white mb-2">Architecting your story...</h3>
+                    <p className="text-cyan-400/80 text-sm animate-pulse">This typically takes 10-20 seconds</p>
+                  </div>
+                ) : outline ? (
+                  <div className="absolute inset-0 overflow-y-auto custom-scrollbar p-6">
+                    <div className="prose prose-invert prose-purple max-w-none">
+                      <div className="whitespace-pre-wrap text-gray-300 text-sm md:text-base leading-relaxed font-medium">
+                        {outline}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+                    <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                      <Sparkles className="w-10 h-10 text-gray-600" />
+                    </div>
+                    <p className="text-lg text-gray-400 font-medium">Your outline will materialize here.</p>
+                    <p className="text-sm text-gray-600 mt-2">Enter an idea to begin.</p>
                   </div>
                 )}
               </div>
-
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                  <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
-                  <p className="text-gray-400">Creating your story outline...</p>
-                  <p className="text-gray-500 text-sm mt-2">This may take 10-20 seconds</p>
-                </div>
-              ) : outline ? (
-                <div className="prose prose-invert max-w-none">
-                  <div className="bg-white/5 rounded-lg p-4 whitespace-pre-wrap text-gray-300 text-sm max-h-[600px] overflow-y-auto">
-                    {outline}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center py-20 text-gray-500">
-                  <p>Your outline will appear here...</p>
-                </div>
-              )}
-            </div>
+            </motion.div>
 
             {/* Action Buttons */}
-            {outline && !loading && (
-              <button
-                onClick={handleCreateProject}
-                className="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all"
-              >
-                Create Project from Outline
-              </button>
-            )}
+            <AnimatePresence>
+              {outline && !loading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <button
+                    onClick={handleCreateProject}
+                    className="w-full group relative flex items-center justify-center gap-3 px-8 py-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-3xl font-bold text-lg shadow-[0_0_30px_-5px_rgba(16,185,129,0.5)] transition-all overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                    <span className="relative z-10 flex items-center gap-3">
+                      <BookOpen className="w-6 h-6" />
+                      Create Story Project from Outline
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
