@@ -176,7 +176,7 @@ export default function NewProjectPage() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-full flex flex-col max-w-4xl mx-auto pb-12 px-4"
+      className="h-full flex flex-col max-w-5xl mx-auto pb-12 px-4"
     >
       {/* Top Nav */}
       <div className="mb-6 lg:mb-8 pt-2 lg:pt-0">
@@ -222,7 +222,7 @@ export default function NewProjectPage() {
         </div>
 
         {/* Right Column: Form */}
-        <div className="lg:w-[62%]">
+        <div className="flex-1">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
