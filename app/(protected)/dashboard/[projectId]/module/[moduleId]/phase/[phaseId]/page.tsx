@@ -8,6 +8,8 @@ import CommentsPanel from "./components/CommentsPanel";
 import RichTextEditor from "./components/RichTextEditor";
 import AIWritingPartner from "./components/AIWritingPartner";
 import FocusModeEditor from "./components/FocusModeEditor";
+import StoryWiki from "./components/StoryWiki";
+import { savePhaseMemory, extractAndSaveEntities } from "@/lib/ai/storyMemory";
 import {
   ArrowLeft,
   Save,
@@ -21,6 +23,8 @@ import {
   X,
   Sparkles,
   Maximize,
+  BookMarked,
+  RefreshCw,
 } from "lucide-react";
 
 type Phase = {
@@ -65,6 +69,8 @@ export default function WritingEditorPage() {
   const [showAIPartner, setShowAIPartner] = useState(false);
   const [fullStoryContext, setFullStoryContext] = useState("");
   const [showFocusMode, setShowFocusMode] = useState(false);
+  const [showWiki, setShowWiki] = useState(false);
+  const [isSyncingMemory, setIsSyncingMemory] = useState(false);
 
   // Refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -269,6 +275,24 @@ export default function WritingEditorPage() {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     saveContent();
+  };
+
+  const handleMemorySync = async () => {
+    if (!phase || !content || isSyncingMemory) return;
+    setIsSyncingMemory(true);
+    try {
+      // Run both in parallel: embed the text + extract entities
+      await Promise.all([
+        savePhaseMemory(projectId, phaseId, phase.title, content),
+        extractAndSaveEntities(projectId, phaseId, phase.title, content),
+      ]);
+      // Open the wiki so user can see the results
+      setShowWiki(true);
+    } catch (err) {
+      console.error("❌ Memory sync failed:", err);
+    } finally {
+      setIsSyncingMemory(false);
+    }
   };
 
   const loadFullStoryContext = async () => {
@@ -581,9 +605,39 @@ export default function WritingEditorPage() {
                 <span className="text-sm font-medium">AI</span>
               </button>
 
+              {/* Memory Sync Button */}
+              <button
+                onClick={handleMemorySync}
+                disabled={isSyncingMemory}
+                title="Sync AI Memory — extracts characters, locations, and embeds text for smarter AI suggestions"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncingMemory ? "animate-spin" : ""}`} />
+                <span className="text-sm font-medium">Memory</span>
+              </button>
+
+              {/* Story Wiki Button */}
+              <button
+                onClick={() => {
+                  setShowWiki(!showWiki);
+                  setShowComments(false);
+                }}
+                title="Story Wiki — view auto-extracted characters, locations, and items"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  showWiki
+                    ? "bg-amber-500/20 text-amber-300"
+                    : "bg-white/5 text-gray-400 hover:bg-white/10"
+                }`}
+              >
+                <BookMarked className="w-4 h-4" />
+              </button>
+
               {/* Comments Button */}
               <button
-                onClick={() => setShowComments(!showComments)}
+                onClick={() => {
+                  setShowComments(!showComments);
+                  setShowWiki(false);
+                }}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
@@ -640,7 +694,7 @@ export default function WritingEditorPage() {
 
       {/* Main Editor Area */}
       <div className="flex h-[calc(100vh-160px)]">
-        <div className={`flex-1 ${showComments ? "lg:pr-96" : ""}`}>
+        <div className={`flex-1 ${showComments || showWiki ? "lg:pr-80" : ""}`}>
           <RichTextEditor
             content={content}
             onChange={handleContentChange}
@@ -648,9 +702,16 @@ export default function WritingEditorPage() {
           />
         </div>
 
+        {/* Story Wiki Panel - Desktop */}
+        {showWiki && !showComments && (
+          <div className="hidden lg:block fixed right-0 top-[120px] w-80 h-[calc(100vh-120px)] border-l border-white/10 bg-[#0a0a1a]/95 backdrop-blur-sm overflow-y-auto p-4 z-20">
+            <StoryWiki projectId={projectId} />
+          </div>
+        )}
+
         {/* Comments Panel - Desktop */}
         {showComments && (
-          <div className="hidden lg:block fixed right-0 top-[120px] w-96 h-[calc(100vh-80px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto ">
+          <div className="hidden lg:block fixed right-0 top-[120px] w-80 h-[calc(100vh-120px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto z-20">
             <CommentsPanel
               phaseId={phaseId}
               currentUserId={currentUserId}
