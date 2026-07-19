@@ -9,7 +9,7 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
 import { X, Sparkles } from "lucide-react";
-import ZenBackground from "./ZenBackground";
+import ZenBackground, { ZenScene } from "./ZenBackground";
 import { analyzeParagraphEmotion } from "@/lib/ai/geminiClient";
 
 type Theme = "light" | "dark" | "sepia" | "zen";
@@ -33,6 +33,7 @@ export default function FocusModeEditor({
   const [typewriterMode, setTypewriterMode] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(0);
   const [emotionColor, setEmotionColor] = useState("#6366f1");
+  const [zenScene, setZenScene] = useState<ZenScene>("cosmic");
   const editorRef = useRef<HTMLDivElement>(null);
   
   // Typing speed tracking
@@ -175,14 +176,16 @@ export default function FocusModeEditor({
 
   return createPortal(
     <div
-      className={`fixed inset-0 z-[9999] ${themeClasses[theme]} transition-colors duration-300`}
+      className={`fixed inset-0 z-[9999] ${themeClasses[theme]} transition-colors duration-300 flex flex-col`}
     >
       {theme === "zen" && (
-        <ZenBackground typingSpeed={typingSpeed} emotionColor={emotionColor} />
+        <ZenBackground typingSpeed={typingSpeed} emotionColor={emotionColor} scene={zenScene} />
       )}
-      {/* Top Controls */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between opacity-100 transition-opacity duration-300 z-50 bg-[#02020a]/80 backdrop-blur-md border-b border-white/5">
-        <div className="flex items-center gap-3">
+      {/* Top Navigation Container */}
+      <div className="relative z-50 opacity-100 transition-opacity duration-300 flex flex-col shrink-0">
+        {/* Top Controls */}
+        <div className="p-4 flex items-center justify-between bg-[#02020a]/80 backdrop-blur-md border-b border-white/5">
+          <div className="flex items-center gap-3">
           {/* Theme Switcher */}
           <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg p-2">
             <button
@@ -248,12 +251,41 @@ export default function FocusModeEditor({
           <X className="w-4 h-4" />
           Exit Focus Mode (ESC)
         </button>
+        </div>
+
+        {/* Zen Scene Picker — stacked cleanly below toolbar */}
+        {theme === "zen" && (
+          <div className="flex justify-center py-2 bg-black/40 backdrop-blur-sm border-b border-white/5">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 mr-1">Scene:</span>
+              {([
+                { id: "cosmic", label: "🌌 Cosmic Void",    desc: "Star particles in deep space" },
+                { id: "snow",   label: "❄️ Snowfall",        desc: "Gentle snow for peaceful writing" },
+                { id: "galaxy", label: "🌀 Galaxy Spiral",  desc: "Rotating spiral galaxy" },
+                { id: "ember",  label: "🔥 Ember Storm",    desc: "Sparks rising from a fireplace" },
+              ] as { id: ZenScene; label: string; desc: string }[]).map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setZenScene(s.id)}
+                  title={s.desc}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    zenScene === s.id
+                      ? "bg-white/15 text-white border border-white/20"
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Editor Container */}
       <div
         ref={editorRef}
-        className="relative h-full overflow-y-auto flex items-center justify-center px-8 py-20 z-10"
+        className="relative flex-1 overflow-y-auto flex justify-center px-8 z-10"
       >
         <div className="w-full max-w-4xl">
           <EditorContent
@@ -282,8 +314,8 @@ export default function FocusModeEditor({
       {/* Custom Styles */}
       <style jsx global>{`
         .focus-mode-editor .ProseMirror {
-          min-height: 100vh;
-          padding: 7rem 0 6rem 0;
+          min-height: 100%;
+          padding: 4rem 0 8rem 0;
         }
 
         .focus-mode-editor .ProseMirror:focus {
