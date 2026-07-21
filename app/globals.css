@@ -4,11 +4,92 @@
   html {
     scroll-behavior: smooth;
   }
+  
   body {
-    @apply antialiased bg-[#02020a] text-gray-100 selection:bg-purple-500/30 selection:text-white;
+    @apply antialiased bg-[#02020a] text-gray-100 selection:bg-purple-500/30 selection:text-white transition-colors duration-300;
   }
 
-  /* Custom Scrollbar for a premium look */
+  /* Light mode pure white background */
+  html.light body,
+  html.light .light-mode-active {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Remove gradient background glow & blur effects in light mode */
+  html.light .blur-\[120px\],
+  html.light .blur-\[100px\],
+  html.light .blur-\[80px\],
+  html.light .blur-\[150px\],
+  html.light .blur-\[60px\],
+  html.light .blur-3xl,
+  html.light .blur-2xl,
+  html.light .timeline-glow {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Clean solid white containers and cards in light mode */
+  html.light .bg-\[\#02020a\],
+  html.light .bg-\[\#0a0a1a\]\/80,
+  html.light .bg-\[\#0a0a1a\]\/60,
+  html.light .bg-\[\#0b0914\],
+  html.light .bg-\[\#05050A\],
+  html.light .bg-\[\#080612\]\/95,
+  html.light .bg-\[\#0B0914\]\/90,
+  html.light .bg-\[\#0B0914\]\/80 {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Remove text transparent gradient effects in light mode and make text solid black */
+  html.light .text-transparent,
+  html.light .grad-text,
+  html.light .grad-text-2,
+  html.light .bg-clip-text {
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  /* Solid black text for headings, paragraphs, and labels in light mode */
+  html.light .text-white,
+  html.light .text-slate-100,
+  html.light .text-slate-200,
+  html.light .text-slate-300,
+  html.light .text-slate-400,
+  html.light .text-gray-100,
+  html.light .text-gray-200,
+  html.light .text-gray-300,
+  html.light .text-gray-400 {
+    color: #000000 !important;
+  }
+
+  html.light .text-slate-500,
+  html.light .text-gray-500 {
+    color: #334155 !important;
+  }
+
+  /* Navbar in light mode */
+  html.light nav {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  /* Border color overrides */
+  html.light .border-white\/10,
+  html.light .border-white\/5,
+  html.light .border-white\/20,
+  html.light .border-white\/30 {
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -18,5 +99,10 @@
   }
   ::-webkit-scrollbar-thumb {
     @apply bg-white/10 rounded-full border-2 border-[#02020a] hover:bg-white/20 transition-colors;
+  }
+
+  html.light ::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.5) !important;
+    border-color: #ffffff !important;
   }
 }

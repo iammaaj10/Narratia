@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import ProfileAvatar from "./components/ProfileAvatar";
 import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
+import ThemeToggle from "@/components/ThemeToggle";
 import Link from "next/link";
 import { Home, BarChart3, Menu, X } from "lucide-react";
 import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
@@ -175,7 +176,7 @@ export default function DashboardLayout({
       <aside
         className={`
         fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50
-        w-72 lg:w-64 lg:h-[calc(100vh-3rem)]
+        w-64 lg:w-56 lg:h-[calc(100vh-3rem)]
         lg:ml-6 lg:mr-4
         bg-[#0a0a1a]/80 backdrop-blur-2xl border-r lg:border border-white/10 lg:rounded-[2rem]
         transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -265,14 +266,17 @@ export default function DashboardLayout({
             <Menu className="w-5 h-5" />
           </button>
           {profile && (
-            <ProfileAvatar
-              profile={profile}
-              onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
-            />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <ProfileAvatar
+                profile={profile}
+                onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
+              />
+            </div>
           )}
         </div>
 
-        <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-6 lg:pt-0 flex flex-col gap-2">
+        <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-6 lg:pt-0 flex flex-col gap-2">
           {profile && (
             <div className="space-y-2 relative z-50">
               {/* Desktop Header */}
@@ -285,6 +289,8 @@ export default function DashboardLayout({
                   <p className="text-gray-400 text-sm">{profile.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
+                  <ThemeToggle />
+                  <div className="h-6 w-[1px] bg-white/10" />
                   <div className="scale-90 origin-right">
                     <NotificationBell />
                   </div>

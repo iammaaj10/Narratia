@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate } from "framer-motion";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // ─────────────────────────────────────────────────────────────────
 // ICONS
@@ -238,7 +239,8 @@ export default function Page() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] transition-all outfit">N</div>
             <span className="font-bold text-2xl tracking-tight outfit">Narratia</span>
           </a>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
             <button onClick={() => router.push("/login")} className="text-sm font-semibold text-slate-300 hover:text-white px-2 transition-colors outfit">Sign in</button>
             <button onClick={() => router.push("/register")} className="btn-primary py-2.5 px-5 text-sm border-0 shadow-lg">Sign up</button>
           </div>
