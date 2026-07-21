@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate } from "framer-motion";
 
 // ─────────────────────────────────────────────────────────────────
 // ICONS
@@ -12,6 +12,10 @@ const Sparkles = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="non
 const Users = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
 const Book = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>;
 const Zap = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>;
+const Clock = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>;
+const Download = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>;
+const BarChart = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>;
+const MessageSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>;
 
 // ─────────────────────────────────────────────────────────────────
 // COUNTER
@@ -39,6 +43,52 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   }, [target, started]);
 
   return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// FEATURE CARD WITH SPOTLIGHT EFFECT
+// ─────────────────────────────────────────────────────────────────
+function FeatureCard({ children, delay, glowColor }: { children: React.ReactNode, delay: number, glowColor: string }) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }} 
+      whileInView={{ opacity: 1, y: 0 }} 
+      viewport={{ once: true, margin: "-50px" }} 
+      transition={{ duration: 0.7, delay, type: "spring", bounce: 0.3 }}
+      className="group relative bg-[#0B0914] border border-white/5 hover:border-white/10 rounded-[20px] p-8 overflow-hidden cursor-default"
+      onMouseMove={handleMouseMove}
+    >
+      {/* Dynamic Cursor Spotlight */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-[20px] opacity-0 transition duration-500 group-hover:opacity-100 z-0"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              500px circle at ${mouseX}px ${mouseY}px,
+              ${glowColor},
+              transparent 80%
+            )
+          `,
+        }}
+      />
+      {/* Static ambient corner glow */}
+      <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-40 transition-all duration-700 z-0" style={{ backgroundColor: glowColor.replace('0.15', '1') }} />
+      
+      {/* Content */}
+      <div className="relative z-10">
+        {children}
+      </div>
+    </motion.div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -147,16 +197,18 @@ export default function Page() {
 
         /* Editor window */
         .editor-window {
-          background: #0B0914;
+          background: rgba(11, 9, 20, 0.45);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
           border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 12px;
-          box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.1);
+          border-radius: 16px;
+          box-shadow: 0 40px 80px -20px rgba(0,0,0,1), 0 0 0 1px rgba(124,58,237,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
           overflow: hidden;
         }
         .editor-header {
           background: rgba(255,255,255,0.02);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-          padding: 14px 20px;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          padding: 16px 24px;
           display: flex; gap: 8px; align-items: center;
         }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -208,11 +260,11 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <h1 className="text-4xl sm:text-6xl lg:text-[5rem] font-extrabold leading-[1.05] tracking-tight text-white mb-6 max-w-4xl outfit">
-                Let's build from here, <br className="hidden sm:block" />
-                <span className="grad-text">word by word.</span>
+                Your AI-Powered <br className="hidden sm:block" />
+                <span className="grad-text">Writing Ecosystem.</span>
               </h1>
               <p className="text-lg sm:text-xl text-slate-400 max-w-xl font-normal leading-relaxed mb-10">
-                The complete developer-grade platform for writers. AI-assisted drafting, real-time team collaboration, and seamless multi-format publishing.
+                The ultimate platform for modern authors. From auto-extracting Story Wikis and RAG-powered lore memory to our immersive Zen 3D focus mode.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
                 <button onClick={() => router.push("/register")} className="btn-primary text-base px-8 py-4 w-full sm:w-auto justify-center">
@@ -322,50 +374,136 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ── EDITOR PREVIEW SECTION ── */}
-        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
-          <div className="hidden lg:block absolute left-[40px] top-[100px] w-5 h-5 rounded-full border-[3px] border-[#05050A] bg-purple-500 timeline-glow transform -translate-x-1/2 z-20" />
+        {/* ── FLOATING MANUSCRIPT & LORE NODES SECTION ── */}
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-32 relative">
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes dash {
+              to { stroke-dashoffset: -100; }
+            }
+            .animate-dash {
+              animation: dash 5s linear infinite;
+            }
+          `}} />
 
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.8 }}
-            className="editor-window relative">
-            <div className="editor-header">
-              <div className="dot dot-r" />
-              <div className="dot dot-y" />
-              <div className="dot dot-g" />
-              <div className="ml-4 px-3 py-1 bg-black/40 border border-white/5 rounded-md text-xs font-medium text-slate-400 flex items-center gap-2 mono">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586a.25.25 0 0 1 .177.073l2.414 2.414a.25.25 0 0 1 .073.177v11.586A1.75 1.75 0 0 1 11.25 16h-7.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25V3.5h-2.25a.75.75 0 0 1-.75-.75V.5Z" /></svg>
-                chapter-01.txt
-              </div>
-            </div>
-            <div className="p-8 sm:p-12 min-h-[400px] relative bg-[#05050A]">
-              {/* Line numbers (fake) */}
-              <div className="absolute left-0 top-0 bottom-0 w-[50px] bg-[#0B0914] border-r border-white/5 flex flex-col items-center py-12 text-slate-600 mono text-xs leading-8 select-none">
-                {Array.from({ length: 10 }).map((_, i) => <div key={i}>{i + 1}</div>)}
-              </div>
+          {/* Ambient center glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none" />
 
-              <div className="pl-6 max-w-3xl">
-                <h2 className="text-3xl font-bold text-white mb-6 outfit">The Awakening</h2>
-                <div className="space-y-4">
-                  <p className="text-slate-300 text-lg leading-relaxed">The city of neon and chrome hummed beneath the heavy rain. It was a rhythmic, pulsing sound that vibrated through the floorboards of Kael's tiny apartment.</p>
-                  <p className="text-slate-300 text-lg leading-relaxed">He stared at the glowing terminal. The cursor blinked back at him, almost mockingly. The code was compiled, the narrative locked in. All he had to do was execute.</p>
+          <div className="relative w-full max-w-6xl mx-auto min-h-[500px] flex items-center">
+            
+            {/* The Main Manuscript */}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="w-full lg:w-3/5 z-10 relative"
+            >
+              <div className="pl-8 sm:pl-16 border-l-2 border-indigo-500/20 py-8 relative">
+                <div className="absolute left-[-2px] top-0 h-1/3 w-[2px] bg-gradient-to-b from-indigo-400 to-transparent" />
+                
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-xs font-bold text-indigo-300 tracking-widest uppercase">Chapter 1</div>
+                  <div className="text-slate-500 text-sm mono">12:04 AM • Auto-saved</div>
+                </div>
 
-                  {/* AI Suggestion highlight */}
-                  <div className="relative mt-6 border-l-2 border-purple-500 pl-4 py-2 bg-purple-500/10 rounded-r-md">
-                    <div className="absolute -left-[9px] top-4 w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center shadow-[0_0_10px_rgba(168,85,247,0.6)]">
-                      <Sparkles />
-                    </div>
-                    <p className="text-purple-300 font-medium text-lg leading-relaxed italic">
-                      "Or at least, that's what he thought before the screen flickered to crimson."
-                    </p>
-                    <div className="flex gap-2 mt-3">
-                      <button className="px-3 py-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded shadow-sm transition">Accept</button>
-                      <button className="px-3 py-1 bg-transparent hover:bg-white/5 text-[#8b949e] border border-[#30363d] text-xs font-semibold rounded transition">Reject</button>
-                    </div>
-                  </div>
+                <h2 className="text-5xl sm:text-6xl font-extrabold text-white mb-10 outfit tracking-tight">The Awakening</h2>
+                
+                <div className="space-y-10">
+                  <p className="text-slate-300 text-xl sm:text-2xl leading-[1.7] font-serif">
+                    The city of neon and chrome hummed beneath the heavy rain. It was a rhythmic, pulsing sound that vibrated through the floorboards of <span className="relative inline-block cursor-pointer group">
+                      <span className="absolute -inset-2 bg-amber-500/10 rounded-lg blur-md group-hover:bg-amber-500/30 transition-all duration-300" />
+                      <span className="relative text-amber-300 border-b-2 border-amber-500/40">Kael's</span>
+                    </span> tiny apartment.
+                  </p>
+                  
+                  <p className="text-slate-300 text-xl sm:text-2xl leading-[1.7] font-serif">
+                    He stared at the glowing <span className="relative inline-block cursor-pointer group">
+                      <span className="absolute -inset-2 bg-cyan-500/10 rounded-lg blur-md group-hover:bg-cyan-500/30 transition-all duration-300" />
+                      <span className="relative text-cyan-300 border-b-2 border-cyan-500/40">cyber-terminal</span>
+                    </span>. The cursor blinked back at him, almost mockingly. The code was compiled, the narrative locked in. All he had to do was execute.
+                  </p>
                 </div>
               </div>
+            </motion.div>
+
+            {/* The Floating Wiki Cards */}
+            <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-2/5 space-y-16">
+              
+              {/* SVG Connector Lines */}
+              <svg className="absolute left-[-250px] top-0 w-[400px] h-[500px] pointer-events-none z-0">
+                <path d="M 0 160 C 150 160 150 40 300 40" fill="none" stroke="rgba(245, 158, 11, 0.4)" strokeWidth="2" strokeDasharray="6,6" className="animate-dash" />
+                <path d="M 0 380 C 150 380 200 320 350 320" fill="none" stroke="rgba(6, 182, 212, 0.4)" strokeWidth="2" strokeDasharray="6,6" className="animate-dash" />
+              </svg>
+
+              {/* Kael Lore Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              >
+                <motion.div
+                  animate={{ y: [-8, 8, -8] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative z-10 bg-[#0B0914]/90 backdrop-blur-xl border border-amber-500/30 rounded-2xl p-6 shadow-[0_20px_50px_-10px_rgba(245,158,11,0.15)] hover:border-amber-500/50 transition-colors"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+                  
+                  <div className="flex items-start gap-5 mb-5 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                      <Users />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <div className="text-xs text-amber-500/90 font-bold uppercase tracking-wider">Character Log</div>
+                      </div>
+                      <div className="text-2xl font-bold text-white outfit">Kael Vance</div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-[0.95rem] text-slate-300 leading-relaxed relative z-10">
+                    A rogue archivist trying to decode the lost sequences of the old world. Known for his reckless brilliance and a cybernetic left eye.
+                  </p>
+                </motion.div>
+              </motion.div>
+
+              {/* Cyber-Terminal Lore Card */}
+              <motion.div 
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+                className="ml-16"
+              >
+                <motion.div
+                  animate={{ y: [8, -8, 8] }}
+                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative z-10 bg-[#0B0914]/90 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-6 shadow-[0_20px_50px_-10px_rgba(6,182,212,0.15)] hover:border-cyan-500/50 transition-colors"
+                >
+                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl transform translate-x-1/3 translate-y-1/3 pointer-events-none" />
+                  
+                  <div className="flex items-start gap-5 mb-5 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                      <Zap />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                        <div className="text-xs text-cyan-500/90 font-bold uppercase tracking-wider">Artifact</div>
+                      </div>
+                      <div className="text-2xl font-bold text-white outfit">Cyber-Terminal</div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-[0.95rem] text-slate-300 leading-relaxed relative z-10">
+                    An illegal, heavily modified rig capable of interfacing directly with the deep neural net of the city. Highly unstable.
+                  </p>
+                </motion.div>
+              </motion.div>
+
             </div>
-          </motion.div>
+          </div>
         </section>
 
         {/* ── FEATURES GRID ── */}
@@ -374,85 +512,124 @@ export default function Page() {
 
           <div className="mb-16">
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 outfit">
-              Accelerate your <span className="grad-text-2">workflow.</span>
+              Everything you need to <span className="grad-text-2">tell your story.</span>
             </h2>
             <p className="text-xl text-slate-400 max-w-2xl">
-              Write, edit, and collaborate with tools designed to remove friction from your creative process.
+              Write, world-build, and focus with cutting-edge AI tools built specifically for narrative creators.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card 1 */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
-              className="bg-[#0B0914] border border-white/5 rounded-[16px] p-8 hover:border-indigo-500/30 transition-colors duration-300 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-indigo-500/20 transition-all" />
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 mb-6">
+            <FeatureCard delay={0} glowColor="rgba(99, 102, 241, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-6 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
                 <Sparkles />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 outfit">AI Co-Pilot</h3>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">AI Story Memory</h3>
               <p className="text-slate-400 leading-relaxed">
-                Get context-aware suggestions, generate plot outlines, and overcome writer's block with our specialized storytelling AI model integrated directly into the editor.
+                Never lose track of your lore. Narratia uses full-text search to index your universe, automatically pulling character and location context into your AI Co-Pilot prompt.
               </p>
-            </motion.div>
+            </FeatureCard>
 
-            {/* Card 2 */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-[#0B0914] border border-white/5 rounded-[16px] p-8 hover:border-purple-500/30 transition-colors duration-300 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-purple-500/20 transition-all" />
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 mb-6">
-                <Users />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3 outfit">Real-time Collaboration</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Work seamlessly with co-writers or editors. See multiple cursors, leave inline comments, and track every revision in real-time, just like code.
-              </p>
-            </motion.div>
-
-            {/* Card 3 */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-[#0B0914] border border-white/5 rounded-[16px] p-8 hover:border-pink-500/30 transition-colors duration-300 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-pink-500/20 transition-all" />
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-pink-400 mb-6">
-                <Zap />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3 outfit">Story Arcs & Logic</h3>
-              <p className="text-slate-400 leading-relaxed">
-                Map out character relationships, track timelines, and build structural outlines. Keep your world logic consistent across hundreds of chapters.
-              </p>
-            </motion.div>
-
-            {/* Card 4 */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-[#0B0914] border border-white/5 rounded-[16px] p-8 hover:border-orange-500/30 transition-colors duration-300 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 group-hover:bg-orange-500/20 transition-all" />
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-orange-400 mb-6">
+            <FeatureCard delay={0.1} glowColor="rgba(168, 85, 247, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-6 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                 <Book />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 outfit">Export to Anything</h3>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Auto-Extracting Story Wiki</h3>
               <p className="text-slate-400 leading-relaxed">
-                Compile your manuscript with one click. Generate print-ready PDFs, standard screenplay formats, EPUBs, or push directly to web platforms.
+                As you type, our Gemini-powered engine automatically identifies and extracts Characters, Locations, and Items, building a living encyclopedia of your world.
               </p>
-            </motion.div>
+            </FeatureCard>
+
+            <FeatureCard delay={0.2} glowColor="rgba(236, 72, 153, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 mb-6 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+                <Zap />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Zen 3D Focus Mode</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Enter a flow state with interactive 3D particle environments (Cosmic, Snow, Galaxy, Ember) that react to your typing speed and the emotional tone of your writing.
+              </p>
+            </FeatureCard>
+
+            <FeatureCard delay={0.3} glowColor="rgba(249, 115, 22, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-6 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+                <Users />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Outlines & Commands</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Generate entire chapter outlines using AI, and use intuitive Slash Commands directly in the rich-text editor to instantly pull up context or write new paragraphs.
+              </p>
+            </FeatureCard>
+
+            <FeatureCard delay={0.4} glowColor="rgba(6, 182, 212, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-6 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                <MessageSquare />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Real-time Comments</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Work seamlessly with co-writers or editors. Leave threaded inline comments and track feedback in real-time right alongside your manuscript.
+              </p>
+            </FeatureCard>
+
+            <FeatureCard delay={0.5} glowColor="rgba(16, 185, 129, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <Clock />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Version History</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Time-travel through your drafts. Automatically save snapshots, compare text differences, and restore old versions of any phase effortlessly.
+              </p>
+            </FeatureCard>
+
+            <FeatureCard delay={0.6} glowColor="rgba(59, 130, 246, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-6 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                <Download />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Smart Export</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Compile your module with one click. Generate perfectly formatted PDFs, Word DOCX files, or plain text ready for agents or self-publishing.
+              </p>
+            </FeatureCard>
+
+            <FeatureCard delay={0.7} glowColor="rgba(234, 179, 8, 0.15)">
+              <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 mb-6 shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                <BarChart />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 outfit">Writing Analytics</h3>
+              <p className="text-slate-400 leading-relaxed">
+                Keep track of your productivity. Monitor your word counts, reading times, and writing sessions directly from your personalized dashboard.
+              </p>
+            </FeatureCard>
           </div>
         </section>
 
         {/* ── CTA SECTION ── */}
         <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-24 relative">
-          <div className="hidden lg:block absolute left-[40px] top-[140px] w-5 h-5 rounded-full border-[3px] border-[#05050A] bg-indigo-400 timeline-glow transform -translate-x-1/2 z-20" />
+          <div className="hidden lg:block absolute left-[40px] top-[140px] w-5 h-5 rounded-full border-[3px] border-[#05050A] bg-purple-500 timeline-glow transform -translate-x-1/2 z-20" />
 
-          <div className="bg-[#0B0914] border border-white/5 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 rounded-full blur-[80px]" />
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative max-w-5xl mx-auto rounded-3xl p-[1px] overflow-hidden shadow-2xl">
+            {/* Subtle gradient border */}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/40 via-purple-500/40 to-pink-500/40" />
+            
+            <div className="bg-[#0B0914]/90 backdrop-blur-2xl rounded-[23px] px-8 md:px-12 py-10 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+              {/* Magical inner glow */}
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-[60px] pointer-events-none" />
+              
+              <div className="relative z-10 text-center md:text-left flex-1">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 outfit tracking-tight">
+                  Your universe awaits.
+                </h2>
+                <p className="text-base md:text-lg text-slate-400 font-serif leading-relaxed">
+                  An intelligent workspace where your story's universe remembers itself as you write.
+                </p>
+              </div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 outfit">Ready to write?</h2>
-              <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
-                Join the largest platform for modern writers. Start your free project today.
-              </p>
-              <button onClick={() => router.push("/register")} className="btn-primary text-lg px-10 py-5 w-full sm:w-auto">
-                Start creating for free
-              </button>
-            </motion.div>
-          </div>
+              <div className="relative z-10 flex-shrink-0">
+                <button onClick={() => router.push("/register")} className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95 transition-all whitespace-nowrap">
+                  Begin your narrative
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </section>
 
         {/* ── FOOTER ── */}
