@@ -74,7 +74,6 @@ export default function DashboardLayout({
 
           if (insertError) {
             console.error("❌ Failed to create profile:", insertError);
-            // Even if insert fails, show basic profile
             data = {
               username: newUsername,
               avatar_url: null,
@@ -87,7 +86,6 @@ export default function DashboardLayout({
 
         console.log("✅ Profile loaded:", data);
 
-        // Set profile state
         const avatarUrl = data?.avatar_url
           ? `${data.avatar_url}?t=${Date.now()}`
           : null;
@@ -137,26 +135,26 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#02020a]">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-[#02020a]">
         <div className="text-center px-4">
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           >
-            <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+            <Sparkles className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto mb-4" />
           </motion.div>
-          <p className="text-gray-400">Loading your space...</p>
+          <p className="text-slate-600 dark:text-gray-400">Loading your space...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#02020a] selection:bg-purple-500/30 selection:text-white">
+    <div className="flex min-h-screen bg-[#f0f3f9] dark:bg-[#02020a] selection:bg-purple-500/30 selection:text-white transition-colors duration-300">
       {/* Background glow effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 dark:opacity-0 blur-[120px] opacity-40" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[50%] rounded-full bg-indigo-500/10 dark:opacity-0 blur-[120px] opacity-40" />
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -166,7 +164,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-slate-900/40 dark:bg-black/80 backdrop-blur-sm dark:backdrop-blur-none z-40 lg:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -178,36 +176,36 @@ export default function DashboardLayout({
         fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50
         w-64 lg:w-56 lg:h-[calc(100vh-3rem)]
         lg:ml-6 lg:mr-4
-        bg-[#0a0a1a]/80 backdrop-blur-2xl border-r lg:border border-white/10 lg:rounded-[2rem]
+        bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none border-r lg:border border-slate-200/80 dark:border-white/5 lg:rounded-[2rem]
         transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col shadow-2xl
+        flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none
       `}
       >
         {/* Mobile Header */}
-        <div className="lg:hidden p-6 flex items-center justify-between border-b border-white/5">
+        <div className="lg:hidden p-6 flex items-center justify-between border-b border-slate-200 dark:border-white/5">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-sm">N</span>
             </div>
-            <h1 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
               Narratia
             </h1>
           </Link>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 rounded-xl hover:bg-white/10 transition-colors text-gray-400"
+            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-gray-400"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Desktop Logo */}
-        <div className="hidden lg:flex p-8 items-center gap-3 group cursor-pointer border-b border-white/5" onClick={() => router.push("/")}>
+        <div className="hidden lg:flex p-8 items-center gap-3 group cursor-pointer border-b border-slate-200/80 dark:border-white/5" onClick={() => router.push("/")}>
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all group-hover:scale-105">
             <span className="text-white font-bold text-base">N</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-300 group-hover:to-purple-300 transition-all">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-500 transition-all">
             Narratia
           </h1>
         </div>
@@ -227,16 +225,16 @@ export default function DashboardLayout({
                 {isActive && (
                   <motion.div
                     layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/10 border border-purple-500/20 rounded-2xl"
+                    className="absolute inset-0 bg-purple-100/90 dark:bg-purple-500/15 border border-purple-200 dark:border-purple-500/20 rounded-2xl shadow-sm dark:shadow-none"
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <div className={`relative z-10 flex items-center gap-3 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-200'}`}>
+                <div className={`relative z-10 flex items-center gap-3 ${isActive ? 'text-purple-700 dark:text-white font-bold' : 'text-slate-600 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-gray-200'}`}>
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-300 ${isActive ? "scale-110 text-purple-400" : "group-hover:scale-110"}`}
+                    className={`w-5 h-5 transition-transform duration-300 ${isActive ? "scale-110 text-purple-600 dark:text-purple-400" : "group-hover:scale-110"}`}
                   />
-                  <span className={`font-medium ${isActive ? 'font-semibold' : ''}`}>{item.label}</span>
+                  <span className={`font-medium ${isActive ? 'font-bold' : ''}`}>{item.label}</span>
                 </div>
               </button>
             );
@@ -244,10 +242,10 @@ export default function DashboardLayout({
         </nav>
 
         {/* Footer */}
-        <div className="p-4 lg:p-5 border-t border-white/5">
+        <div className="p-4 lg:p-5 border-t border-slate-200/80 dark:border-white/5">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group outline-none"
+            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-300 group outline-none"
           >
             <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
             <span className="font-medium">Logout</span>
@@ -258,10 +256,10 @@ export default function DashboardLayout({
       {/* Main Content */}
       <main className="flex-1 min-w-0 flex flex-col min-h-screen relative z-10">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-[#0a0a1a]/80 backdrop-blur-xl border-b border-white/5 p-4 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-[#080711] backdrop-blur-xl dark:backdrop-blur-none border-b border-slate-200 dark:border-white/5 p-4 flex items-center justify-between">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2.5 rounded-xl hover:bg-white/10 transition-colors text-gray-400 border border-white/10"
+            className="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-gray-400 border border-slate-200 dark:border-white/5"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -282,19 +280,19 @@ export default function DashboardLayout({
               {/* Desktop Header */}
               <div className="hidden lg:flex items-center justify-between">
                 <div className="flex items-baseline gap-3">
-                  <h2 className="text-xl font-bold text-white tracking-tight">
-                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{profile.username}</span>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">{profile.username}</span>
                   </h2>
-                  <span className="text-white/20 text-sm">|</span>
-                  <p className="text-gray-400 text-sm">{profile.email}</p>
+                  <span className="text-slate-300 dark:text-white/20 text-sm">|</span>
+                  <p className="text-slate-500 dark:text-gray-400 text-sm">{profile.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <ThemeToggle />
-                  <div className="h-6 w-[1px] bg-white/10" />
+                  <div className="h-6 w-[1px] bg-slate-200 dark:bg-white/5" />
                   <div className="scale-90 origin-right">
                     <NotificationBell />
                   </div>
-                  <div className="h-6 w-[1px] bg-white/10" />
+                  <div className="h-6 w-[1px] bg-slate-200 dark:bg-white/5" />
                   <div className="scale-90 origin-right">
                     <ProfileAvatar
                       profile={profile}
@@ -307,10 +305,10 @@ export default function DashboardLayout({
               {/* Mobile Header Additions */}
               <div className="lg:hidden space-y-2">
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-white tracking-tight">
-                    Hi, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{profile.username}</span>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Hi, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">{profile.username}</span>
                   </h2>
-                  <p className="text-gray-400 text-sm">{profile.email}</p>
+                  <p className="text-slate-500 dark:text-gray-400 text-sm">{profile.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <NotificationBell />
@@ -326,10 +324,10 @@ export default function DashboardLayout({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex-1 bg-[#0a0a1a]/60 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative flex flex-col"
+            className="flex-1 bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none rounded-3xl border border-slate-200/80 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
           >
             {/* Subtle inner highlight */}
-            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/5 pointer-events-none" />
+            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-slate-200/60 dark:ring-0 pointer-events-none" />
             <div className="flex-1 relative z-10 p-5 sm:p-6 lg:p-6">
               {children}
             </div>

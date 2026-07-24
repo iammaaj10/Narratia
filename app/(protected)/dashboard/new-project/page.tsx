@@ -182,9 +182,9 @@ export default function NewProjectPage() {
       <div className="mb-6 lg:mb-8 pt-2 lg:pt-0">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-white transition-colors group"
+          className="inline-flex items-center text-sm font-medium text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors group"
         >
-          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center mr-3 group-hover:bg-white/10 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-slate-200/60 dark:bg-white/5 flex items-center justify-center mr-3 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
             <ChevronLeft className="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" />
           </div>
           Back to Dashboard
@@ -195,26 +195,26 @@ export default function NewProjectPage() {
         {/* Left Column: Context / Branding */}
         <div className="lg:w-[35%] flex flex-col">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-white/10 shadow-[0_0_20px_-5px_rgba(168,85,247,0.2)] mb-5">
-              <BookOpen className="w-6 h-6 text-purple-400" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-[0_0_20px_-5px_rgba(168,85,247,0.2)] mb-5">
+              <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3 leading-tight">
+            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 leading-tight">
               Bring your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400">
                 imagination
               </span>{" "}
               to life.
             </h1>
-            <p className="text-gray-400 text-[13px] leading-relaxed mb-6">
+            <p className="text-slate-600 dark:text-gray-400 text-[13px] leading-relaxed mb-6">
               Every great masterpiece starts with a single idea. Give your story a name, a premise, and choose whether to write solo or invite collaborators to join your creative journey.
             </p>
 
-            <div className="hidden lg:block p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 relative overflow-hidden shadow-lg shadow-amber-500/5">
+            <div className="hidden lg:block p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 relative overflow-hidden shadow-sm">
               <div className="flex items-center gap-2 mb-2 relative z-10">
-                <Lightbulb className="text-amber-400 w-4 h-4" />
-                <h4 className="text-amber-200 font-medium text-[13px]">Writer's Tip</h4>
+                <Lightbulb className="text-amber-600 dark:text-amber-400 w-4 h-4" />
+                <h4 className="text-amber-900 dark:text-amber-200 font-medium text-[13px]">Writer's Tip</h4>
               </div>
-              <p className="text-amber-100/70 text-[12px] leading-relaxed relative z-10">
+              <p className="text-amber-800/80 dark:text-amber-100/70 text-[12px] leading-relaxed relative z-10">
                 Start with a strong hook or an intriguing character. Don't worry about getting everything perfect right now—you can always revise and refine your title and synopsis later. Just start writing!
               </p>
             </div>
@@ -227,39 +227,39 @@ export default function NewProjectPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#0b0f19] rounded-2xl p-6 sm:p-7 border border-indigo-500/20"
+            className="bg-white dark:bg-[#0b0f19] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-indigo-500/20 shadow-xl shadow-slate-200/40 dark:shadow-none"
           >
             <div className="space-y-6">
               {/* Title Input */}
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-indigo-200 ml-1">
-                  Story Title <span className="text-pink-400">*</span>
+                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
+                  Story Title <span className="text-pink-500">*</span>
                 </label>
                 <input
                   placeholder="e.g., The Midnight Library"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-[#131726] hover:bg-[#1a1f33] focus:bg-[#1a1f33] border border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-white placeholder:text-indigo-300/40 focus:outline-none focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400 transition-colors"
+                  className="w-full bg-slate-50 dark:bg-[#131726] hover:bg-slate-100/80 dark:hover:bg-[#1a1f33] focus:bg-white dark:focus:bg-[#1a1f33] border border-slate-200 dark:border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-indigo-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-colors"
                   autoFocus
                 />
               </div>
 
               {/* Description Input */}
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-indigo-200 ml-1">
+                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
                   Synopsis / Premise
                 </label>
                 <textarea
                   placeholder="A brief overview of your story's plot or themes..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-[#131726] hover:bg-[#1a1f33] focus:bg-[#1a1f33] border border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-white placeholder:text-indigo-300/40 focus:outline-none focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400 min-h-[100px] resize-none transition-colors"
+                  className="w-full bg-slate-50 dark:bg-[#131726] hover:bg-slate-100/80 dark:hover:bg-[#1a1f33] focus:bg-white dark:focus:bg-[#1a1f33] border border-slate-200 dark:border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-indigo-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[100px] resize-none transition-colors"
                 />
               </div>
 
               {/* Project Type */}
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-indigo-200 ml-1">
+                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
                   Collaboration
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -267,19 +267,19 @@ export default function NewProjectPage() {
                   <button
                     onClick={() => setIsTeam(false)}
                     className={`relative p-3.5 rounded-xl border transition-colors text-left group ${!isTeam
-                        ? "bg-indigo-500/10 border-indigo-400 ring-1 ring-indigo-400"
-                        : "bg-[#131726] border-indigo-500/20 hover:border-indigo-500/40 hover:bg-[#1a1f33]"
+                        ? "bg-purple-50 dark:bg-indigo-500/10 border-purple-500 dark:border-indigo-400 ring-1 ring-purple-500 dark:ring-indigo-400"
+                        : "bg-slate-50 dark:bg-[#131726] border-slate-200 dark:border-indigo-500/20 hover:border-purple-300 dark:hover:border-indigo-500/40 hover:bg-slate-100 dark:hover:bg-[#1a1f33]"
                       }`}
                   >
                     <div className="flex flex-col gap-2 relative z-10">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${!isTeam ? "bg-indigo-500/30 text-indigo-200" : "bg-indigo-900/50 text-indigo-300 group-hover:text-indigo-200"}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${!isTeam ? "bg-purple-100 text-purple-700 dark:bg-indigo-500/30 dark:text-indigo-200" : "bg-slate-200 text-slate-600 dark:bg-indigo-900/50 dark:text-indigo-300"}`}>
                         <User className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className={`font-semibold text-[14px] transition-colors ${!isTeam ? "text-white" : "text-indigo-200 group-hover:text-white"}`}>
+                        <h3 className={`font-semibold text-[14px] transition-colors ${!isTeam ? "text-purple-900 dark:text-white" : "text-slate-700 dark:text-indigo-200"}`}>
                           Solo Project
                         </h3>
-                        <p className={`text-[12px] mt-0.5 leading-relaxed ${!isTeam ? "text-indigo-200" : "text-indigo-300/70"}`}>
+                        <p className={`text-[12px] mt-0.5 leading-relaxed ${!isTeam ? "text-purple-700 dark:text-indigo-200" : "text-slate-500 dark:text-indigo-300/70"}`}>
                           Write independently.
                         </p>
                       </div>
@@ -290,19 +290,19 @@ export default function NewProjectPage() {
                   <button
                     onClick={() => setIsTeam(true)}
                     className={`relative p-3.5 rounded-xl border transition-colors text-left group ${isTeam
-                        ? "bg-indigo-500/10 border-indigo-400 ring-1 ring-indigo-400"
-                        : "bg-[#131726] border-indigo-500/20 hover:border-indigo-500/40 hover:bg-[#1a1f33]"
+                        ? "bg-purple-50 dark:bg-indigo-500/10 border-purple-500 dark:border-indigo-400 ring-1 ring-purple-500 dark:ring-indigo-400"
+                        : "bg-slate-50 dark:bg-[#131726] border-slate-200 dark:border-indigo-500/20 hover:border-purple-300 dark:hover:border-indigo-500/40 hover:bg-slate-100 dark:hover:bg-[#1a1f33]"
                       }`}
                   >
                     <div className="flex flex-col gap-2 relative z-10">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isTeam ? "bg-indigo-500/30 text-indigo-200" : "bg-indigo-900/50 text-indigo-300 group-hover:text-indigo-200"}`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isTeam ? "bg-purple-100 text-purple-700 dark:bg-indigo-500/30 dark:text-indigo-200" : "bg-slate-200 text-slate-600 dark:bg-indigo-900/50 dark:text-indigo-300"}`}>
                         <Users className="w-4 h-4" />
                       </div>
                       <div>
-                        <h3 className={`font-semibold text-[14px] transition-colors ${isTeam ? "text-white" : "text-indigo-200 group-hover:text-white"}`}>
+                        <h3 className={`font-semibold text-[14px] transition-colors ${isTeam ? "text-purple-900 dark:text-white" : "text-slate-700 dark:text-indigo-200"}`}>
                           Team Project
                         </h3>
-                        <p className={`text-[12px] mt-0.5 leading-relaxed ${isTeam ? "text-indigo-200" : "text-indigo-300/70"}`}>
+                        <p className={`text-[12px] mt-0.5 leading-relaxed ${isTeam ? "text-purple-700 dark:text-indigo-200" : "text-slate-500 dark:text-indigo-300/70"}`}>
                           Collaborate with others.
                         </p>
                       </div>

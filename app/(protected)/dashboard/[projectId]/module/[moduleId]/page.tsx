@@ -181,7 +181,7 @@ export default function ModuleDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-gray-400">Loading module...</div>
+        <div className="text-slate-500 dark:text-gray-400 font-medium">Loading module...</div>
       </div>
     );
   }
@@ -189,7 +189,7 @@ export default function ModuleDetailPage() {
   if (!module) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-gray-400">Module not found</div>
+        <div className="text-slate-500 dark:text-gray-400 font-medium">Module not found</div>
       </div>
     );
   }
@@ -204,7 +204,7 @@ export default function ModuleDetailPage() {
         {/* Navigation Breadcrumb */}
         <button
           onClick={() => router.push(`/dashboard/${projectId}`)}
-          className="group flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-purple-400 transition-colors self-start"
+          className="group flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors self-start"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Project
@@ -214,20 +214,20 @@ export default function ModuleDetailPage() {
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-4">
           <div className="flex-1">
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border border-white/10">
-                <FileText className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center border border-purple-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="inline-flex px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300">
+              <div className="inline-flex px-3 py-1 rounded-full bg-purple-50 dark:bg-white/5 border border-purple-200 dark:border-white/10 text-xs font-semibold text-purple-700 dark:text-gray-300">
                 Story Module
               </div>
             </motion.div>
             
-            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-2">
+            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
               {module.title}
             </motion.h1>
             
             {module.description && (
-              <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-gray-400 text-base lg:text-lg max-w-3xl leading-relaxed">
+              <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-slate-600 dark:text-gray-400 text-base lg:text-lg max-w-3xl leading-relaxed">
                 {module.description}
               </motion.p>
             )}
@@ -238,12 +238,12 @@ export default function ModuleDetailPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                <FileText className="w-5 h-5 text-purple-400" />
+              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center border border-purple-200 dark:border-purple-500/20">
+                <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Phases / Episodes</h2>
-                <p className="text-sm text-gray-400">Manage the individual scenes of this module.</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Phases / Episodes</h2>
+                <p className="text-sm text-slate-600 dark:text-gray-400">Manage the individual scenes of this module.</p>
               </div>
             </div>
 
@@ -258,9 +258,9 @@ export default function ModuleDetailPage() {
                         `/dashboard/${projectId}/module/${moduleId}/emotions`
                       )
                     }
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 rounded-xl font-medium border border-pink-500/20 transition-all group"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-pink-50 dark:bg-pink-500/10 text-pink-700 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-500/20 rounded-xl font-medium border border-pink-200 dark:border-pink-500/20 transition-all group shadow-sm dark:shadow-none"
                   >
-                    <Heart className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Heart className="w-4 h-4 group-hover:scale-110 transition-transform text-pink-600 dark:text-pink-400" />
                     <span className="hidden sm:inline">Heatmap</span>
                   </button>
                 )}
@@ -273,9 +273,9 @@ export default function ModuleDetailPage() {
                         `/dashboard/${projectId}/module/${moduleId}/screenplay`
                       )
                     }
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded-xl font-medium border border-cyan-500/20 transition-all group"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 rounded-xl font-medium border border-cyan-200 dark:border-cyan-500/20 transition-all group shadow-sm dark:shadow-none"
                   >
-                    <Film className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <Film className="w-4 h-4 group-hover:scale-110 transition-transform text-cyan-600 dark:text-cyan-400" />
                     <span className="hidden sm:inline">Screenplay</span>
                   </button>
                 )}
@@ -283,7 +283,7 @@ export default function ModuleDetailPage() {
                 {/* Create Phase */}
                 <button
                   onClick={() => setShowCreatePhase(true)}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-500 hover:bg-purple-400 text-white rounded-xl font-medium shadow-lg shadow-purple-500/20 transition-all group"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 dark:bg-purple-500 dark:hover:bg-purple-400 text-white rounded-xl font-medium shadow-lg shadow-purple-500/20 transition-all group"
                 >
                   <PlusCircle className="w-4 h-4 group-hover:rotate-90 transition-transform" />
                   <span>New Phase</span>
@@ -297,21 +297,21 @@ export default function ModuleDetailPage() {
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="text-center py-20 rounded-3xl border border-dashed border-white/20 bg-white/[0.01]"
+              className="text-center py-20 rounded-3xl border border-dashed border-slate-300 dark:border-white/20 bg-slate-50 dark:bg-[#0c0c1b]"
             >
-              <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
-                <FileText className="w-10 h-10 text-gray-500" />
+              <div className="w-20 h-20 bg-slate-200 dark:bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3 border border-slate-300 dark:border-transparent">
+                <FileText className="w-10 h-10 text-slate-400 dark:text-gray-500" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
                 No phases created yet
               </h3>
-              <p className="text-gray-400 mb-8 max-w-sm mx-auto">
+              <p className="text-slate-600 dark:text-gray-400 mb-8 max-w-sm mx-auto">
                 Break your story down into manageable scenes or chapters.
               </p>
               {isOwner && (
                 <button
                   onClick={() => setShowCreatePhase(true)}
-                  className="px-8 py-3.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all hover:scale-105"
+                  className="px-8 py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-white font-semibold shadow-lg shadow-purple-500/25 transition-all hover:scale-105"
                 >
                   Create First Phase
                 </button>
@@ -328,23 +328,23 @@ export default function ModuleDetailPage() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ delay: 0.05 * index }}
                     onClick={() => router.push(`/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`)}
-                    className="group cursor-pointer relative p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-purple-500/30 hover:shadow-[0_8px_30px_rgb(168,85,247,0.1)] transition-all overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="group cursor-pointer relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0d0c1d] border border-slate-200 dark:border-white/5 hover:bg-slate-50/80 dark:hover:bg-[#121128] hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     {/* Ambient Glow */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-[40px] pointer-events-none group-hover:bg-purple-500/10 transition-colors rounded-full" />
                     
                     <div className="relative z-10 flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-gray-400 group-hover:bg-purple-500/20 group-hover:text-purple-300 group-hover:border-purple-500/30 transition-colors">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-gray-400 group-hover:bg-purple-100 dark:group-hover:bg-purple-500/20 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
                           {index + 1}
                         </span>
-                        <h3 className="text-lg font-bold text-white truncate group-hover:text-purple-300 transition-colors">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
                           {phase.title}
                         </h3>
                       </div>
 
                       {phase.description && (
-                        <p className="text-sm text-gray-400 truncate pl-11 mb-3">
+                        <p className="text-sm text-slate-600 dark:text-gray-400 truncate pl-11 mb-3">
                           {phase.description}
                         </p>
                       )}
@@ -352,7 +352,7 @@ export default function ModuleDetailPage() {
                       <div className="flex flex-wrap items-center gap-4 pl-11">
                         {/* Assigned Writer */}
                         {phase.profiles && (
-                          <div className="flex items-center gap-2 text-xs font-medium text-gray-400 bg-black/20 px-2 py-1 rounded-md">
+                          <div className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-gray-400 bg-slate-100 dark:bg-black/20 border border-slate-200 dark:border-transparent px-2 py-1 rounded-md">
                             <User className="w-3.5 h-3.5" />
                             <span className="truncate">
                               {phase.profiles.username}
@@ -361,7 +361,7 @@ export default function ModuleDetailPage() {
                         )}
 
                         {/* Word Count */}
-                        <div className="text-xs font-medium text-gray-500 bg-white/5 px-2 py-1 rounded-md">
+                        <div className="text-xs font-medium text-slate-600 dark:text-gray-400 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent px-2 py-1 rounded-md">
                           {phase.content
                             ? `${phase.content.split(" ").filter((w) => w.length > 0).length} words`
                             : "No content yet"}
@@ -370,13 +370,13 @@ export default function ModuleDetailPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-md rounded-xl p-1 border border-white/5">
+                    <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-black/40 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           router.push(`/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`);
                         }}
-                        className="p-2 rounded-lg text-gray-400 hover:text-purple-400 hover:bg-purple-500/20 transition-all"
+                        className="p-2 rounded-lg text-slate-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/20 transition-all"
                         title="Edit Phase"
                       >
                         <Edit className="w-4 h-4" />
@@ -388,7 +388,7 @@ export default function ModuleDetailPage() {
                             e.stopPropagation();
                             deletePhase(phase.id);
                           }}
-                          className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/20 transition-all"
+                          className="p-2 rounded-lg text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/20 transition-all"
                           title="Delete Phase"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -482,15 +482,15 @@ function CreatePhaseModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl border border-white/10 p-6 sm:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">
+    <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 p-6 sm:p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-4 sm:mb-6">
           Create New Phase
         </h2>
 
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
               Phase Title *
             </label>
             <input
@@ -498,31 +498,31 @@ function CreatePhaseModal({
               placeholder="e.g., Episode 1, Chapter 1"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+              className="w-full bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
               Description
             </label>
             <textarea
               placeholder="Brief description of this phase"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 min-h-[80px] resize-none"
+              className="w-full bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 min-h-[80px] resize-none"
             />
           </div>
 
           {teamMembers.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-gray-300 mb-2">
                 Assign Writer (Optional)
               </label>
               <select
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white focus:outline-none focus:border-purple-500/50"
+                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 sm:py-3 text-sm sm:text-base text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
               >
                 <option value="">Unassigned</option>
                 {teamMembers.map((member) => {
@@ -541,14 +541,14 @@ function CreatePhaseModal({
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl border border-white/10 text-sm sm:text-base text-gray-300 hover:bg-white/5 transition-all"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 dark:border-white/10 text-sm sm:text-base text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 sm:py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm sm:text-base font-semibold shadow-md transition-all disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Phase"}
           </button>

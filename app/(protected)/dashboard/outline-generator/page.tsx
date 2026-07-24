@@ -135,7 +135,7 @@ export default function OutlineGeneratorPage() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="pb-12"
@@ -143,7 +143,7 @@ export default function OutlineGeneratorPage() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="mb-8">
-          <Link 
+          <Link
             href="/dashboard"
             className="inline-flex items-center text-sm font-medium text-gray-400 hover:text-purple-400 transition-colors mb-4 group"
           >
@@ -170,14 +170,14 @@ export default function OutlineGeneratorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Input Section */}
           <div className="lg:col-span-5 space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="bg-black/40 border border-white/10 rounded-3xl p-6 lg:p-8 shadow-2xl backdrop-blur-md relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-3xl rounded-full pointer-events-none" />
-              
+
               <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
                 <Lightbulb className="w-6 h-6 text-yellow-400" />
                 The Spark
@@ -216,9 +216,9 @@ export default function OutlineGeneratorPage() {
               </div>
 
               {error && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }} 
-                  animate={{ opacity: 1, height: 'auto' }} 
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
                 >
                   <p className="text-red-400 text-sm font-medium">{error}</p>
@@ -227,7 +227,7 @@ export default function OutlineGeneratorPage() {
             </motion.div>
 
             {/* Tips Card */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -255,7 +255,7 @@ export default function OutlineGeneratorPage() {
 
           {/* Output Section */}
           <div className="lg:col-span-7 space-y-6 h-full flex flex-col">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -269,7 +269,7 @@ export default function OutlineGeneratorPage() {
 
                 <AnimatePresence>
                   {outline && !loading && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="flex items-center gap-2"

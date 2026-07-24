@@ -39,28 +39,28 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#05050A]">
+    <div className="min-h-screen flex bg-[#f0f3f9] dark:bg-[#05050A] transition-colors duration-300">
       {/* Left Pane - Visual Storytelling */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-[#0A0A10] border-r border-white/5">
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-white dark:bg-[#0A0A10] border-r border-slate-200 dark:border-white/5 transition-colors duration-300">
         {/* Subtle abstract gradient */}
-        <div className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent blur-3xl rounded-full" />
+        <div className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-transparent blur-3xl rounded-full" />
         
         <div className="relative z-10 flex flex-col justify-between p-12 w-full h-full">
            <Link href="/" className="flex items-center gap-3 w-fit">
-              <div className="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-bold text-xl outfit">
+              <div className="w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-black rounded-xl flex items-center justify-center font-bold text-xl outfit shadow-lg">
                 N
               </div>
-              <span className="text-2xl font-bold text-white tracking-tight outfit">
+              <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight outfit">
                 Narratia
               </span>
            </Link>
 
            <div className="max-w-md">
-             <h2 className="text-4xl font-bold text-white mb-6 outfit leading-[1.2]">
+             <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 outfit leading-[1.2]">
                Your story deserves <br />
-               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">the perfect canvas.</span>
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:to-purple-400">the perfect canvas.</span>
              </h2>
-             <p className="text-lg text-slate-400 leading-relaxed">
+             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                Join thousands of writers who have found their voice on the most advanced storytelling platform ever built.
              </p>
            </div>
@@ -75,36 +75,36 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center relative">
          <div className="w-full max-w-[400px] px-6 py-12">
             <div className="lg:hidden flex items-center gap-2 mb-12">
-              <div className="w-8 h-8 bg-white text-black rounded flex items-center justify-center font-bold text-lg outfit">N</div>
-              <span className="text-xl font-bold text-white tracking-tight outfit">Narratia</span>
+              <div className="w-8 h-8 bg-slate-900 text-white dark:bg-white dark:text-black rounded flex items-center justify-center font-bold text-lg outfit">N</div>
+              <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight outfit">Narratia</span>
             </div>
             
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white tracking-tight mb-2 outfit">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2 outfit">
                 Welcome back
               </h1>
-              <p className="text-slate-400 text-sm">
+              <p className="text-slate-600 dark:text-slate-400 text-sm">
                 Enter your credentials to access your workspace.
               </p>
             </div>
             
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Email address</label>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email address</label>
                 <input
                   type="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-sm"
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm shadow-sm dark:shadow-none"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-slate-300">Password</label>
-                  <Link href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                  <Link href="#" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline transition-colors">
                     Forgot password?
                   </Link>
                 </div>
@@ -113,7 +113,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all text-sm"
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm shadow-sm dark:shadow-none"
                   required
                 />
               </div>
@@ -121,16 +121,16 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-white hover:bg-slate-200 text-black rounded-xl py-3.5 font-semibold text-sm transition-colors mt-6 flex items-center justify-center gap-2"
+                className="w-full bg-purple-600 hover:bg-purple-700 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-black rounded-xl py-3.5 font-semibold text-sm transition-colors mt-6 flex items-center justify-center gap-2 shadow-md"
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
               </button>
             </form>
             
             <div className="mt-8 text-center">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Don't have an account?{" "}
-                <Link href="/register" className="font-semibold text-white hover:text-indigo-300 transition-colors">
+                <Link href="/register" className="font-semibold text-purple-600 dark:text-white hover:underline transition-colors">
                   Create one now
                 </Link>
               </p>
