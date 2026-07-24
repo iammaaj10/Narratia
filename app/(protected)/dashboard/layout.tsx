@@ -173,7 +173,7 @@ export default function DashboardLayout({
       {/* Sidebar - Desktop & Mobile */}
       <aside
         className={`
-        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50
+        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-30
         w-64 lg:w-56 lg:h-[calc(100vh-3rem)]
         lg:ml-6 lg:mr-4
         bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none border-r lg:border border-slate-200/80 dark:border-white/5 lg:rounded-[2rem]
@@ -254,7 +254,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 flex flex-col min-h-screen relative z-10">
+      <main className="flex-1 min-w-0 flex flex-col min-h-screen relative">
         {/* Mobile Header */}
         <div className="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-[#080711] backdrop-blur-xl dark:backdrop-blur-none border-b border-slate-200 dark:border-white/5 p-4 flex items-center justify-between">
           <button

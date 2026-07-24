@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase/client";
 import {
   History,
@@ -44,6 +45,11 @@ export default function VersionHistory({
   const [versions, setVersions] = useState<Version[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     loadVersions();
@@ -118,25 +124,27 @@ export default function VersionHistory({
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl border border-white/10 max-w-6xl w-full h-[80vh] shadow-2xl flex flex-col">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 max-w-6xl w-full h-[80vh] shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
               <History className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Version History</h2>
-              <p className="text-sm text-gray-400">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Version History</h2>
+              <p className="text-sm text-slate-500 dark:text-gray-400">
                 {versions.length} saved version{versions.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-700 dark:text-gray-400 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
           >
             <X className="w-5 h-5" />
           </button>
@@ -145,16 +153,16 @@ export default function VersionHistory({
         {/* Content */}
         <div className="flex flex-1 overflow-hidden">
           {/* Versions List */}
-          <div className="w-80 border-r border-white/10 overflow-y-auto">
+          <div className="w-80 border-r border-slate-200 dark:border-white/10 overflow-y-auto bg-slate-50/50 dark:bg-black/20">
             {loading ? (
-              <div className="p-8 text-center text-gray-400">
+              <div className="p-8 text-center text-slate-500 dark:text-gray-400">
                 Loading versions...
               </div>
             ) : versions.length === 0 ? (
               <div className="p-8 text-center">
-                <History className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 text-sm">No versions saved yet</p>
-                <p className="text-gray-500 text-xs mt-2">
+                <History className="w-16 h-16 text-slate-300 dark:text-gray-600 mx-auto mb-4" />
+                <p className="text-slate-600 dark:text-gray-400 text-sm font-medium">No versions saved yet</p>
+                <p className="text-slate-400 dark:text-gray-500 text-xs mt-2">
                   Versions are saved automatically when you make significant changes
                 </p>
               </div>
@@ -166,8 +174,8 @@ export default function VersionHistory({
                     onClick={() => setSelectedVersion(version)}
                     className={`w-full text-left p-4 rounded-xl border transition-all ${
                       selectedVersion?.id === version.id
-                        ? "bg-blue-500/20 border-blue-500/50"
-                        : "bg-white/5 border-white/10 hover:border-white/20"
+                        ? "bg-blue-100/80 dark:bg-blue-500/20 border-blue-400 dark:border-blue-500/50 shadow-sm"
+                        : "bg-white dark:bg-white/5 border-slate-200/80 dark:border-white/10 hover:bg-slate-100/80 dark:hover:bg-white/10"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -175,33 +183,33 @@ export default function VersionHistory({
                         {version.profiles.avatar_url ? (
                           <img
                             src={version.profiles.avatar_url}
-                            className="w-6 h-6 rounded-full"
+                            className="w-6 h-6 rounded-full border border-slate-200 dark:border-transparent"
                             alt={version.profiles.username}
                           />
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                            <User className="w-3 h-3 text-purple-300" />
+                          <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center">
+                            <User className="w-3 h-3 text-purple-600 dark:text-purple-300" />
                           </div>
                         )}
-                        <span className="text-sm font-medium text-white">
+                        <span className="text-sm font-semibold text-slate-900 dark:text-white">
                           {version.profiles.username}
                         </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                      <ChevronRight className="w-4 h-4 text-slate-400 dark:text-gray-400" />
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                      <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-gray-400 mb-2 font-medium">
+                      <Clock className="w-3 h-3 text-slate-400 dark:text-gray-500" />
                       {new Date(version.created_at).toLocaleString()}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-gray-500">
                       <FileText className="w-3 h-3" />
                       {version.word_count} words
                     </div>
 
                     {version.version_note && (
-                      <p className="text-xs text-gray-400 mt-2 italic">
+                      <p className="text-xs text-slate-600 dark:text-gray-400 mt-2 italic">
                         "{version.version_note}"
                       </p>
                     )}
@@ -212,27 +220,27 @@ export default function VersionHistory({
           </div>
 
           {/* Preview Panel */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
             {selectedVersion ? (
               <>
                 {/* Preview Header */}
-                <div className="p-6 border-b border-white/10">
+                <div className="p-6 border-b border-slate-200 dark:border-white/10">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold text-white mb-1">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
                         Version from{" "}
                         {new Date(selectedVersion.created_at).toLocaleDateString()}
                       </h3>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-slate-500 dark:text-gray-400">
                         {selectedVersion.word_count} words • Saved by{" "}
-                        {selectedVersion.profiles.username}
+                        <span className="font-semibold text-slate-700 dark:text-gray-300">{selectedVersion.profiles.username}</span>
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleRestore(selectedVersion)}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-100 dark:bg-green-500/20 text-emerald-800 dark:text-green-300 rounded-xl hover:bg-emerald-200 dark:hover:bg-green-500/30 transition-all font-semibold text-sm border border-emerald-300 dark:border-transparent"
                       >
                         <RotateCcw className="w-4 h-4" />
                         Restore
@@ -241,7 +249,8 @@ export default function VersionHistory({
                       {isOwner && (
                         <button
                           onClick={() => handleDelete(selectedVersion.id)}
-                          className="p-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-all"
+                          className="p-2 bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300 rounded-xl hover:bg-red-200 dark:hover:bg-red-500/30 transition-all border border-red-300 dark:border-transparent"
+                          title="Delete Version"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -251,25 +260,26 @@ export default function VersionHistory({
                 </div>
 
                 {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="prose prose-invert max-w-none">
-                    <pre className="whitespace-pre-wrap text-gray-300 text-base leading-relaxed font-serif">
+                <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 dark:bg-transparent">
+                  <div className="max-w-none">
+                    <pre className="whitespace-pre-wrap text-slate-800 dark:text-gray-300 text-base leading-relaxed font-serif">
                       {selectedVersion.content}
                     </pre>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-400">
+              <div className="flex-1 flex items-center justify-center text-slate-400 dark:text-gray-400">
                 <div className="text-center">
-                  <History className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Select a version to preview</p>
+                  <History className="w-16 h-16 mx-auto mb-4 opacity-40 text-slate-400 dark:text-gray-400" />
+                  <p className="font-medium text-slate-600 dark:text-gray-400">Select a version to preview</p>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
