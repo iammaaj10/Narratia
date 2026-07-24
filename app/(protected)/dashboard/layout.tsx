@@ -173,13 +173,13 @@ export default function DashboardLayout({
       {/* Sidebar - Desktop & Mobile */}
       <aside
         className={`
-        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-30
+        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50 lg:z-30
         w-64 lg:w-56 lg:h-[calc(100vh-3rem)]
         lg:ml-6 lg:mr-4
-        bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none border-r lg:border border-slate-200/80 dark:border-white/5 lg:rounded-[2rem]
+        bg-white dark:bg-[#080711] border-r lg:border border-slate-200/80 dark:border-white/5 lg:rounded-[2rem]
         transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col shadow-xl shadow-slate-200/50 dark:shadow-none
+        flex flex-col shadow-2xl dark:shadow-none
       `}
       >
         {/* Mobile Header */}
@@ -276,7 +276,7 @@ export default function DashboardLayout({
 
         <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-6 lg:pt-0 flex flex-col gap-2">
           {profile && (
-            <div className="space-y-2 relative z-50">
+            <div className="space-y-2 relative z-20">
               {/* Desktop Header */}
               <div className="hidden lg:flex items-center justify-between">
                 <div className="flex items-baseline gap-3">

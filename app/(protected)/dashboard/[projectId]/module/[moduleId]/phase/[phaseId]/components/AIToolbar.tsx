@@ -118,11 +118,11 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
   return (
     <>
       {/* AI Toolbar */}
-      <div className="flex items-center gap-2 px-2 border-r border-white/10">
+      <div className="flex items-center gap-2 px-2 border-r border-slate-200 dark:border-white/10">
         <button
           onClick={() => handleAIAction("suggest")}
           disabled={loading}
-          className="p-2 rounded hover:bg-purple-500/20 transition-colors text-purple-400 disabled:opacity-50"
+          className="p-2 rounded hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors text-purple-600 dark:text-purple-400 disabled:opacity-50"
           title="Continue Writing (AI)"
         >
           {loading ? (
@@ -135,7 +135,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
         <button
           onClick={() => handleAIAction("fix")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-blue-500/20 transition-colors text-blue-400 disabled:opacity-50"
+          className="p-2 rounded hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors text-blue-600 dark:text-blue-400 disabled:opacity-50"
           title="Fix Grammar & Style"
         >
           <Wand2 className="w-4 h-4" />
@@ -144,7 +144,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
         <button
           onClick={() => handleAIAction("expand")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-green-500/20 transition-colors text-green-400 disabled:opacity-50"
+          className="p-2 rounded hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors text-emerald-600 dark:text-green-400 disabled:opacity-50"
           title="Expand Text"
         >
           <Maximize2 className="w-4 h-4" />
@@ -153,7 +153,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
         <button
           onClick={() => handleAIAction("shorten")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-orange-500/20 transition-colors text-orange-400 disabled:opacity-50"
+          className="p-2 rounded hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-colors text-orange-600 dark:text-orange-400 disabled:opacity-50"
           title="Shorten Text"
         >
           <Minimize2 className="w-4 h-4" />
@@ -162,36 +162,36 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
 
       {/* AI Result Modal */}
       {showResult && result && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 top-40">
-          <div className="bg-gray-900 rounded-2xl border border-white/10 p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 top-40">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" />
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 AI Suggestion
               </h3>
               <button
                 onClick={handleReject}
-                className="p-2 text-gray-400 hover:text-white transition-colors"
+                className="p-2 text-slate-400 dark:text-gray-400 hover:text-slate-700 dark:hover:text-white transition-colors"
               >
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4 ">
-              <p className="text-gray-300 whitespace-pre-wrap">{result}</p>
+            <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 mb-4">
+              <p className="text-slate-800 dark:text-gray-300 whitespace-pre-wrap">{result}</p>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={handleReject}
-                className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-white/10 text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-2 font-medium"
               >
                 <XCircle className="w-4 h-4" />
                 Reject
               </button>
               <button
                 onClick={handleAccept}
-                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
               >
                 <CheckCircle className="w-4 h-4" />
                 Accept & Insert
@@ -203,8 +203,8 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
 
       {/* Error Display */}
       {error && (
-        <div className="fixed bottom-4 right-4 bg-red-500/20 border border-red-500/50 rounded-lg p-4 max-w-md">
-          <p className="text-red-300 text-sm">{error}</p>
+        <div className="fixed bottom-4 right-4 bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/50 rounded-lg p-4 max-w-md shadow-lg">
+          <p className="text-red-800 dark:text-red-300 text-sm font-medium">{error}</p>
         </div>
       )}
     </>

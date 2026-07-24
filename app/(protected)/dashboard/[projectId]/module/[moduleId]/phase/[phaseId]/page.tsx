@@ -523,7 +523,7 @@ export default function WritingEditorPage() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-white/10 bg-black/20 backdrop-blur-sm sticky top-0 z-30">
+      <div className="border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-black/20 backdrop-blur-sm sticky top-0 z-30 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Left: Back button and title */}
@@ -535,18 +535,18 @@ export default function WritingEditorPage() {
                   }
                   router.push(`/dashboard/${projectId}/module/${moduleId}`);
                 }}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors flex-shrink-0"
+                className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm hidden sm:inline">Back</span>
+                <span className="text-sm hidden sm:inline font-medium">Back</span>
               </button>
 
-              <div className="border-l border-white/10 pl-3 min-w-0 flex-1">
-                <h1 className="text-base sm:text-lg font-semibold text-white truncate">
+              <div className="border-l border-slate-200 dark:border-white/10 pl-3 min-w-0 flex-1">
+                <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white truncate">
                   {phase.title}
                 </h1>
                 {module && (
-                  <p className="text-xs text-gray-400 truncate hidden sm:block">
+                  <p className="text-xs text-slate-500 dark:text-gray-400 truncate hidden sm:block">
                     {module.title}
                   </p>
                 )}
@@ -556,53 +556,53 @@ export default function WritingEditorPage() {
             {/* Desktop Controls */}
             <div className="hidden lg:flex items-center gap-3">
               {/* Word Count */}
-              <div className="flex items-center gap-3 text-sm text-gray-400 px-3 py-2 bg-white/5 rounded-lg">
-                <span className="font-medium">{wordCount.toLocaleString()}w</span>
-                <span className="text-gray-600">•</span>
+              <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-400 px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg font-medium">
+                <span>{wordCount.toLocaleString()}w</span>
+                <span className="text-slate-300 dark:text-gray-600">•</span>
                 <span>{charCount.toLocaleString()}c</span>
               </div>
 
               {/* Save Status */}
-              <div className="flex items-center gap-2 min-w-[90px] px-3 py-2 bg-white/5 rounded-lg">
+              <div className="flex items-center gap-2 min-w-[90px] px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg">
                 {saveStatus === "saving" && (
                   <>
-                    <Clock className="w-4 h-4 text-yellow-400 animate-spin" />
-                    <span className="text-sm text-yellow-400">Saving</span>
+                    <Clock className="w-4 h-4 text-amber-600 dark:text-yellow-400 animate-spin" />
+                    <span className="text-sm font-semibold text-amber-600 dark:text-yellow-400">Saving</span>
                   </>
                 )}
                 {saveStatus === "saved" && (
                   <>
-                    <Check className="w-4 h-4 text-green-400" />
-                    <span className="text-sm text-green-400">Saved</span>
+                    <Check className="w-4 h-4 text-emerald-600 dark:text-green-400" />
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-green-400">Saved</span>
                   </>
                 )}
                 {saveStatus === "error" && (
                   <>
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span className="text-sm text-red-400">Error</span>
+                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    <span className="text-sm font-semibold text-red-600 dark:text-red-400">Error</span>
                   </>
                 )}
                 {saveStatus === "idle" && (
-                  <span className="text-sm text-gray-400">Ready</span>
+                  <span className="text-sm font-medium text-slate-500 dark:text-gray-400">Ready</span>
                 )}
               </div>
 
               {/* Focus Mode Button */}
               <button
                 onClick={() => setShowFocusMode(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
               >
                 <Maximize className="w-4 h-4" />
-                <span className="text-sm font-medium">Focus</span>
+                <span>Focus</span>
               </button>
 
               {/* AI Partner Button */}
               <button
                 onClick={handleOpenAIPartner}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
               >
                 <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">AI</span>
+                <span>AI</span>
               </button>
 
               {/* Memory Sync Button */}
@@ -610,10 +610,10 @@ export default function WritingEditorPage() {
                 onClick={handleMemorySync}
                 disabled={isSyncingMemory}
                 title="Sync AI Memory — extracts characters, locations, and embeds text for smarter AI suggestions"
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-transparent rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
               >
                 <RefreshCw className={`w-4 h-4 ${isSyncingMemory ? "animate-spin" : ""}`} />
-                <span className="text-sm font-medium">Memory</span>
+                <span>Memory</span>
               </button>
 
               {/* Story Wiki Button */}
@@ -623,10 +623,10 @@ export default function WritingEditorPage() {
                   setShowComments(false);
                 }}
                 title="Story Wiki — view auto-extracted characters, locations, and items"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${
                   showWiki
-                    ? "bg-amber-500/20 text-amber-300"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10"
+                    ? "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50"
+                    : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-transparent"
                 }`}
               >
                 <BookMarked className="w-4 h-4" />
@@ -638,7 +638,7 @@ export default function WritingEditorPage() {
                   setShowComments(!showComments);
                   setShowWiki(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-transparent rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-all"
               >
                 <MessageSquare className="w-4 h-4" />
               </button>
@@ -646,7 +646,7 @@ export default function WritingEditorPage() {
               {/* Version History Button */}
               <button
                 onClick={() => setShowVersionHistory(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-cyan-50 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-transparent rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-500/30 transition-all"
               >
                 <History className="w-4 h-4" />
               </button>
@@ -658,7 +658,7 @@ export default function WritingEditorPage() {
                   saveStatus === "saving" ||
                   content === lastSavedContentRef.current
                 }
-                className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
               </button>
@@ -666,14 +666,14 @@ export default function WritingEditorPage() {
 
             {/* Mobile: Word count + Menu */}
             <div className="lg:hidden flex items-center gap-3">
-              <div className="text-xs text-gray-400 font-medium">
+              <div className="text-xs text-slate-500 dark:text-gray-400 font-medium">
                 {wordCount.toLocaleString()}w
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors border border-slate-200 dark:border-transparent"
               >
-                <Menu className="w-5 h-5 text-gray-400" />
+                <Menu className="w-5 h-5 text-slate-600 dark:text-gray-400" />
               </button>
             </div>
           </div>
