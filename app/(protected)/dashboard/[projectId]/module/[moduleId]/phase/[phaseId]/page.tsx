@@ -25,6 +25,7 @@ import {
   Maximize,
   BookMarked,
   RefreshCw,
+  Users,
 } from "lucide-react";
 
 type Phase = {
@@ -630,6 +631,15 @@ export default function WritingEditorPage() {
                 }`}
               >
                 <BookMarked className="w-4 h-4" />
+              </button>
+
+              {/* Character Profiles Button */}
+              <button
+                onClick={() => window.open(`/dashboard/${projectId}/characters`, "_blank")}
+                title="Character Profiles — open full character bible in new tab"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all"
+              >
+                <Users className="w-4 h-4" />
               </button>
 
               {/* Comments Button */}

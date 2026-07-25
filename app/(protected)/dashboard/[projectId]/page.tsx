@@ -299,6 +299,29 @@ export default function ProjectDetailPage() {
             </div>
           </motion.div>
         )}
+
+        {/* Characters Section — Quick Access */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          onClick={() => router.push(`/dashboard/${projectId}/characters`)}
+          className="group cursor-pointer p-5 rounded-2xl border border-purple-200 dark:border-purple-500/20 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-500/[0.06] dark:to-indigo-500/[0.04] hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-500/40 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center border border-purple-200 dark:border-purple-500/30 group-hover:scale-110 transition-transform">
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">Character Profiles</h2>
+                <p className="text-sm text-slate-500 dark:text-gray-400">View and manage your story&apos;s cast of characters</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-400 dark:text-gray-500 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+          </div>
+        </motion.div>
+
         {/* Story Modules Section */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

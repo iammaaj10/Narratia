@@ -81,16 +81,27 @@ export default function StoryWiki({ projectId }: Props) {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
-          <BookMarked className="w-4 h-4 text-indigo-400" />
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-white/10">
+            <BookMarked className="w-4 h-4 text-indigo-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">Story Wiki</h3>
+            <p className="text-[11px] text-gray-500">
+              {loading ? "Loading..." : `${totalEntities} entities auto-extracted`}
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm font-semibold text-white">Story Wiki</h3>
-          <p className="text-[11px] text-gray-500">
-            {loading ? "Loading..." : `${totalEntities} entities auto-extracted`}
-          </p>
-        </div>
+
+        <a
+          href={`/dashboard/${projectId}/characters`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[11px] font-semibold text-purple-400 hover:text-purple-300 transition-colors bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20"
+        >
+          Characters →
+        </a>
       </div>
 
       {loading ? (
