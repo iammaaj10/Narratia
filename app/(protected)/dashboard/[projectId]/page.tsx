@@ -359,7 +359,7 @@ export default function ProjectDetailPage() {
                     whileHover={{ y: -4 }}
                     key={module.id}
                     onClick={() => router.push(`/dashboard/${projectId}/module/${module.id}`)}
-                    className="group cursor-pointer flex flex-col h-48 p-6 rounded-3xl bg-white dark:bg-gradient-to-br dark:from-white/[0.05] dark:to-transparent border border-slate-200 dark:border-white/10 hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden relative"
+                    className="group cursor-pointer flex flex-col h-48 p-6 rounded-3xl bg-white dark:bg-[#0d0c1d] hover:bg-slate-50/80 dark:hover:bg-[#121128] border border-slate-200 dark:border-white/5 hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden relative"
                   >
                     <div className="flex items-start justify-between mb-4 z-10">
                       <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-white/5 flex items-center justify-center border border-purple-200 dark:border-white/10 group-hover:bg-purple-100 dark:group-hover:bg-purple-500/20 group-hover:border-purple-300 dark:group-hover:border-purple-500/30 transition-colors">
@@ -474,7 +474,7 @@ function CreateModuleModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
@@ -482,46 +482,46 @@ function CreateModuleModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-gray-900 rounded-3xl border border-white/10 p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
+        className="bg-white dark:bg-gray-900 rounded-3xl border border-slate-200 dark:border-white/10 p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
       >
         {/* Glow effect */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/20 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/10 dark:bg-purple-500/20 blur-3xl rounded-full pointer-events-none" />
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
-              <FolderOpen className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center border border-purple-200 dark:border-purple-500/30">
+              <FolderOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               New Module
             </h2>
           </div>
 
           <div className="space-y-5 mb-8">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider ml-1 flex items-center gap-2">
+              <label className="text-sm font-semibold text-slate-700 dark:text-gray-300 uppercase tracking-wider ml-1 flex items-center gap-2">
                 Module Title
-                <span className="text-purple-400">*</span>
+                <span className="text-purple-600 dark:text-purple-400">*</span>
               </label>
               <input
                 type="text"
                 placeholder="e.g., Season 1, Act 1, Beginning"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                className="w-full bg-slate-50 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-2xl px-5 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
                 autoFocus
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-300 uppercase tracking-wider ml-1">
+              <label className="text-sm font-semibold text-slate-700 dark:text-gray-300 uppercase tracking-wider ml-1">
                 Description (Optional)
               </label>
               <textarea
                 placeholder="Brief description of this module's contents"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-3.5 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[120px] resize-none transition-all"
+                className="w-full bg-slate-50 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-2xl px-5 py-3.5 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[120px] resize-none transition-all"
               />
             </div>
           </div>
@@ -529,14 +529,14 @@ function CreateModuleModal({
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-all"
+              className="flex-1 px-4 py-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-white font-medium transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleCreate}
               disabled={loading || !title.trim()}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
