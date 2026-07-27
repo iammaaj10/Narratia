@@ -114,7 +114,7 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-[#02020a]">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 dark:bg-[#111113]">
         <div className="text-center px-4">
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
@@ -129,12 +129,21 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f0f3f9] dark:bg-[#02020a] selection:bg-purple-500/30 selection:text-white transition-colors duration-300">
+    <div className="flex flex-col min-h-screen bg-[#f0f3f9] dark:bg-[#111113] selection:bg-purple-500/30 selection:text-white transition-colors duration-300">
 
-      {/* ── Ambient background glows ── */}
+      {/* ── Background depth layer (dark mode only) ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 dark:opacity-0 blur-[120px] opacity-40" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[50%] rounded-full bg-indigo-500/10 dark:opacity-0 blur-[120px] opacity-40" />
+        {/* Light mode glows */}
+        <div className="absolute top-[-20%] left-[-10%] w-[55%] h-[55%] rounded-full bg-purple-500/10 blur-[130px] opacity-40 dark:opacity-0" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[45%] h-[55%] rounded-full bg-indigo-500/10 blur-[130px] opacity-40 dark:opacity-0" />
+        {/* Dark mode: clean radial depth — no color, just subtle lightness in center */}
+        <div
+          className="absolute inset-0 opacity-0 dark:opacity-100"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 0%, #1e1c28 0%, transparent 70%)",
+          }}
+        />
       </div>
 
       {/* ══════════════════════════════════════
@@ -142,7 +151,7 @@ export default function DashboardLayout({
       ══════════════════════════════════════ */}
       <header className="sticky top-0 z-50 w-full">
         {/* Glass backdrop */}
-        <div className="absolute inset-0 bg-white/80 dark:bg-[#080711]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]" />
+        <div className="absolute inset-0 bg-white/80 dark:bg-[#1c1b20]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.05]" />
 
         <div className="relative flex items-center h-14 px-4 sm:px-6 gap-4">
 
@@ -260,7 +269,7 @@ export default function DashboardLayout({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ type: "spring", stiffness: 350, damping: 30 }}
-              className="fixed top-14 left-0 right-0 z-50 mx-3 mt-2 bg-white dark:bg-[#0d0c1d] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xl overflow-hidden"
+              className="fixed top-14 left-0 right-0 z-50 mx-3 mt-2 bg-white dark:bg-[#1f1e24] rounded-2xl border border-slate-200/80 dark:border-white/[0.07] shadow-2xl overflow-hidden"
             >
               <div className="p-3 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
                 {profile && (
@@ -330,7 +339,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none rounded-2xl border border-slate-200/80 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
+            className="flex-1 bg-white/90 dark:bg-[#1a1921] backdrop-blur-2xl dark:backdrop-blur-none rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
           >
             {/* Subtle inner ring */}
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-200/60 dark:ring-0 pointer-events-none" />
