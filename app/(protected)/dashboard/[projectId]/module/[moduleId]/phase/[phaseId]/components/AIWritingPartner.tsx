@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   MessageCircle,
   Send,
@@ -41,11 +40,6 @@ export default function AIWritingPartner({
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Gemini
-  const genAI = new GoogleGenerativeAI(
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-  );
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
   // Auto-scroll to bottom when new messages
   useEffect(() => {
@@ -120,8 +114,14 @@ Instructions:
 
 Your response as AI Writing Partner:`;
 
-      const result = await model.generateContent(prompt);
-      const response = result.response.text();
+      const res = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, model: "gemini-2.0-flash-exp" }),
+      });
+
+      if (!res.ok) throw new Error("AI request failed");
+      const { text: response } = await res.json();
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),

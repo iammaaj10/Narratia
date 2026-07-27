@@ -1,11 +1,18 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "@/lib/supabase/client";
 
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-);
-
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+async function callAI(prompt: string): Promise<string> {
+  const res = await fetch("/api/ai/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(err.error || `AI request failed (${res.status})`);
+  }
+  const data = await res.json();
+  return data.text as string;
+}
 
 // ============================================
 // Character Profile Type
@@ -115,8 +122,7 @@ Rules:
 - Return ONLY the JSON object`;
 
   try {
-    const result = await model.generateContent(prompt);
-    let response = result.response.text().trim();
+    let response = (await callAI(prompt)).trim();
     response = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
     const parsed = JSON.parse(response);

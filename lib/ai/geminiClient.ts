@@ -1,20 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// ============================================
+// Gemini Client — calls the secure server-side
+// API route (/api/ai/generate) instead of
+// talking to Gemini directly from the browser.
+// The API key never reaches the client bundle.
+// ============================================
 
-// Check if API key exists
-if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-  console.error("❌ GEMINI API KEY NOT FOUND!");
-  console.error("Add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local file");
+async function callAI(prompt: string, model = "gemini-2.5-flash"): Promise<string> {
+  const res = await fetch("/api/ai/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, model }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(err.error || `AI request failed (${res.status})`);
+  }
+
+  const data = await res.json();
+  return data.text as string;
 }
-
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-);
-
-// Get the model - UPDATED MODEL NAME
-const model = genAI.getGenerativeModel({ 
-  model: "gemini-2.5-flash"  
-});
 
 // ============================================
 // AI FEATURE 1: Context-Aware Writing Suggestions
@@ -23,8 +28,6 @@ export async function generateWritingSuggestion(
   context: string,
   currentText: string
 ): Promise<string> {
-  console.log("🤖 Generating AI suggestion...");
-
   const prompt = `You are a creative writing assistant. Based on the story context and current text, suggest the next 2-3 sentences that would naturally continue the narrative.
 
 Story Context (what happened before):
@@ -43,26 +46,10 @@ Instructions:
 Your suggestion:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-    
-    console.log("✅ AI suggestion generated");
-    return text.trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
-    
-    // More helpful error messages
-    if (error.message?.includes("API key")) {
-      throw new Error("Invalid API key. Check your .env.local file");
-    }
-    if (error.message?.includes("quota")) {
-      throw new Error("API quota exceeded. Try again later");
-    }
-    if (error.message?.includes("blocked")) {
-      throw new Error("Content was blocked by safety filters");
-    }
-    
+    if (error.message?.includes("quota")) throw new Error("API quota exceeded. Try again later.");
+    if (error.message?.includes("blocked")) throw new Error("Content was blocked by safety filters.");
     throw new Error(`AI Error: ${error.message || "Unknown error"}`);
   }
 }
@@ -86,11 +73,8 @@ Instructions:
 Corrected text:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text().trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
     throw new Error(`Failed to fix grammar: ${error.message}`);
   }
 }
@@ -115,11 +99,8 @@ Instructions:
 Expanded text:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text().trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
     throw new Error(`Failed to expand text: ${error.message}`);
   }
 }
@@ -143,11 +124,8 @@ Instructions:
 Shortened text:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text().trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
     throw new Error(`Failed to shorten text: ${error.message}`);
   }
 }
@@ -174,11 +152,8 @@ Instructions:
 Story Outline:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text().trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
     throw new Error(`Failed to generate outline: ${error.message}`);
   }
 }
@@ -213,11 +188,8 @@ Instructions:
 Screenplay:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    return response.text().trim();
+    return await callAI(prompt);
   } catch (error: any) {
-    console.error("❌ Gemini API error:", error);
     throw new Error(`Failed to convert to screenplay: ${error.message}`);
   }
 }
@@ -241,7 +213,6 @@ export async function analyzeEmotions(
   pacingInsights: string[];
   recommendations: string[];
 }> {
-  // Combine all phases for analysis
   const storyContent = phases
     .map((p, i) => `\n\n=== PHASE ${i + 1}: ${p.title} ===\n${p.content}`)
     .join("\n");
@@ -281,21 +252,15 @@ Provide your analysis in the following JSON format (RETURN ONLY VALID JSON, NO M
 }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response.text();
-
-    // Clean the response - remove markdown code blocks if present
-    let cleanedResponse = response.trim();
-    if (cleanedResponse.startsWith("```json")) {
-      cleanedResponse = cleanedResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "");
-    } else if (cleanedResponse.startsWith("```")) {
-      cleanedResponse = cleanedResponse.replace(/```\n?/g, "");
+    const response = await callAI(prompt);
+    let cleaned = response.trim();
+    if (cleaned.startsWith("```json")) {
+      cleaned = cleaned.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (cleaned.startsWith("```")) {
+      cleaned = cleaned.replace(/```\n?/g, "");
     }
-
-    const data = JSON.parse(cleanedResponse);
-    return data;
+    return JSON.parse(cleaned);
   } catch (error: any) {
-    console.error("❌ Emotion analysis error:", error);
     throw new Error(`Failed to analyze emotions: ${error.message}`);
   }
 }
@@ -305,24 +270,20 @@ Provide your analysis in the following JSON format (RETURN ONLY VALID JSON, NO M
 // ============================================
 export async function analyzeParagraphEmotion(text: string): Promise<string> {
   if (!text.trim()) return "#9333ea"; // Default purple
-  
+
   const prompt = `Analyze the primary emotion of this text snippet in one word (choose exactly one: tension, action, joy, sadness, magic, neutral).
 Text: "${text}"
 Output only the word, nothing else.`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const emotion = result.response.text().trim().toLowerCase();
-    
-    // Convert emotion to a hex color
-    if (emotion.includes("tension")) return "#ef4444"; // Red
-    if (emotion.includes("action")) return "#f97316"; // Orange
-    if (emotion.includes("joy")) return "#eab308"; // Yellow
-    if (emotion.includes("sadness")) return "#3b82f6"; // Blue
-    if (emotion.includes("magic")) return "#8b5cf6"; // Purple
-    return "#6366f1"; // Indigo/Neutral
-  } catch (error) {
-    console.error("Emotion check failed:", error);
-    return "#6366f1"; // Fallback color
+    const emotion = (await callAI(prompt)).trim().toLowerCase();
+    if (emotion.includes("tension")) return "#ef4444";
+    if (emotion.includes("action")) return "#f97316";
+    if (emotion.includes("joy")) return "#eab308";
+    if (emotion.includes("sadness")) return "#3b82f6";
+    if (emotion.includes("magic")) return "#8b5cf6";
+    return "#6366f1";
+  } catch {
+    return "#6366f1";
   }
 }

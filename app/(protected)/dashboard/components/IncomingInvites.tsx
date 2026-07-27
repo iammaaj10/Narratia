@@ -49,8 +49,7 @@ export default function IncomingInvites() {
       return;
     }
 
-    console.log("🔍 Loading invites for:", user.email);
-    console.log("🔍 User ID:", user.id);
+
 
     // 2. Query with detailed error logging
     const { data, error: queryError } = await supabase
@@ -70,19 +69,16 @@ export default function IncomingInvites() {
       .eq("invited_email", user.email.toLowerCase())
       .eq("status", "pending");
 
-    console.log("🔍 Raw query response:", { data, error: queryError });
-    console.log("🔍 Query error type:", typeof queryError);
-    console.log("🔍 Query error keys:", queryError ? Object.keys(queryError) : 'null');
-    console.log("🔍 Query error JSON:", JSON.stringify(queryError));
+
 
     if (queryError) {
       console.error("❌ Query error:", queryError);
-      setError(`Query failed: ${JSON.stringify(queryError)}`);
+      setError("Failed to load invitations. Please try again.");
       setLoading(false);
       return;
     }
 
-    console.log("✅ Invites loaded:", data);
+
     setInvites((data as unknown as Invite[]) || []);
   } catch (err) {
     console.error("❌ Unexpected error:", err);
@@ -103,7 +99,7 @@ export default function IncomingInvites() {
         return;
       }
 
-      console.log(`📝 ${accept ? "Accepting" : "Rejecting"} invite:`, id);
+
 
       if (accept) {
         const { error } = await supabase
@@ -124,7 +120,7 @@ export default function IncomingInvites() {
           return;
         }
 
-        console.log("✅ Invite accepted");
+
         alert("Invite accepted! Redirecting...");
         window.location.href = `/dashboard/${projectId}`;
       } else {
@@ -142,7 +138,7 @@ export default function IncomingInvites() {
           return;
         }
 
-        console.log("✅ Invite rejected");
+
         setInvites((prev) => prev.filter((i) => i.id !== id));
       }
     } catch (err) {

@@ -29,7 +29,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      console.log("📝 Registering user:", email);
+
 
       // Step 1: Sign up the user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -50,11 +50,11 @@ export default function RegisterPage() {
         return;
       }
 
-      console.log("✅ User created:", signUpData.user?.id);
+
 
       // Step 2: Check if profile was created by trigger
       if (signUpData.user) {
-        console.log("🔍 Checking for profile...");
+
 
         // Wait a moment for the trigger to fire
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -68,7 +68,7 @@ export default function RegisterPage() {
         if (profileError) {
           console.warn("⚠️ Could not verify profile:", profileError);
         } else if (profile) {
-          console.log("✅ Profile exists:", profile);
+
         } else {
           console.warn("⚠️ Profile not found, creating manually...");
 
@@ -84,7 +84,7 @@ export default function RegisterPage() {
           if (insertError) {
             console.error("❌ Failed to create profile:", insertError);
           } else {
-            console.log("✅ Profile created manually");
+
           }
         }
       }

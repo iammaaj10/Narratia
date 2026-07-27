@@ -37,7 +37,7 @@ export default function ProfileAvatar({
       const fileName = `avatar.${fileExt}`;
       const filePath = `${profile.id}/${fileName}`;
 
-      console.log("📤 Uploading to:", filePath);
+
 
       // Upload new avatar (upsert will replace if exists)
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -54,7 +54,7 @@ export default function ProfileAvatar({
         return;
       }
 
-      console.log("✅ Upload successful:", uploadData);
+
 
       // Get public URL (without cache buster for database)
       const { data: urlData } = supabase.storage
@@ -62,7 +62,7 @@ export default function ProfileAvatar({
         .getPublicUrl(filePath);
 
       const publicUrl = urlData.publicUrl;
-      console.log("🔗 Public URL:", publicUrl);
+
 
       // Update profile in database
       const { error: updateError } = await supabase
@@ -77,7 +77,7 @@ export default function ProfileAvatar({
         return;
       }
 
-      console.log("✅ Profile updated in database");
+
 
       // Update UI with cache buster to force reload
       onAvatarUpdate(`${publicUrl}?t=${Date.now()}`);

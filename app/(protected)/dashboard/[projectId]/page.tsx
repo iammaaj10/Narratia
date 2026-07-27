@@ -95,7 +95,31 @@ export default function ProjectDetailPage() {
       }
 
       setProject(projectData);
-      setIsOwner(projectData.owner_id === user.id);
+      const owner = projectData.owner_id === user.id;
+      setIsOwner(owner);
+
+      // Security: verify user has access to this project
+      if (!owner) {
+        if (projectData.is_team) {
+          // Check if user is an accepted member
+          const { data: membership } = await supabase
+            .from("project_members")
+            .select("id")
+            .eq("project_id", projectId)
+            .eq("user_id", user.id)
+            .eq("status", "accepted")
+            .maybeSingle();
+
+          if (!membership) {
+            router.push("/dashboard");
+            return;
+          }
+        } else {
+          // Solo project owned by someone else
+          router.push("/dashboard");
+          return;
+        }
+      }
 
       if (projectData.is_team) {
         const { data: memberRecords } = await supabase
@@ -211,13 +235,15 @@ export default function ProjectDetailPage() {
               </button>
             )}
 
-            <button
-              onClick={() => setShowShareSettings(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-800 dark:text-white shadow-sm transition-all group"
-            >
-              <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
-              Share
-            </button>
+            {isOwner && (
+              <button
+                onClick={() => setShowShareSettings(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-800 dark:text-white shadow-sm transition-all group"
+              >
+                <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+                Share
+              </button>
+            )}
 
             <button
               onClick={() => setShowExportModal(true)}

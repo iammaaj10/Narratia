@@ -47,7 +47,7 @@ export default function DashboardLayout({
           return;
         }
 
-        console.log("✅ User authenticated:", user.id);
+
 
         // Try to get profile
         let { data, error } = await supabase
@@ -58,7 +58,7 @@ export default function DashboardLayout({
 
         // If no profile exists, create one
         if (!data) {
-          console.log("⚠️ No profile found, creating one...");
+
 
           const newUsername = user.email?.split("@")[0] || "Writer";
 
@@ -79,12 +79,12 @@ export default function DashboardLayout({
               avatar_url: null,
             };
           } else {
-            console.log("✅ Profile created successfully");
+
             data = newProfile;
           }
         }
 
-        console.log("✅ Profile loaded:", data);
+
 
         const avatarUrl = data?.avatar_url
           ? `${data.avatar_url}?t=${Date.now()}`

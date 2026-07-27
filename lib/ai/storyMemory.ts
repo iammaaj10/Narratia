@@ -1,9 +1,18 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "@/lib/supabase/client";
 
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-);
+async function callAI(prompt: string): Promise<string> {
+  const res = await fetch("/api/ai/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: "Unknown error" }));
+    throw new Error(err.error || `AI request failed (${res.status})`);
+  }
+  const data = await res.json();
+  return data.text as string;
+}
 
 // We use PostgreSQL full-text search (tsvector) instead of vector embeddings.
 // This avoids needing any embedding API and works entirely within Supabase free tier.
@@ -137,7 +146,7 @@ export async function extractAndSaveEntities(
 
   if (plainText.length < 100) return;
 
-  const textModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  // AI call is routed through the secure server proxy
 
   const prompt = `Extract all named entities from this story excerpt. Return ONLY valid JSON, no markdown.
 
@@ -162,8 +171,7 @@ Rules:
 - Return ONLY the JSON object`;
 
   try {
-    const result = await textModel.generateContent(prompt);
-    let response = result.response.text().trim();
+    let response = (await callAI(prompt)).trim();
     response = response.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
     const parsed = JSON.parse(response);
