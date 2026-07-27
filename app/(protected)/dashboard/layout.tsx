@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import ProfileAvatar from "./components/ProfileAvatar";
 import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
 import ThemeToggle from "@/components/ThemeToggle";
 import Link from "next/link";
-import { Home, BarChart3, Menu, X } from "lucide-react";
-import { BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
+import { BarChart3, Menu, X, BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Profile = {
@@ -25,17 +24,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
         setLoading(true);
 
-        // Get current user
         const {
           data: { user },
           error: userError,
@@ -47,19 +45,13 @@ export default function DashboardLayout({
           return;
         }
 
-
-
-        // Try to get profile
         let { data, error } = await supabase
           .from("profiles")
           .select("username, avatar_url")
           .eq("id", user.id)
           .maybeSingle();
 
-        // If no profile exists, create one
         if (!data) {
-
-
           const newUsername = user.email?.split("@")[0] || "Writer";
 
           const { data: newProfile, error: insertError } = await supabase
@@ -74,17 +66,11 @@ export default function DashboardLayout({
 
           if (insertError) {
             console.error("❌ Failed to create profile:", insertError);
-            data = {
-              username: newUsername,
-              avatar_url: null,
-            };
+            data = { username: newUsername, avatar_url: null };
           } else {
-
             data = newProfile;
           }
         }
-
-
 
         const avatarUrl = data?.avatar_url
           ? `${data.avatar_url}?t=${Date.now()}`
@@ -113,25 +99,18 @@ export default function DashboardLayout({
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BookOpen, path: "/dashboard" },
-    {
-      id: "new-project",
-      label: "Create Story",
-      icon: PlusCircle,
-      path: "/dashboard/new-project",
-    },
-    {
-      id: "stats",
-      label: "Statistics",
-      icon: BarChart3,
-      path: "/dashboard/stats",
-    },
+    { id: "new-project", label: "Create Story", icon: PlusCircle, path: "/dashboard/new-project" },
+    { id: "stats", label: "Statistics", icon: BarChart3, path: "/dashboard/stats" },
   ];
 
-  const handleNavigation = (path: string, id: string) => {
-    setActiveTab(id);
-    router.push(path);
-    setIsMobileMenuOpen(false);
+  // Derive active tab from the current URL instead of state
+  const getActiveId = () => {
+    if (pathname === "/dashboard") return "dashboard";
+    if (pathname.startsWith("/dashboard/new-project")) return "new-project";
+    if (pathname.startsWith("/dashboard/stats")) return "stats";
+    return "";
   };
+  const activeTab = getActiveId();
 
   if (loading) {
     return (
@@ -150,188 +129,216 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f0f3f9] dark:bg-[#02020a] selection:bg-purple-500/30 selection:text-white transition-colors duration-300">
-      {/* Background glow effects */}
+    <div className="flex flex-col min-h-screen bg-[#f0f3f9] dark:bg-[#02020a] selection:bg-purple-500/30 selection:text-white transition-colors duration-300">
+
+      {/* ── Ambient background glows ── */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 dark:opacity-0 blur-[120px] opacity-40" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[50%] rounded-full bg-indigo-500/10 dark:opacity-0 blur-[120px] opacity-40" />
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* ══════════════════════════════════════
+          TOP NAVIGATION BAR
+      ══════════════════════════════════════ */}
+      <header className="sticky top-0 z-50 w-full">
+        {/* Glass backdrop */}
+        <div className="absolute inset-0 bg-white/80 dark:bg-[#080711]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/[0.06]" />
+
+        <div className="relative flex items-center h-14 px-4 sm:px-6 gap-4">
+
+          {/* ── Logo ── */}
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2.5 group flex-shrink-0 outline-none"
+          >
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-purple-500/30 group-hover:shadow-purple-500/50 group-hover:scale-105 transition-all">
+              <span className="text-white font-bold text-sm">N</span>
+            </div>
+            <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors hidden sm:block">
+              Narratia
+            </span>
+          </button>
+
+          {/* ── Divider ── */}
+          <div className="h-5 w-px bg-slate-200 dark:bg-white/10 hidden sm:block flex-shrink-0" />
+
+          {/* ── Desktop Nav Links ── */}
+          <nav className="hidden md:flex items-center gap-1 flex-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => router.push(item.path)}
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 outline-none group ${
+                    isActive
+                      ? "text-purple-700 dark:text-white"
+                      : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="topNavIndicator"
+                      className="absolute inset-0 bg-purple-100/90 dark:bg-purple-500/15 border border-purple-200/80 dark:border-purple-500/20 rounded-xl"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                    />
+                  )}
+                  <Icon className={`w-4 h-4 relative z-10 transition-transform duration-200 ${isActive ? "text-purple-600 dark:text-purple-400 scale-110" : "group-hover:scale-110"}`} />
+                  <span className="relative z-10">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* ── Right side: actions ── */}
+          <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+
+            {/* Greeting — desktop only */}
+            {profile && (
+              <span className="hidden lg:block text-sm text-slate-500 dark:text-gray-400 mr-1">
+                Hi, <span className="font-semibold text-slate-700 dark:text-gray-200">{profile.username}</span>
+              </span>
+            )}
+
+            <ThemeToggle />
+
+            {profile && (
+              <>
+                <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
+                <NotificationBell />
+                <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
+                <ProfileAvatar
+                  profile={profile}
+                  onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
+                />
+              </>
+            )}
+
+            <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
+
+            {/* Logout — desktop */}
+            <button
+              onClick={handleLogout}
+              title="Logout"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-200 outline-none"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden lg:block">Logout</span>
+            </button>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-gray-400 outline-none"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* ══════════════════════════════════════
+          MOBILE SLIDE-DOWN MENU
+      ══════════════════════════════════════ */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-900/40 dark:bg-black/80 backdrop-blur-sm dark:backdrop-blur-none z-40 lg:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/40 dark:bg-black/70 backdrop-blur-sm z-40"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Slide-down panel */}
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              className="fixed top-14 left-0 right-0 z-50 mx-3 mt-2 bg-white dark:bg-[#0d0c1d] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xl overflow-hidden"
+            >
+              <div className="p-3 flex items-center justify-between border-b border-slate-100 dark:border-white/5">
+                {profile && (
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{profile.username}</p>
+                    <p className="text-xs text-slate-500 dark:text-gray-400">{profile.email}</p>
+                  </div>
+                )}
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-gray-400"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <nav className="p-2 space-y-0.5">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => { router.push(item.path); setIsMobileMenuOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                        isActive
+                          ? "bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-white border border-purple-200/80 dark:border-purple-500/20"
+                          : "text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/5"
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 ${isActive ? "text-purple-600 dark:text-purple-400" : ""}`} />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="p-2 border-t border-slate-100 dark:border-white/5">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all text-left"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Desktop & Mobile */}
-      <aside
-        className={`
-        fixed lg:sticky top-0 lg:top-6 inset-y-0 left-0 z-50 lg:z-30
-        w-64 lg:w-56 lg:h-[calc(100vh-3rem)]
-        lg:ml-6 lg:mr-4
-        bg-white dark:bg-[#080711] border-r lg:border border-slate-200/80 dark:border-white/5 lg:rounded-[2rem]
-        transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        flex flex-col shadow-2xl dark:shadow-none
-      `}
-      >
-        {/* Mobile Header */}
-        <div className="lg:hidden p-6 flex items-center justify-between border-b border-slate-200 dark:border-white/5">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
-              Narratia
-            </h1>
-          </Link>
-          <button
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-500 dark:text-gray-400"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+      {/* ══════════════════════════════════════
+          MAIN CONTENT — full width, full height
+      ══════════════════════════════════════ */}
+      <main className="flex-1 flex flex-col relative">
+        <div className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-5 flex flex-col gap-3">
 
-        {/* Desktop Logo */}
-        <div className="hidden lg:flex p-8 items-center gap-3 group cursor-pointer border-b border-slate-200/80 dark:border-white/5" onClick={() => router.push("/")}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all group-hover:scale-105">
-            <span className="text-white font-bold text-base">N</span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-500 transition-all">
-            Narratia
-          </h1>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 lg:p-5 space-y-2 overflow-y-auto custom-scrollbar">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavigation(item.path, item.id)}
-                className="w-full relative group flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 text-left outline-none"
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className="absolute inset-0 bg-purple-100/90 dark:bg-purple-500/15 border border-purple-200 dark:border-purple-500/20 rounded-2xl shadow-sm dark:shadow-none"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <div className={`relative z-10 flex items-center gap-3 ${isActive ? 'text-purple-700 dark:text-white font-bold' : 'text-slate-600 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-gray-200'}`}>
-                  <Icon
-                    className={`w-5 h-5 transition-transform duration-300 ${isActive ? "scale-110 text-purple-600 dark:text-purple-400" : "group-hover:scale-110"}`}
-                  />
-                  <span className={`font-medium ${isActive ? 'font-bold' : ''}`}>{item.label}</span>
-                </div>
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Footer */}
-        <div className="p-4 lg:p-5 border-t border-slate-200/80 dark:border-white/5">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-300 group outline-none"
-          >
-            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            <span className="font-medium">Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 min-w-0 flex flex-col min-h-screen relative">
-        {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white/80 dark:bg-[#080711] backdrop-blur-xl dark:backdrop-blur-none border-b border-slate-200 dark:border-white/5 p-4 flex items-center justify-between">
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-gray-400 border border-slate-200 dark:border-white/5"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {/* Incoming invites banner (shown on all dashboard pages) */}
           {profile && (
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <ProfileAvatar
-                profile={profile}
-                onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-6 lg:pt-0 flex flex-col gap-2">
-          {profile && (
-            <div className="space-y-2 relative z-20">
-              {/* Desktop Header */}
-              <div className="hidden lg:flex items-center justify-between">
-                <div className="flex items-baseline gap-3">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">{profile.username}</span>
-                  </h2>
-                  <span className="text-slate-300 dark:text-white/20 text-sm">|</span>
-                  <p className="text-slate-500 dark:text-gray-400 text-sm">{profile.email}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ThemeToggle />
-                  <div className="h-6 w-[1px] bg-slate-200 dark:bg-white/5" />
-                  <div className="scale-90 origin-right">
-                    <NotificationBell />
-                  </div>
-                  <div className="h-6 w-[1px] bg-slate-200 dark:bg-white/5" />
-                  <div className="scale-90 origin-right">
-                    <ProfileAvatar
-                      profile={profile}
-                      onAvatarUpdate={(url) => setProfile((p) => p && { ...p, avatar_url: url })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Header Additions */}
-              <div className="lg:hidden space-y-2">
-                <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                    Hi, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">{profile.username}</span>
-                  </h2>
-                  <p className="text-slate-500 dark:text-gray-400 text-sm">{profile.email}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <NotificationBell />
-                </div>
-              </div>
-              
+            <div className="relative z-20">
               <IncomingInvites />
             </div>
           )}
 
-          {/* Page Content Container */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
+          {/* Page content — full-width card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex-1 bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none rounded-3xl border border-slate-200/80 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="flex-1 bg-white/90 dark:bg-[#080711] backdrop-blur-2xl dark:backdrop-blur-none rounded-2xl border border-slate-200/80 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
           >
-            {/* Subtle inner highlight */}
-            <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-slate-200/60 dark:ring-0 pointer-events-none" />
-            <div className="flex-1 relative z-10 p-5 sm:p-6 lg:p-6">
+            {/* Subtle inner ring */}
+            <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-200/60 dark:ring-0 pointer-events-none" />
+            <div className="flex-1 relative z-10 p-5 sm:p-6">
               {children}
             </div>
           </motion.div>
+
         </div>
       </main>
     </div>

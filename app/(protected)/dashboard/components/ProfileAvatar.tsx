@@ -93,7 +93,7 @@ export default function ProfileAvatar({
 
   return (
     <div className="relative group">
-      <div className="relative w-14 h-14 mt-2 rounded-xl overflow-hidden border-2 border-white/10 shadow-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+      <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shadow-md bg-gradient-to-br from-purple-500/20 to-pink-500/20">
         {profile.avatar_url ? (
           <img
             key={profile.avatar_url} // Force re-render when URL changes
@@ -110,7 +110,7 @@ export default function ProfileAvatar({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <User className="w-10 h-10 text-purple-300" />
+            <User className="w-5 h-5 text-purple-300" />
           </div>
         )}
 
@@ -121,15 +121,15 @@ export default function ProfileAvatar({
             }`}
         >
           {uploading ? (
-            <Loader2 className="w-6 h-6 text-white animate-spin" />
+            <Loader2 className="w-4 h-4 text-white animate-spin" />
           ) : (
-            <Camera className="w-6 h-6 text-white" />
+            <Camera className="w-4 h-4 text-white" />
           )}
         </div>
       </div>
 
       {/* Gradient ring on hover */}
-      <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-200 -z-10" />
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg opacity-0 group-hover:opacity-20 blur transition-opacity duration-200 -z-10" />
 
       <input
         ref={inputRef}
