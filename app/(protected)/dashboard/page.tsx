@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Wand2, Star, Loader2 } from "lucide-react";
 import {
   PlusCircle,
   Search,
@@ -238,7 +238,7 @@ export default function DashboardPage() {
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
               className="absolute -top-3 -right-3"
             >
-              <Sparkles className="w-8 h-8 text-pink-400" />
+              <Star className="w-8 h-8 text-pink-400 fill-pink-400" />
             </motion.div>
           </motion.div>
         </div>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
             onClick={() => router.push("/dashboard/outline-generator")}
             className="group relative flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 text-cyan-300 rounded-2xl font-semibold border border-cyan-500/20 transition-all duration-300"
           >
-            <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <Wand2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
             AI Generator
           </button>
 
@@ -296,7 +296,7 @@ export default function DashboardPage() {
             onClick={() => router.push("/dashboard/outline-generator")}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-xl font-semibold border border-blue-200 dark:border-blue-500/20 transition-all group"
           >
-            <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <Wand2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
             <span className="hidden sm:inline">AI Outline</span>
             <span className="sm:hidden">AI</span>
           </button>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Loader2, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");

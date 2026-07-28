@@ -7,7 +7,7 @@ import {
   X,
   Save,
   Trash2,
-  Sparkles,
+  Wand2,
   Loader2,
   User,
   Heart,
@@ -206,7 +206,7 @@ export default function CharacterDetailModal({
               {generating ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Sparkles className="w-4 h-4" />
+                <Wand2 className="w-4 h-4" />
               )}
               {generating ? "Generating..." : "Auto-Fill with AI"}
             </button>

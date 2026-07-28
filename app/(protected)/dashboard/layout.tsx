@@ -8,7 +8,7 @@ import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
 import ThemeToggle from "@/components/ThemeToggle";
 import Link from "next/link";
-import { BarChart3, Menu, X, BookOpen, PlusCircle, LogOut, Sparkles } from "lucide-react";
+import { BarChart3, Menu, X, BookOpen, PlusCircle, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Profile = {
@@ -120,7 +120,7 @@ export default function DashboardLayout({
             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
           >
-            <Sparkles className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto mb-4" />
+            <BookOpen className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto mb-4" />
           </motion.div>
           <p className="text-slate-600 dark:text-gray-400">Loading your space...</p>
         </div>

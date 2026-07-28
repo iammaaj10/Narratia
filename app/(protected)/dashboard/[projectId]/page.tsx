@@ -15,7 +15,7 @@ import {
   MessageCircle,
   Loader2,
   ChevronRight,
-  Sparkles,
+  Wand2,
   Settings,
   MoreVertical,
   Calendar
@@ -590,7 +590,7 @@ function CreateModuleModal({
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <Sparkles className="w-5 h-5" />
+                <Wand2 className="w-5 h-5" />
               )}
               Create Module
             </button>

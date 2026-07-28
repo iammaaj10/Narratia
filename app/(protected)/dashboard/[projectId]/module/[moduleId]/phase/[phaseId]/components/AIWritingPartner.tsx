@@ -6,7 +6,6 @@ import {
   Send,
   Loader2,
   X,
-  Sparkles,
   Bot,
   User,
   Lightbulb,

@@ -22,7 +22,7 @@ import {
   History,
   Menu,
   X,
-  Sparkles,
+  Wand2,
   Maximize,
   BookMarked,
   RefreshCw,
@@ -509,7 +509,7 @@ export default function WritingEditorPage() {
             }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
-            <Sparkles className="w-5 h-5" />
+            <Wand2 className="w-5 h-5" />
             <span>AI Writing Partner</span>
           </button>
 
@@ -683,7 +683,7 @@ export default function WritingEditorPage() {
                 onClick={handleOpenAIPartner}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
               >
-                <Sparkles className="w-4 h-4" />
+                <Wand2 className="w-4 h-4" />
                 <span>AI</span>
               </button>
 
@@ -776,7 +776,7 @@ export default function WritingEditorPage() {
                 title="AI Writing Partner"
                 className="p-2 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30"
               >
-                <Sparkles className="w-4 h-4" />
+                <Wand2 className="w-4 h-4" />
               </button>
 
               {/* Quick Comments */}

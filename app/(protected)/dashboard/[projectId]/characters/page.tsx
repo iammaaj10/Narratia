@@ -8,7 +8,6 @@ import {
   Users,
   PlusCircle,
   Download,
-  Sparkles,
   Loader2,
   Crown,
   Swords,

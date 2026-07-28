@@ -2,7 +2,7 @@
 
 import { useState, forwardRef, useImperativeHandle } from "react";
 import {
-  Sparkles,
+  Bot,
   Wand2,
   Maximize2,
   Minimize2,
@@ -128,7 +128,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <Sparkles className="w-4 h-4" />
+            <Bot className="w-4 h-4" />
           )}
         </button>
 
@@ -166,7 +166,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <Bot className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 AI Suggestion
               </h3>
               <button

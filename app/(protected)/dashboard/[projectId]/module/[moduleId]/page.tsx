@@ -14,7 +14,6 @@ import {
   Film,
   Heart,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

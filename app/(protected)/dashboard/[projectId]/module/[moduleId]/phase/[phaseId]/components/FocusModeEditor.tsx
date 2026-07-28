@@ -8,7 +8,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
-import { X, Sparkles } from "lucide-react";
+import { X, Compass } from "lucide-react";
 import ZenBackground, { ZenScene } from "./ZenBackground";
 import { analyzeParagraphEmotion } from "@/lib/ai/geminiClient";
 
@@ -226,7 +226,7 @@ export default function FocusModeEditor({
                   : "text-purple-400 hover:text-purple-300"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" /> Zen 3D
+              <Compass className="w-3.5 h-3.5" /> Zen 3D
             </button>
           </div>
 

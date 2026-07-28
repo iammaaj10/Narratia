@@ -11,7 +11,7 @@ import {
   Award,
   FileText,
   Edit,
-  Sparkles,
+  Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -421,7 +421,7 @@ export default function StatsPage() {
                       >
                         {achieved ? (
                           <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                            <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <Award className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           </div>
                         ) : (
                           <div className="w-5 h-5 rounded-full border border-slate-300 dark:border-gray-700 bg-slate-100 dark:bg-black/20 flex-shrink-0" />
@@ -448,7 +448,7 @@ export default function StatsPage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <Zap className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Daily Goal Achieved!</h3>

@@ -13,7 +13,6 @@ import {
   Target,
   X,
   Award,
-  Sparkles,
   ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -388,7 +387,7 @@ export default function WritingSprintModal({
                   <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 flex items-center justify-center mx-auto shadow-xl shadow-orange-500/30">
                     <Award className="w-10 h-10 text-white" />
                   </div>
-                  <Sparkles className="w-6 h-6 text-yellow-300 absolute -top-2 -right-2 animate-bounce" />
+                  <Flame className="w-6 h-6 text-yellow-300 absolute -top-2 -right-2 animate-bounce" />
                 </div>
 
                 <div>
@@ -448,7 +447,7 @@ export default function WritingSprintModal({
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5" />
+                        <Zap className="w-5 h-5" />
                         {savingStats ? "Saving Stats..." : "Save to My Daily Streak"}
                       </>
                     )}

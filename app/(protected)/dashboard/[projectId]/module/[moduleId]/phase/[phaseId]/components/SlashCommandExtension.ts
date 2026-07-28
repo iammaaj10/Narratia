@@ -11,7 +11,6 @@ import {
   List,
   ListOrdered,
   Quote,
-  Sparkles,
   Wand2,
   Minimize2,
   CheckCheck
@@ -23,7 +22,7 @@ export const getSuggestionItems = (query: string, aiHandlers: any) => {
     {
       title: 'AI: Continue Writing',
       description: 'Let AI generate the next sentences',
-      icon: Sparkles,
+      icon: Wand2,
       command: ({ editor, range }: any) => {
         editor.chain().focus().deleteRange(range).run();
         if (aiHandlers?.handleAIContinue) aiHandlers.handleAIContinue();

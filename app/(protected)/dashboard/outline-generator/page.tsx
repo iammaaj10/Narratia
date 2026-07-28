@@ -6,7 +6,6 @@ import { supabase } from "@/lib/supabase/client";
 import { generateStoryOutline } from "@/lib/ai/geminiClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles,
   Loader2,
   Copy,
   Download,
@@ -15,7 +14,8 @@ import {
   Wand2,
   Lightbulb,
   CheckCircle2,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
 
@@ -207,7 +207,7 @@ export default function OutlineGeneratorPage() {
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5" />
+                        <Wand2 className="w-5 h-5" />
                         Generate Outline
                       </>
                     )}
@@ -234,7 +234,7 @@ export default function OutlineGeneratorPage() {
               className="bg-blue-500/5 border border-blue-500/20 rounded-3xl p-6"
             >
               <h3 className="text-base font-bold text-blue-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4" /> Pro Tips
+                <Zap className="w-4 h-4" /> Pro Tips
               </h3>
               <ul className="space-y-3">
                 {[
@@ -313,7 +313,7 @@ export default function OutlineGeneratorPage() {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
                     <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                      <Sparkles className="w-10 h-10 text-gray-600" />
+                      <Wand2 className="w-10 h-10 text-gray-600" />
                     </div>
                     <p className="text-lg text-gray-400 font-medium">Your outline will materialize here.</p>
                     <p className="text-sm text-gray-600 mt-2">Enter an idea to begin.</p>
