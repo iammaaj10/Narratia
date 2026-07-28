@@ -127,17 +127,17 @@ export default function VersionHistory({
   if (!mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 max-w-6xl w-full h-[80vh] shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999] p-2 sm:p-4">
+      <div className="bg-white dark:bg-[#16151f] rounded-2xl border border-slate-200 dark:border-white/10 max-w-6xl w-full h-[92vh] sm:h-[80vh] shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/10">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
-              <History className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md flex-shrink-0">
+              <History className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Version History</h2>
-              <p className="text-sm text-slate-500 dark:text-gray-400">
+              <h2 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">Version History</h2>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400">
                 {versions.length} saved version{versions.length !== 1 ? "s" : ""}
               </p>
             </div>
@@ -151,9 +151,9 @@ export default function VersionHistory({
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
           {/* Versions List */}
-          <div className="w-80 border-r border-slate-200 dark:border-white/10 overflow-y-auto bg-slate-50/50 dark:bg-black/20">
+          <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 overflow-y-auto bg-slate-50/50 dark:bg-black/20 shrink-0 max-h-52 md:max-h-none">
             {loading ? (
               <div className="p-8 text-center text-slate-500 dark:text-gray-400">
                 Loading versions...

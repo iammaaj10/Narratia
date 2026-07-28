@@ -166,7 +166,7 @@ export default function RichTextEditor({
     <div className="flex flex-col h-full bg-transparent overflow-hidden rich-text-editor transition-colors">
       {/* Toolbar */}
       <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/90 dark:bg-[#181724]/90 backdrop-blur-md sticky top-0 z-10">
-        <div className="flex items-center gap-1 p-2 flex-wrap">
+        <div className="flex items-center gap-1 p-2 overflow-x-auto custom-scrollbar flex-nowrap">
           {/* AI Toolbar */}
           <AIToolbar
             ref={aiToolbarRef}
@@ -362,9 +362,9 @@ export default function RichTextEditor({
           </div>
 
           {/* Word Count */}
-          <div className="ml-auto flex items-center gap-4 px-4 text-sm text-slate-500 dark:text-gray-400 font-medium">
-            <div>{editor.storage.characterCount.words()} words</div>
-            <div>{editor.storage.characterCount.characters()} characters</div>
+          <div className="ml-auto hidden sm:flex items-center gap-3 px-3 text-xs text-slate-500 dark:text-gray-400 font-medium shrink-0">
+            <div>{editor.storage.characterCount.words()}w</div>
+            <div>{editor.storage.characterCount.characters()}c</div>
           </div>
         </div>
       </div>

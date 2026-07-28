@@ -10,6 +10,7 @@ import AIWritingPartner from "./components/AIWritingPartner";
 import FocusModeEditor from "./components/FocusModeEditor";
 import StoryWiki from "./components/StoryWiki";
 import { savePhaseMemory, extractAndSaveEntities } from "@/lib/ai/storyMemory";
+import WritingSprintModal from "./components/WritingSprintModal";
 import {
   ArrowLeft,
   Save,
@@ -26,6 +27,7 @@ import {
   BookMarked,
   RefreshCw,
   Users,
+  Flame,
 } from "lucide-react";
 
 type Phase = {
@@ -71,6 +73,10 @@ export default function WritingEditorPage() {
   const [fullStoryContext, setFullStoryContext] = useState("");
   const [showFocusMode, setShowFocusMode] = useState(false);
   const [showWiki, setShowWiki] = useState(false);
+  const [showSprintModal, setShowSprintModal] = useState(false);
+  const [isSprintActive, setIsSprintActive] = useState(false);
+  const [sprintTimeLeft, setSprintTimeLeft] = useState("");
+  const [sprintWordsWritten, setSprintWordsWritten] = useState(0);
   const [isSyncingMemory, setIsSyncingMemory] = useState(false);
 
   // Refs
@@ -416,13 +422,15 @@ export default function WritingEditorPage() {
         ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
       `}
       >
-        <div className="p-4 border-b border-white/10 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Editor Tools</h3>
+        <div className="pt-14 pb-4 px-4 border-b border-white/10 flex items-center justify-between bg-slate-950/80">
+          <h3 className="text-lg font-bold text-white">Editor Tools</h3>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            className="px-3 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20 border border-white/15 transition-all flex items-center gap-1 text-xs font-semibold"
+            title="Close Menu"
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-5 h-5" />
+            <span>Close</span>
           </button>
         </div>
 
@@ -473,16 +481,33 @@ export default function WritingEditorPage() {
 
           {/* Action Buttons */}
           <button
-            onClick={() => setShowFocusMode(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
+            onClick={() => {
+              setShowSprintModal(true);
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold shadow-lg shadow-orange-500/20 transition-all"
+          >
+            <Flame className="w-5 h-5" />
+            <span>Writing Sprint {isSprintActive ? `(${sprintTimeLeft})` : ""}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setShowFocusMode(true);
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/25 transition-all"
           >
             <Maximize className="w-5 h-5" />
             <span>Focus Mode</span>
           </button>
 
           <button
-            onClick={handleOpenAIPartner}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+            onClick={() => {
+              handleOpenAIPartner();
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all"
           >
             <Sparkles className="w-5 h-5" />
             <span>AI Writing Partner</span>
@@ -490,10 +515,23 @@ export default function WritingEditorPage() {
 
           <button
             onClick={() => {
-              setShowComments(!showComments);
+              setShowWiki(!showWiki);
+              setShowComments(false);
               setIsMobileMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/20 text-blue-300 rounded-xl hover:bg-blue-500/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-xl hover:bg-amber-500/30 transition-all"
+          >
+            <BookMarked className="w-5 h-5" />
+            <span>{showWiki ? "Hide" : "Show"} Story Wiki</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setShowComments(!showComments);
+              setShowWiki(false);
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-xl hover:bg-blue-500/30 transition-all"
           >
             <MessageSquare className="w-5 h-5" />
             <span>{showComments ? "Hide" : "Show"} Comments</span>
@@ -501,21 +539,47 @@ export default function WritingEditorPage() {
 
           <button
             onClick={() => {
+              window.open(`/dashboard/${projectId}/characters`, "_blank");
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-xl hover:bg-purple-500/30 transition-all"
+          >
+            <Users className="w-5 h-5" />
+            <span>Character Profiles</span>
+          </button>
+
+          <button
+            onClick={() => {
+              handleMemorySync();
+              setIsMobileMenuOpen(false);
+            }}
+            disabled={isSyncingMemory}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-xl hover:bg-indigo-500/30 transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-5 h-5 ${isSyncingMemory ? "animate-spin" : ""}`} />
+            <span>Sync AI Memory</span>
+          </button>
+
+          <button
+            onClick={() => {
               setShowVersionHistory(true);
               setIsMobileMenuOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-500/20 text-cyan-300 rounded-xl hover:bg-cyan-500/30 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-xl hover:bg-cyan-500/30 transition-all"
           >
             <History className="w-5 h-5" />
             <span>Version History</span>
           </button>
 
           <button
-            onClick={handleManualSave}
+            onClick={() => {
+              handleManualSave();
+              setIsMobileMenuOpen(false);
+            }}
             disabled={
               saveStatus === "saving" || content === lastSavedContentRef.current
             }
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 text-purple-300 rounded-xl hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/30 transition-all disabled:opacity-50"
           >
             <Save className="w-5 h-5" />
             <span>Save Now</span>
@@ -586,6 +650,24 @@ export default function WritingEditorPage() {
                   <span className="text-sm font-medium text-slate-500 dark:text-gray-400">Ready</span>
                 )}
               </div>
+
+              {/* Sprint Companion Button */}
+              <button
+                onClick={() => setShowSprintModal(true)}
+                title="Writing Sprint & Pomodoro Timer"
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${
+                  isSprintActive
+                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse shadow-orange-500/20"
+                    : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:bg-amber-500/20"
+                }`}
+              >
+                <Flame className={`w-4 h-4 ${isSprintActive ? "text-white" : "text-amber-500"}`} />
+                <span>
+                  {isSprintActive
+                    ? `${sprintTimeLeft} (+${sprintWordsWritten}w)`
+                    : "Sprint"}
+                </span>
+              </button>
 
               {/* Focus Mode Button */}
               <button
@@ -673,16 +755,49 @@ export default function WritingEditorPage() {
               </button>
             </div>
 
-            {/* Mobile: Word count + Menu */}
-            <div className="lg:hidden flex items-center gap-3">
-              <div className="text-xs text-slate-500 dark:text-gray-400 font-medium">
-                {wordCount.toLocaleString()}w
-              </div>
+            {/* Mobile Header Quick Tools */}
+            <div className="lg:hidden flex items-center gap-1.5">
+              {/* Quick Sprint */}
+              <button
+                onClick={() => setShowSprintModal(true)}
+                title="Writing Sprint"
+                className={`p-2 rounded-lg font-medium text-xs transition-all ${
+                  isSprintActive
+                    ? "bg-amber-500 text-white animate-pulse"
+                    : "bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30"
+                }`}
+              >
+                <Flame className="w-4 h-4" />
+              </button>
+
+              {/* Quick AI */}
+              <button
+                onClick={handleOpenAIPartner}
+                title="AI Writing Partner"
+                className="p-2 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30"
+              >
+                <Sparkles className="w-4 h-4" />
+              </button>
+
+              {/* Quick Comments */}
+              <button
+                onClick={() => {
+                  setShowComments(!showComments);
+                  setShowWiki(false);
+                }}
+                title="Comments"
+                className="p-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </button>
+
+              {/* Menu Launcher */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors border border-slate-200 dark:border-transparent"
+                className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 ml-1"
+                title="All Tools"
               >
-                <Menu className="w-5 h-5 text-slate-600 dark:text-gray-400" />
+                <Menu className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -732,32 +847,61 @@ export default function WritingEditorPage() {
           </div>
         )}
 
-        {/* Comments Panel - Mobile Overlay */}
-        {showComments && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/95 dark:bg-[#0e0d14]/95 backdrop-blur-md flex flex-col">
-            <div className="sticky top-0 bg-slate-800 dark:bg-[#181724] border-b border-slate-700 dark:border-white/10 p-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Comments</h3>
-              <button
-                onClick={() => setShowComments(false)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <CommentsPanel
-                phaseId={phaseId}
-                currentUserId={currentUserId}
-                isOwner={isOwner}
-                projectId={projectId}
-                moduleId={moduleId}
-                phaseTitle={phase?.title || ""}
-                assignedTo={phase?.assigned_to || null}
-              />
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Comments Panel - Mobile Overlay */}
+      {showComments && (
+        <div className="lg:hidden fixed inset-0 z-[100] bg-slate-950/95 dark:bg-[#0e0d14]/98 backdrop-blur-xl flex flex-col">
+          <div className="sticky top-0 bg-slate-900 dark:bg-[#181724] border-b border-slate-700/80 dark:border-white/10 pt-14 pb-4 px-4 flex items-center justify-between z-10 shadow-lg">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-bold text-white">Comments & Feedback</h3>
+            </div>
+            <button
+              onClick={() => setShowComments(false)}
+              className="px-3.5 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-500/40 transition-all cursor-pointer flex items-center gap-1 text-xs font-semibold shadow-md"
+              title="Close Comments"
+            >
+              <X className="w-5 h-5" />
+              <span>Close</span>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            <CommentsPanel
+              phaseId={phaseId}
+              currentUserId={currentUserId}
+              isOwner={isOwner}
+              projectId={projectId}
+              moduleId={moduleId}
+              phaseTitle={phase?.title || ""}
+              assignedTo={phase?.assigned_to || null}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Story Wiki Panel - Mobile Overlay */}
+      {showWiki && (
+        <div className="lg:hidden fixed inset-0 z-[100] bg-slate-950/95 dark:bg-[#0e0d14]/98 backdrop-blur-xl flex flex-col">
+          <div className="sticky top-0 bg-slate-900 dark:bg-[#181724] border-b border-slate-700/80 dark:border-white/10 pt-14 pb-4 px-4 flex items-center justify-between z-10 shadow-lg">
+            <div className="flex items-center gap-2">
+              <BookMarked className="w-5 h-5 text-amber-400" />
+              <h3 className="text-lg font-bold text-white">Story Wiki</h3>
+            </div>
+            <button
+              onClick={() => setShowWiki(false)}
+              className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 transition-all cursor-pointer flex items-center gap-1 text-xs font-semibold shadow-md"
+              title="Close Story Wiki"
+            >
+              <X className="w-5 h-5" />
+              <span>Close</span>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <StoryWiki projectId={projectId} />
+          </div>
+        </div>
+      )}
 
       {/* Version History Modal */}
       {showVersionHistory && (
@@ -791,6 +935,18 @@ export default function WritingEditorPage() {
           charCount={charCount}
         />
       )}
+
+      {/* Writing Sprint Companion */}
+      <WritingSprintModal
+        isOpen={showSprintModal}
+        onClose={() => setShowSprintModal(false)}
+        currentWordCount={wordCount}
+        onSprintStateChange={(active, timeLeft, wordsAdded) => {
+          setIsSprintActive(active);
+          setSprintTimeLeft(timeLeft);
+          setSprintWordsWritten(wordsAdded);
+        }}
+      />
     </div>
   );
 }

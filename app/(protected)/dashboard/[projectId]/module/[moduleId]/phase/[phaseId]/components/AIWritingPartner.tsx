@@ -160,9 +160,17 @@ Your response as AI Writing Partner:`;
   ];
 
   return (
-    <div className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-96 bg-slate-900/95 dark:bg-[#16151f]/95 backdrop-blur-xl border-l border-slate-200/80 dark:border-white/[0.08] shadow-2xl flex flex-col z-40">
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[100]"
+        onClick={onClose}
+      />
+
+      {/* Drawer */}
+      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-slate-900/98 dark:bg-[#16151f]/98 backdrop-blur-xl border-l border-slate-200/80 dark:border-white/[0.08] shadow-2xl flex flex-col z-[101]">
       {/* Header */}
-      <div className="p-4 border-b border-white/10 bg-purple-500/10">
+      <div className="pt-14 sm:pt-4 pb-4 px-4 border-b border-white/10 bg-purple-500/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bot className="w-6 h-6 text-purple-400" />
@@ -173,9 +181,11 @@ Your response as AI Writing Partner:`;
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            className="px-3.5 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-500/40 rounded-xl transition-all cursor-pointer flex items-center gap-1 text-xs font-semibold shadow-md"
+            title="Close AI Partner"
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-4 h-4" />
+            <span>Close</span>
           </button>
         </div>
       </div>
@@ -284,5 +294,6 @@ Your response as AI Writing Partner:`;
         </p>
       </div>
     </div>
-  );
+  </>
+);
 }

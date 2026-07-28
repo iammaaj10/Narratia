@@ -184,7 +184,7 @@ export default function FocusModeEditor({
       {/* Top Navigation Container */}
       <div className="relative z-50 opacity-100 transition-opacity duration-300 flex flex-col shrink-0">
         {/* Top Controls */}
-        <div className="p-4 flex items-center justify-between bg-[#02020a]/80 backdrop-blur-md border-b border-white/5">
+        <div className="pt-14 sm:pt-4 pb-4 px-4 flex items-center justify-between bg-[#02020a]/80 backdrop-blur-md border-b border-white/5 gap-2 overflow-x-auto">
           <div className="flex items-center gap-3">
           {/* Theme Switcher */}
           <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg p-2">
@@ -246,10 +246,11 @@ export default function FocusModeEditor({
         {/* Exit Button */}
         <button
           onClick={onExit}
-          className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-sm rounded-lg text-gray-300 hover:bg-black/30 transition-colors"
+          className="flex items-center gap-1.5 px-3.5 py-2 bg-white/10 text-white border border-white/20 rounded-xl hover:bg-white/20 transition-all font-semibold text-xs shrink-0 cursor-pointer shadow-md"
+          title="Exit Focus Mode"
         >
           <X className="w-4 h-4" />
-          Exit Focus Mode (ESC)
+          <span>Exit</span>
         </button>
         </div>
 
