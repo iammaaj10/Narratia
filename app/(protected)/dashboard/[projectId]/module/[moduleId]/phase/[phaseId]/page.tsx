@@ -398,7 +398,7 @@ export default function WritingEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
+    <div className="flex flex-col flex-1 h-full min-h-0 -m-5 sm:-m-6 bg-[#13121a]">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -524,10 +524,9 @@ export default function WritingEditorPage() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-black/20 backdrop-blur-sm sticky top-0 z-30 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-4">
-            {/* Left: Back button and title */}
+      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#181724] px-4 sm:px-6 py-2.5 flex-shrink-0 z-30 transition-colors">
+        <div className="w-full flex items-center justify-between gap-4">
+          {/* Left: Back button and title */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <button
                 onClick={() => {
@@ -688,12 +687,11 @@ export default function WritingEditorPage() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Phase Description */}
       {phase.description && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-          <div className="p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        <div className="px-4 sm:px-6 py-2 flex-shrink-0">
+          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <p className="text-sm text-blue-300">
               <strong className="font-semibold">Description:</strong>{" "}
               {phase.description}
@@ -703,7 +701,7 @@ export default function WritingEditorPage() {
       )}
 
       {/* Main Editor & Side Panels Container */}
-      <div className="flex h-[calc(100vh-170px)] min-h-[500px] overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f]">
+      <div className="flex-1 flex min-h-[550px] overflow-hidden bg-white dark:bg-[#13121a]">
         <div className="flex-1 min-w-0 h-full overflow-hidden">
           <RichTextEditor
             content={content}
