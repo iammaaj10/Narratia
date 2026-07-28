@@ -312,58 +312,60 @@ export default function DashboardPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 p-2 rounded-2xl bg-slate-100/90 dark:bg-[#0c0c1b] border border-slate-200 dark:border-white/5">
-        {/* Search */}
+      <div className="flex flex-col lg:flex-row gap-3 p-2 rounded-2xl bg-slate-200/50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.07] backdrop-blur-md">
+        {/* Search Input */}
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-400" />
           <input
             type="text"
             placeholder="Search your stories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-transparent rounded-xl pl-12 pr-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 shadow-sm transition-all"
+            className="w-full bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.07] border border-slate-200/80 dark:border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/50 shadow-sm transition-all"
           />
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 custom-scrollbar">
           {/* Filter by type */}
-          <div className="relative min-w-[140px]">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-400 pointer-events-none" />
+          <div className="relative min-w-[130px]">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-gray-400 pointer-events-none" />
             <select
               value={filterBy}
               onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-              className="w-full bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-transparent rounded-xl pl-9 pr-8 py-3 text-sm font-medium text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer shadow-sm transition-all"
+              className="w-full bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.07] border border-slate-200/80 dark:border-white/[0.08] rounded-xl pl-8 pr-8 py-2.5 text-xs font-semibold text-slate-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40 appearance-none cursor-pointer shadow-sm transition-all"
             >
-              <option value="all">All Types</option>
-              <option value="solo">Solo Only</option>
-              <option value="team">Team Only</option>
+              <option value="all" className="dark:bg-[#1a1921] dark:text-white">All Types</option>
+              <option value="solo" className="dark:bg-[#1a1921] dark:text-white">Solo Only</option>
+              <option value="team" className="dark:bg-[#1a1921] dark:text-white">Team Only</option>
             </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-gray-500 text-[10px]">▼</div>
           </div>
 
           {/* Sort */}
-          <div className="relative min-w-[150px]">
-            <SortAsc className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-gray-400 pointer-events-none" />
+          <div className="relative min-w-[140px]">
+            <SortAsc className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-gray-400 pointer-events-none" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="w-full bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-transparent rounded-xl pl-9 pr-8 py-3 text-sm font-medium text-slate-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 appearance-none cursor-pointer shadow-sm transition-all"
+              className="w-full bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.07] border border-slate-200/80 dark:border-white/[0.08] rounded-xl pl-8 pr-8 py-2.5 text-xs font-semibold text-slate-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500/40 appearance-none cursor-pointer shadow-sm transition-all"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
+              <option value="newest" className="dark:bg-[#1a1921] dark:text-white">Newest First</option>
+              <option value="oldest" className="dark:bg-[#1a1921] dark:text-white">Oldest First</option>
+              <option value="name-asc" className="dark:bg-[#1a1921] dark:text-white">Name (A-Z)</option>
+              <option value="name-desc" className="dark:bg-[#1a1921] dark:text-white">Name (Z-A)</option>
             </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-gray-500 text-[10px]">▼</div>
           </div>
 
           {/* Show Archived Toggle */}
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className={`flex items-center justify-center gap-2 px-4 py-3 min-w-[140px] rounded-xl text-sm font-medium border shadow-sm transition-all ${showArchived
-                ? "bg-orange-100 dark:bg-orange-500/20 text-orange-800 dark:text-orange-300 border-orange-300 dark:border-orange-500/50"
-                : "bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border-slate-200 dark:border-transparent"
+            className={`flex items-center justify-center gap-2 px-3.5 py-2.5 min-w-[120px] rounded-xl text-xs font-semibold border shadow-sm transition-all ${showArchived
+                ? "bg-orange-500/15 text-orange-600 dark:text-orange-300 border-orange-500/30"
+                : "bg-white dark:bg-white/[0.04] hover:bg-slate-50 dark:hover:bg-white/[0.07] text-slate-700 dark:text-gray-300 border-slate-200/80 dark:border-white/[0.08]"
               }`}
           >
-            {showArchived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+            {showArchived ? <ArchiveRestore className="w-3.5 h-3.5" /> : <Archive className="w-3.5 h-3.5" />}
             {showArchived ? "Active" : "Archived"}
           </button>
         </div>
@@ -395,40 +397,43 @@ export default function DashboardPage() {
               <div
                 key={project.id}
                 onClick={() => router.push(`/dashboard/${project.id}`)}
-                className={`group relative cursor-pointer flex flex-col h-[280px] p-6 sm:p-8 rounded-[2rem] border transition-all duration-300 overflow-hidden hover:-translate-y-1 ${project.archived
-                    ? "bg-slate-50 dark:bg-[#0c0c1b]/60 border-slate-200 dark:border-white/5 opacity-60"
-                    : "bg-white dark:bg-[#0d0c1d] hover:bg-slate-50/80 dark:hover:bg-[#121128] border-slate-200 dark:border-white/5 hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none"
+                className={`group relative cursor-pointer flex flex-col h-[280px] p-6 sm:p-7 rounded-3xl border transition-all duration-300 overflow-hidden hover:-translate-y-1 ${project.archived
+                    ? "bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.05] opacity-60"
+                    : "bg-white dark:bg-white/[0.03] hover:bg-slate-50/80 dark:hover:bg-white/[0.06] border-slate-200/80 dark:border-white/[0.08] hover:border-purple-500/50 dark:hover:border-purple-500/40 shadow-sm hover:shadow-xl dark:shadow-none"
                   }`}
               >
+                {/* Subtle card top glow on hover */}
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
                 {/* Top Bar: Badges & Actions */}
                 <div className="relative z-10 flex items-start justify-between mb-4">
                   <div className="flex flex-wrap gap-2">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider ${project.is_team
-                        ? "bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/20"
-                        : "bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20"
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider ${project.is_team
+                        ? "bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20"
+                        : "bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20"
                       }`}>
                       {project.is_team ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                       {project.is_team ? "Team" : "Solo"}
                     </span>
                     {isOwner && project.is_team && (
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
+                      <span className="inline-flex items-center px-3 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
                         Owner
                       </span>
                     )}
                   </div>
 
                   {isOwner && (
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-black/40 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/5 shadow-md">
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-black/60 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/10 shadow-md">
                       <button
                         onClick={(e) => toggleArchive(project.id, project.archived, e)}
-                        className="p-1.5 rounded-lg text-slate-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/20 transition-all"
+                        className="p-1.5 rounded-lg text-slate-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-300 hover:bg-orange-500/10 transition-all"
                         title={project.archived ? "Unarchive" : "Archive"}
                       >
                         {project.archived ? <ArchiveRestore className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
                       </button>
                       <button
                         onClick={(e) => deleteProject(project.id, project.title, e)}
-                        className="p-1.5 rounded-lg text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/20 transition-all"
+                        className="p-1.5 rounded-lg text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 transition-all"
                         title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -438,8 +443,8 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 flex-1 flex flex-col pt-2">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
+                <div className="relative z-10 flex-1 flex flex-col pt-1">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
                     {project.title}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
@@ -448,12 +453,12 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="relative z-10 mt-4 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-medium text-slate-500 dark:text-gray-500">
+                <div className="relative z-10 mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between text-xs font-medium text-slate-500 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-slate-400 dark:text-gray-500" />
                     Updated {new Date(project.updated_at || project.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
-                  <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                  <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
                     <MoreVertical className="w-4 h-4" />
                   </div>
                 </div>

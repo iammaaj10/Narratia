@@ -408,7 +408,7 @@ export default function ProjectDetailPage() {
                     whileHover={{ y: -4 }}
                     key={module.id}
                     onClick={() => router.push(`/dashboard/${projectId}/module/${module.id}`)}
-                    className="group cursor-pointer flex flex-col h-48 p-6 rounded-3xl bg-white dark:bg-[#0d0c1d] hover:bg-slate-50/80 dark:hover:bg-[#121128] border border-slate-200 dark:border-white/5 hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden relative"
+                    className="group cursor-pointer flex flex-col h-48 p-6 rounded-3xl bg-white dark:bg-white/[0.03] hover:bg-slate-50/80 dark:hover:bg-white/[0.06] border border-slate-200/80 dark:border-white/[0.08] hover:border-purple-400 dark:hover:border-purple-500/40 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden relative"
                   >
                     <div className="flex items-start justify-between mb-4 z-10">
                       <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-white/5 flex items-center justify-center border border-purple-200 dark:border-white/10 group-hover:bg-purple-100 dark:group-hover:bg-purple-500/20 group-hover:border-purple-300 dark:group-hover:border-purple-500/30 transition-colors">

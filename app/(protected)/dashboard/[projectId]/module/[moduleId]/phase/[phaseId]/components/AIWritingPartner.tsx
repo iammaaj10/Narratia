@@ -160,7 +160,7 @@ Your response as AI Writing Partner:`;
   ];
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-gray-900 border-l border-white/10 shadow-2xl flex flex-col z-50">
+    <div className="fixed right-0 top-14 h-[calc(100vh-3.5rem)] w-96 bg-slate-900/95 dark:bg-[#16151f]/95 backdrop-blur-xl border-l border-slate-200/80 dark:border-white/[0.08] shadow-2xl flex flex-col z-40">
       {/* Header */}
       <div className="p-4 border-b border-white/10 bg-purple-500/10">
         <div className="flex items-center justify-between">

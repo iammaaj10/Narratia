@@ -82,37 +82,58 @@ export default function CommentsPanel({
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
+      // 1️⃣ Fetch comments for this phase
+      const { data: commentsData, error: commentsError } = await supabase
         .from("comments")
-        .select(
-          `
-          id,
-          phase_id,
-          user_id,
-          content,
-          parent_id,
-          resolved,
-          created_at,
-          profiles (
-            username,
-            avatar_url
-          )
-        `
-        )
+        .select("id, phase_id, user_id, content, parent_id, resolved, created_at")
         .eq("phase_id", phaseId)
         .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error("❌ Comments error:", error);
+      if (commentsError) {
+        console.error("❌ Comments error:", commentsError.message || commentsError);
+        setLoading(false);
         return;
       }
 
+      if (!commentsData || commentsData.length === 0) {
+        setComments([]);
+        setLoading(false);
+        return;
+      }
+
+      // 2️⃣ Fetch profiles for all commenters
+      const userIds = Array.from(new Set(commentsData.map((c: any) => c.user_id).filter(Boolean)));
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, username, avatar_url")
+        .in("id", userIds);
+
+      const profilesMap = new Map<string, { username: string; avatar_url: string | null }>();
+      (profilesData || []).forEach((p: any) => {
+        profilesMap.set(p.id, {
+          username: p.username || "Writer",
+          avatar_url: p.avatar_url,
+        });
+      });
+
+      // 3️⃣ Map profiles & build top-level comments + replies hierarchy
       const topLevel: Comment[] = [];
       const repliesMap = new Map<string, Comment[]>();
 
-      (data as unknown as Comment[]).forEach((comment) => {
+      commentsData.forEach((rawComment: any) => {
+        const profile = profilesMap.get(rawComment.user_id) || {
+          username: "Writer",
+          avatar_url: null,
+        };
+
+        const comment: Comment = {
+          ...rawComment,
+          profiles: profile,
+          replies: [],
+        };
+
         if (!comment.parent_id) {
-          topLevel.push({ ...comment, replies: [] });
+          topLevel.push(comment);
         } else {
           if (!repliesMap.has(comment.parent_id)) {
             repliesMap.set(comment.parent_id, []);
@@ -258,7 +279,7 @@ export default function CommentsPanel({
     : comments.filter((c) => !c.resolved);
 
   return (
-    <div className="h-full flex flex-col bg-white/[0.02] border-l border-white/10 ">
+    <div className="h-full flex flex-col bg-transparent">
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">

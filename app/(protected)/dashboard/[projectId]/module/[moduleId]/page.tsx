@@ -297,7 +297,7 @@ export default function ModuleDetailPage() {
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="text-center py-20 rounded-3xl border border-dashed border-slate-300 dark:border-white/20 bg-slate-50 dark:bg-[#0c0c1b]"
+              className="text-center py-20 rounded-3xl border border-dashed border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02]"
             >
               <div className="w-20 h-20 bg-slate-200 dark:bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 transform rotate-3 border border-slate-300 dark:border-transparent">
                 <FileText className="w-10 h-10 text-slate-400 dark:text-gray-500" />
@@ -328,7 +328,7 @@ export default function ModuleDetailPage() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ delay: 0.05 * index }}
                     onClick={() => router.push(`/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`)}
-                    className="group cursor-pointer relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0d0c1d] border border-slate-200 dark:border-white/5 hover:bg-slate-50/80 dark:hover:bg-[#121128] hover:border-purple-400 dark:hover:border-purple-500/30 shadow-md hover:shadow-xl dark:shadow-none transition-all overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className="group cursor-pointer relative p-5 sm:p-6 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-50/80 dark:hover:bg-white/[0.06] hover:border-purple-400 dark:hover:border-purple-500/40 shadow-sm hover:shadow-xl dark:shadow-none transition-all overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                   >
                     {/* Ambient Glow */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 blur-[40px] pointer-events-none group-hover:bg-purple-500/10 transition-colors rounded-full" />

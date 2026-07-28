@@ -702,9 +702,9 @@ export default function WritingEditorPage() {
         </div>
       )}
 
-      {/* Main Editor Area */}
-      <div className="flex h-[calc(100vh-160px)]">
-        <div className={`flex-1 ${showComments || showWiki ? "lg:pr-80" : ""}`}>
+      {/* Main Editor & Side Panels Container */}
+      <div className="flex h-[calc(100vh-170px)] min-h-[500px] overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f]">
+        <div className="flex-1 min-w-0 h-full overflow-hidden">
           <RichTextEditor
             content={content}
             onChange={handleContentChange}
@@ -714,14 +714,14 @@ export default function WritingEditorPage() {
 
         {/* Story Wiki Panel - Desktop */}
         {showWiki && !showComments && (
-          <div className="hidden lg:block fixed right-0 top-[120px] w-80 h-[calc(100vh-120px)] border-l border-white/10 bg-[#0a0a1a]/95 backdrop-blur-sm overflow-y-auto p-4 z-20">
+          <div className="hidden lg:block w-80 h-full border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto p-4 flex-shrink-0 z-20">
             <StoryWiki projectId={projectId} />
           </div>
         )}
 
         {/* Comments Panel - Desktop */}
         {showComments && (
-          <div className="hidden lg:block fixed right-0 top-[120px] w-80 h-[calc(100vh-120px)] border-l border-white/10 bg-gray-900/95 backdrop-blur-sm overflow-y-auto z-20">
+          <div className="hidden lg:block w-80 h-full border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto flex-shrink-0 z-20">
             <CommentsPanel
               phaseId={phaseId}
               currentUserId={currentUserId}
@@ -736,8 +736,8 @@ export default function WritingEditorPage() {
 
         {/* Comments Panel - Mobile Overlay */}
         {showComments && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-gray-900">
-            <div className="sticky top-0 bg-gray-800 border-b border-white/10 p-4 flex items-center justify-between">
+          <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/95 dark:bg-[#0e0d14]/95 backdrop-blur-md flex flex-col">
+            <div className="sticky top-0 bg-slate-800 dark:bg-[#181724] border-b border-slate-700 dark:border-white/10 p-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Comments</h3>
               <button
                 onClick={() => setShowComments(false)}
@@ -746,15 +746,17 @@ export default function WritingEditorPage() {
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
-            <CommentsPanel
-              phaseId={phaseId}
-              currentUserId={currentUserId}
-              isOwner={isOwner}
-              projectId={projectId}
-              moduleId={moduleId}
-              phaseTitle={phase?.title || ""}
-              assignedTo={phase?.assigned_to || null}
-            />
+            <div className="flex-1 overflow-y-auto">
+              <CommentsPanel
+                phaseId={phaseId}
+                currentUserId={currentUserId}
+                isOwner={isOwner}
+                projectId={projectId}
+                moduleId={moduleId}
+                phaseTitle={phase?.title || ""}
+                assignedTo={phase?.assigned_to || null}
+              />
+            </div>
           </div>
         )}
       </div>
