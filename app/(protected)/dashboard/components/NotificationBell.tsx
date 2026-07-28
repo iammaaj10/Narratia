@@ -176,27 +176,37 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown / Mobile Modal */}
       {showDropdown && (
-        <div className="absolute right-0 mt-2 w-96 bg-gray-900 border border-white/10 rounded-xl shadow-2xl z-50 max-h-[600px] flex flex-col">
+        <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-96 max-w-md bg-white dark:bg-[#181724] border border-slate-200 dark:border-white/[0.1] rounded-2xl shadow-2xl z-[100] max-h-[80vh] sm:max-h-[550px] flex flex-col overflow-hidden backdrop-blur-xl">
           {/* Header */}
-          <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-white">Notifications</h3>
+          <div className="p-4 border-b border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between bg-slate-50 dark:bg-white/[0.02]">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Notifications</h3>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-semibold">
+                  {unreadCount} new
+                </span>
+              )}
+            </div>
+
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                  className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
                 >
-                  <Check className="w-3 h-3" />
+                  <Check className="w-3.5 h-3.5" />
                   Mark all read
                 </button>
               )}
               <button
                 onClick={() => setShowDropdown(false)}
-                className="p-1 text-gray-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-xl text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+                title="Close"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -204,46 +214,46 @@ export default function NotificationBell() {
           {/* Notifications List */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-8 text-center text-gray-400">
+              <div className="p-8 text-center text-slate-500 dark:text-gray-400 text-sm">
                 Loading notifications...
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center">
-                <Bell className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm">No notifications yet</p>
+                <Bell className="w-10 h-10 text-slate-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-slate-600 dark:text-gray-400 text-sm font-medium">No notifications yet</p>
               </div>
             ) : (
-              <div className="divide-y divide-white/10">
+              <div className="divide-y divide-slate-100 dark:divide-white/[0.06]">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
                     className={`p-4 cursor-pointer transition-all ${
                       notification.read
-                        ? "bg-transparent hover:bg-white/5"
-                        : "bg-blue-500/10 hover:bg-blue-500/20"
+                        ? "bg-transparent hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                        : "bg-purple-500/10 hover:bg-purple-500/15"
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       {/* Icon */}
-                      <div className="text-2xl flex-shrink-0">
+                      <div className="text-xl flex-shrink-0">
                         {getNotificationIcon(notification.type)}
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h4 className="text-sm font-semibold text-white truncate">
+                          <h4 className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                             {notification.title}
                           </h4>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1" />
+                            <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0 mt-1" />
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                        <p className="text-xs text-slate-600 dark:text-gray-400 mb-2 line-clamp-2 leading-relaxed">
                           {notification.message}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-[11px] text-slate-400 dark:text-gray-500">
                           {new Date(notification.created_at).toLocaleDateString()}{" "}
                           at{" "}
                           {new Date(notification.created_at).toLocaleTimeString([], {
@@ -259,7 +269,7 @@ export default function NotificationBell() {
                           e.stopPropagation();
                           deleteNotification(notification.id);
                         }}
-                        className="p-1 text-gray-400 hover:text-red-400 transition-colors flex-shrink-0"
+                        className="p-1.5 text-slate-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors flex-shrink-0"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -272,15 +282,14 @@ export default function NotificationBell() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-white/10 text-center">
+            <div className="p-3 border-t border-slate-200/80 dark:border-white/[0.08] text-center bg-slate-50/50 dark:bg-white/[0.02]">
               <button
                 onClick={() => {
-                  // Future: Navigate to full notifications page
                   setShowDropdown(false);
                 }}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs font-semibold text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
-                View all notifications
+                Close
               </button>
             </div>
           )}
