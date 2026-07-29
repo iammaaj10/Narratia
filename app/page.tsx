@@ -18,6 +18,10 @@ const Clock = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" 
 const Download = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>;
 const BarChart = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>;
 const MessageSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>;
+const OutlineIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
+const ScreenplayIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>;
+const SprintIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>;
+const CharacterIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 
 // ─────────────────────────────────────────────────────────────────
 // COUNTER
@@ -276,27 +280,30 @@ export default function Page() {
           style={{ scaleY, height: "100%" }} />
       </div>
 
-      <main className="relative z-10 pt-[160px]">
+      <main className="relative z-10 pt-[104px]">
         {/* ── HERO SECTION ── */}
         <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] pb-24 relative">
           {/* Timeline node */}
-          <div className={`hidden lg:block absolute left-[40px] top-[24px] w-5 h-5 rounded-full border-[3px] bg-indigo-500 timeline-glow transform -translate-x-1/2 z-20 ${isLight ? "border-[#f0f3f9]" : "border-[#05050A]"}`} />
+          <div className={`hidden lg:block absolute left-[40px] top-[14px] w-5 h-5 rounded-full border-[3px] bg-indigo-500 timeline-glow transform -translate-x-1/2 z-20 ${isLight ? "border-[#f0f3f9]" : "border-[#05050A]"}`} />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <h1 className={`text-4xl sm:text-6xl lg:text-[5rem] font-extrabold leading-[1.05] tracking-tight mb-6 max-w-4xl outfit ${isLight ? "text-slate-900" : "text-white"}`}>
-                Your AI-Powered <br className="hidden sm:block" />
-                <span className="grad-text">Writing Ecosystem.</span>
+              <h1 className={`text-3xl sm:text-5xl lg:text-[3.6rem] font-extrabold leading-[1.12] tracking-[-0.03em] mb-6 max-w-2xl outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+                <span className="inline-block">Your AI-Powered</span>{" "}
+                <br className="hidden sm:block" />
+                <span className="grad-text inline-block">Writing Ecosystem.</span>
               </h1>
-              <p className={`text-lg sm:text-xl max-w-xl font-normal leading-relaxed mb-10 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                The ultimate platform for modern authors. From auto-extracting Story Wikis and RAG-powered lore memory to our immersive Zen 3D focus mode.
+
+              <p className={`text-base sm:text-lg max-w-xl font-normal leading-[1.7] mb-8 ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+                The ultimate platform for modern authors. From auto-extracting <span className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>Story Wikis</span> and <span className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>RAG-powered lore memory</span> to our immersive <span className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>Zen 3D focus mode</span>.
               </p>
+
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
-                <button onClick={() => router.push("/register")} className="btn-primary text-base px-8 py-4 w-full sm:w-auto justify-center">
-                  Start writing
+                <button onClick={() => router.push("/register")} className="btn-primary text-base px-8 py-3.5 w-full sm:w-auto justify-center shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all">
+                  Start writing free
                   <ChevronRight />
                 </button>
-                <button onClick={() => router.push("/login")} className="btn-secondary text-base px-8 py-4 w-full sm:w-auto justify-center">
+                <button onClick={() => router.push("/login")} className="btn-secondary text-base px-8 py-3.5 w-full sm:w-auto justify-center backdrop-blur-md">
                   Login to Narratia
                 </button>
               </div>
@@ -418,7 +425,7 @@ export default function Page() {
         </section>
 
         {/* ── FLOATING MANUSCRIPT & LORE NODES SECTION ── */}
-        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-32 relative">
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
           <style dangerouslySetInnerHTML={{
             __html: `
             @keyframes dash {
@@ -434,14 +441,14 @@ export default function Page() {
             isLight ? "bg-indigo-500/5" : "bg-indigo-500/10"
           }`} />
 
-          <div className="relative w-full max-w-6xl mx-auto min-h-[500px] flex items-center">
+          <div className="relative w-full max-w-6xl mx-auto min-h-[480px] flex items-center">
 
             {/* The Main Manuscript */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               className="w-full lg:w-3/5 z-10 relative"
             >
               <div className={`pl-8 sm:pl-16 border-l-2 py-8 relative ${isLight ? "border-indigo-500/30" : "border-indigo-500/20"}`}>
@@ -488,7 +495,7 @@ export default function Page() {
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               >
                 <motion.div
                   animate={{ y: [-8, 8, -8] }}
@@ -527,7 +534,7 @@ export default function Page() {
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
                 className="ml-16"
               >
                 <motion.div
@@ -567,120 +574,102 @@ export default function Page() {
         </section>
 
         {/* ── FEATURES GRID ── */}
-        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-24 relative">
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
           <div className={`hidden lg:block absolute left-[40px] top-[140px] w-5 h-5 rounded-full border-[3px] bg-pink-500 timeline-glow transform -translate-x-1/2 z-20 ${isLight ? "border-[#f0f3f9]" : "border-[#05050A]"}`} />
 
-          <div className="mb-16">
-            <h2 className={`text-3xl sm:text-5xl font-extrabold mb-4 outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+          <div className="mb-10">
+            <h2 className={`text-3xl sm:text-5xl font-extrabold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>
               Everything you need to <span className="grad-text-2">tell your story.</span>
             </h2>
-            <p className={`text-xl max-w-2xl ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+            <p className={`text-lg sm:text-xl max-w-2xl ${isLight ? "text-slate-600" : "text-slate-400"}`}>
               Write, world-build, and focus with cutting-edge AI tools built specifically for narrative creators.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Feature 1: AI Outline Generator */}
             <FeatureCard delay={0} glowColor="rgba(99, 102, 241, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
                 isLight ? "bg-indigo-50 border-indigo-200 text-indigo-600 shadow-sm" : "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
               }`}>
-                <Sparkles />
+                <OutlineIcon />
               </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>AI Story Memory</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Never lose track of your lore. Narratia uses full-text search to index your universe, automatically pulling character and location context into your AI Co-Pilot prompt.
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>AI Outline Generator</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Instantly generate structured, beat-by-beat plot outlines, act breakdowns, and scene lists tailored to your story tone.
               </p>
             </FeatureCard>
 
+            {/* Feature 2: Screenplay Mode */}
             <FeatureCard delay={0.1} glowColor="rgba(168, 85, 247, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
                 isLight ? "bg-purple-50 border-purple-200 text-purple-600 shadow-sm" : "bg-purple-500/10 border-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+              }`}>
+                <ScreenplayIcon />
+              </div>
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Screenplay & Script Mode</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Professional screenplay formatting engine with automated character sluglines, dialogue shortcuts, and Final Draft ready export.
+              </p>
+            </FeatureCard>
+
+            {/* Feature 3: Writing Sprint Timer */}
+            <FeatureCard delay={0.2} glowColor="rgba(236, 72, 153, 0.15)">
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
+                isLight ? "bg-pink-50 border-pink-200 text-pink-600 shadow-sm" : "bg-pink-500/10 border-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.2)]"
+              }`}>
+                <SprintIcon />
+              </div>
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Writing Sprints & Velocity</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Crush word count goals with timed writing sprints, real-time velocity tracking, word per minute analytics, and daily streaks.
+              </p>
+            </FeatureCard>
+
+            {/* Feature 4: Interactive Character AI */}
+            <FeatureCard delay={0.3} glowColor="rgba(249, 115, 22, 0.15)">
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
+                isLight ? "bg-orange-50 border-orange-200 text-orange-600 shadow-sm" : "bg-orange-500/10 border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.2)]"
+              }`}>
+                <CharacterIcon />
+              </div>
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Interactive Character AI</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Chat in real time with your fictional characters, uncover deep psychological motivations, and auto-map relationship webs.
+              </p>
+            </FeatureCard>
+
+            {/* Feature 5: Auto Story Wiki */}
+            <FeatureCard delay={0.4} glowColor="rgba(6, 182, 212, 0.15)">
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
+                isLight ? "bg-cyan-50 border-cyan-200 text-cyan-600 shadow-sm" : "bg-cyan-500/10 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
               }`}>
                 <Book />
               </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Auto-Extracting Story Wiki</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                As you type, our Gemini-powered engine automatically identifies and extracts Characters, Locations, and Items, building a living encyclopedia of your world.
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Auto Story Wiki</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Gemini engine automatically extracts Characters, Locations, and Items as you write, keeping a living lore database.
               </p>
             </FeatureCard>
 
-            <FeatureCard delay={0.2} glowColor="rgba(236, 72, 153, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-pink-50 border-pink-200 text-pink-600 shadow-sm" : "bg-pink-500/10 border-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.2)]"
+            {/* Feature 6: Zen 3D Focus Mode */}
+            <FeatureCard delay={0.5} glowColor="rgba(16, 185, 129, 0.15)">
+              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-5 ${
+                isLight ? "bg-emerald-50 border-emerald-200 text-emerald-600 shadow-sm" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
               }`}>
                 <Zap />
               </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Zen 3D Focus Mode</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Enter a flow state with interactive 3D particle environments (Cosmic, Snow, Galaxy, Ember) that react to your typing speed and the emotional tone of your writing.
-              </p>
-            </FeatureCard>
-
-            <FeatureCard delay={0.3} glowColor="rgba(249, 115, 22, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-orange-50 border-orange-200 text-orange-600 shadow-sm" : "bg-orange-500/10 border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.2)]"
-              }`}>
-                <Users />
-              </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Outlines & Commands</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Generate entire chapter outlines using AI, and use intuitive Slash Commands directly in the rich-text editor to instantly pull up context or write new paragraphs.
-              </p>
-            </FeatureCard>
-
-            <FeatureCard delay={0.4} glowColor="rgba(6, 182, 212, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-cyan-50 border-cyan-200 text-cyan-600 shadow-sm" : "bg-cyan-500/10 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-              }`}>
-                <MessageSquare />
-              </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Real-time Comments</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Work seamlessly with co-writers or editors. Leave threaded inline comments and track feedback in real-time right alongside your manuscript.
-              </p>
-            </FeatureCard>
-
-            <FeatureCard delay={0.5} glowColor="rgba(16, 185, 129, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-emerald-50 border-emerald-200 text-emerald-600 shadow-sm" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-              }`}>
-                <Clock />
-              </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Version History</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Time-travel through your drafts. Automatically save snapshots, compare text differences, and restore old versions of any phase effortlessly.
-              </p>
-            </FeatureCard>
-
-            <FeatureCard delay={0.6} glowColor="rgba(59, 130, 246, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-blue-50 border-blue-200 text-blue-600 shadow-sm" : "bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
-              }`}>
-                <Download />
-              </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Smart Export</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Compile your module with one click. Generate perfectly formatted PDFs, Word DOCX files, or plain text ready for agents or self-publishing.
-              </p>
-            </FeatureCard>
-
-            <FeatureCard delay={0.7} glowColor="rgba(234, 179, 8, 0.15)">
-              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center mb-6 ${
-                isLight ? "bg-yellow-50 border-yellow-200 text-yellow-600 shadow-sm" : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-              }`}>
-                <BarChart />
-              </div>
-              <h3 className={`text-xl font-bold mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Writing Analytics</h3>
-              <p className={`leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-                Keep track of your productivity. Monitor your word counts, reading times, and writing sessions directly from your personalized dashboard.
+              <h3 className={`text-lg font-bold mb-2 outfit ${isLight ? "text-slate-900" : "text-white"}`}>Zen 3D Focus Mode</h3>
+              <p className={`text-sm leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                Interactive 3D particle environments (Cosmic, Snow, Ember) that react dynamically to your typing speed and mood.
               </p>
             </FeatureCard>
           </div>
         </section>
 
         {/* ── CTA SECTION ── */}
-        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-24 relative">
-          <div className={`hidden lg:block absolute left-[40px] top-[140px] w-5 h-5 rounded-full border-[3px] bg-purple-500 timeline-glow transform -translate-x-1/2 z-20 ${isLight ? "border-[#f0f3f9]" : "border-[#05050A]"}`} />
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
+          <div className={`hidden lg:block absolute left-[40px] top-[100px] w-5 h-5 rounded-full border-[3px] bg-purple-500 timeline-glow transform -translate-x-1/2 z-20 ${isLight ? "border-[#f0f3f9]" : "border-[#05050A]"}`} />
 
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative max-w-5xl mx-auto rounded-3xl p-[1px] overflow-hidden shadow-2xl">
             {/* Subtle gradient border */}
