@@ -152,11 +152,10 @@ function FeatureCard({ delay, badge, title, description, icon, accentColor, chil
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay }}
-      className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-default flex flex-col justify-between overflow-hidden ${
-        isLight
+      className={`group relative rounded-2xl p-6 transition-all duration-300 cursor-default flex flex-col justify-between overflow-hidden ${isLight
           ? "bg-white/90 backdrop-blur-xl border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:border-slate-300 hover:shadow-xl hover:-translate-y-0.5"
           : "bg-[#0b0c10]/80 backdrop-blur-xl border border-white/[0.08] hover:border-white/20 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
-      }`}
+        }`}
       onMouseMove={handleMouseMove}
     >
       {/* Top sheen line */}
@@ -259,11 +258,10 @@ export default function Page() {
 
         /* Ambient grid pattern */
         .bg-grid {
-          background-image: ${
-            isLight
-              ? "linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)"
-              : "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)"
-          };
+          background-image: ${isLight
+          ? "linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)"
+          : "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)"
+        };
           background-size: 40px 40px;
           background-position: center center;
         }
@@ -310,10 +308,7 @@ export default function Page() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 dark:text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-6 outfit">
-                <Sparkles />
-                Next-Gen Storycraft Platform
-              </div>
+
 
               <h1 className={`text-3xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] tracking-tight mb-6 outfit ${isLight ? "text-slate-900" : "text-white"}`}>
                 Your AI-Powered <br />
@@ -329,11 +324,10 @@ export default function Page() {
                   Start writing free
                   <ChevronRight />
                 </button>
-                <button onClick={() => router.push("/login")} className={`w-full sm:w-auto px-6 py-3 rounded-xl border text-sm font-semibold transition-all flex items-center justify-center gap-2 outfit ${
-                  isLight
+                <button onClick={() => router.push("/login")} className={`w-full sm:w-auto px-6 py-3 rounded-xl border text-sm font-semibold transition-all flex items-center justify-center gap-2 outfit ${isLight
                     ? "border-slate-200 hover:border-slate-300 bg-white/80 text-slate-800"
                     : "border-white/10 hover:border-white/20 bg-white/[0.03] text-slate-200"
-                }`}>
+                  }`}>
                   Sign in to workspace
                 </button>
               </div>
@@ -373,44 +367,36 @@ export default function Page() {
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] rounded-full blur-[80px] pointer-events-none ${isLight ? "bg-indigo-500/10" : "bg-indigo-600/15"}`} />
 
                 {/* Left Book Base / Pages Stack */}
-                <div className={`absolute top-0 right-1/2 w-[240px] h-full backdrop-blur-xl border-y border-l rounded-l-[20px] origin-right flex items-center justify-center overflow-hidden ${
-                  isLight ? "bg-white/90 border-slate-200 shadow-lg" : "bg-[#0b0c10]/90 border-white/10 shadow-2xl"
-                }`} style={{ transform: "rotateY(-4deg)" }}>
+                <div className={`absolute top-0 right-1/2 w-[240px] h-full backdrop-blur-xl border-y border-l rounded-l-[20px] origin-right flex items-center justify-center overflow-hidden ${isLight ? "bg-white/90 border-slate-200 shadow-lg" : "bg-[#0b0c10]/90 border-white/10 shadow-2xl"
+                  }`} style={{ transform: "rotateY(-4deg)" }}>
                   <div className={`w-[140%] h-[140%] absolute border rounded-full ${isLight ? "border-indigo-500/10" : "border-indigo-500/5"}`} style={{ transform: "translate(-20%, -10%)" }} />
                 </div>
-                <div className={`absolute top-0 right-1/2 w-[240px] h-full border-y border-l rounded-l-[20px] origin-right ${
-                  isLight ? "bg-slate-50/90 border-slate-200/60" : "bg-[#08090d]/90 border-white/5"
-                }`} style={{ transform: "rotateY(-8deg) translateZ(-6px)" }} />
-                <div className={`absolute top-0 right-1/2 w-[240px] h-full border-y border-l rounded-l-[20px] origin-right ${
-                  isLight ? "bg-slate-100 border-slate-200/60" : "bg-[#06070a] border-white/5"
-                }`} style={{ transform: "rotateY(-12deg) translateZ(-12px)" }} />
+                <div className={`absolute top-0 right-1/2 w-[240px] h-full border-y border-l rounded-l-[20px] origin-right ${isLight ? "bg-slate-50/90 border-slate-200/60" : "bg-[#08090d]/90 border-white/5"
+                  }`} style={{ transform: "rotateY(-8deg) translateZ(-6px)" }} />
+                <div className={`absolute top-0 right-1/2 w-[240px] h-full border-y border-l rounded-l-[20px] origin-right ${isLight ? "bg-slate-100 border-slate-200/60" : "bg-[#06070a] border-white/5"
+                  }`} style={{ transform: "rotateY(-12deg) translateZ(-12px)" }} />
 
                 {/* Right Book Base / Pages Stack */}
-                <div className={`absolute top-0 left-1/2 w-[240px] h-full backdrop-blur-xl border-y border-r rounded-r-[20px] origin-left flex items-center justify-center overflow-hidden ${
-                  isLight ? "bg-white/90 border-slate-200 shadow-lg" : "bg-[#0b0c10]/90 border-white/10 shadow-2xl"
-                }`} style={{ transform: "rotateY(4deg)" }}>
+                <div className={`absolute top-0 left-1/2 w-[240px] h-full backdrop-blur-xl border-y border-r rounded-r-[20px] origin-left flex items-center justify-center overflow-hidden ${isLight ? "bg-white/90 border-slate-200 shadow-lg" : "bg-[#0b0c10]/90 border-white/10 shadow-2xl"
+                  }`} style={{ transform: "rotateY(4deg)" }}>
                   <div className={`w-[140%] h-[140%] absolute border rounded-full ${isLight ? "border-indigo-500/10" : "border-indigo-500/5"}`} style={{ transform: "translate(20%, -10%)" }} />
                 </div>
-                <div className={`absolute top-0 left-1/2 w-[240px] h-full border-y border-r rounded-r-[20px] origin-left ${
-                  isLight ? "bg-slate-50/90 border-slate-200/60" : "bg-[#08090d]/90 border-white/5"
-                }`} style={{ transform: "rotateY(8deg) translateZ(-6px)" }} />
-                <div className={`absolute top-0 left-1/2 w-[240px] h-full border-y border-r rounded-r-[20px] origin-left ${
-                  isLight ? "bg-slate-100 border-slate-200/60" : "bg-[#06070a] border-white/5"
-                }`} style={{ transform: "rotateY(12deg) translateZ(-12px)" }} />
+                <div className={`absolute top-0 left-1/2 w-[240px] h-full border-y border-r rounded-r-[20px] origin-left ${isLight ? "bg-slate-50/90 border-slate-200/60" : "bg-[#08090d]/90 border-white/5"
+                  }`} style={{ transform: "rotateY(8deg) translateZ(-6px)" }} />
+                <div className={`absolute top-0 left-1/2 w-[240px] h-full border-y border-r rounded-r-[20px] origin-left ${isLight ? "bg-slate-100 border-slate-200/60" : "bg-[#06070a] border-white/5"
+                  }`} style={{ transform: "rotateY(12deg) translateZ(-12px)" }} />
 
                 {/* Book Spine Shadow / Light Effect */}
-                <div className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-5 bg-gradient-to-r blur-[2px] z-10 ${
-                  isLight ? "from-transparent via-slate-400/20 to-transparent" : "from-transparent via-white/15 to-transparent"
-                }`} />
+                <div className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-5 bg-gradient-to-r blur-[2px] z-10 ${isLight ? "from-transparent via-slate-400/20 to-transparent" : "from-transparent via-white/15 to-transparent"
+                  }`} />
                 <div className="absolute top-[-10px] bottom-[-10px] left-1/2 -translate-x-1/2 w-8 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent rounded-[50%] blur-lg z-10" />
 
                 {/* Animated Flipping Holographic Pages */}
                 {[0, 1, 2, 3].map((i) => (
                   <motion.div
                     key={i}
-                    className={`absolute top-0 left-1/2 w-[240px] h-full origin-left overflow-hidden flex flex-col justify-between p-6 rounded-r-[20px] border-y border-r ${
-                      isLight ? "border-indigo-400/30" : "border-indigo-500/30"
-                    }`}
+                    className={`absolute top-0 left-1/2 w-[240px] h-full origin-left overflow-hidden flex flex-col justify-between p-6 rounded-r-[20px] border-y border-r ${isLight ? "border-indigo-400/30" : "border-indigo-500/30"
+                      }`}
                     style={{
                       background: isLight
                         ? "linear-gradient(to right, rgba(99,102,241,0.1), rgba(139,92,246,0.03))"
@@ -428,9 +414,8 @@ export default function Page() {
                   >
                     {/* Glowing Symbol / Icon on Page */}
                     <div className="flex items-center justify-between">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                        isLight ? "bg-white/90 border-indigo-200 text-indigo-600 shadow-sm" : "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
-                      }`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${isLight ? "bg-white/90 border-indigo-200 text-indigo-600 shadow-sm" : "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
+                        }`}>
                         {i % 2 === 0 ? <Sparkles /> : <Zap />}
                       </div>
                       <span className="text-[10px] font-mono text-indigo-400 font-medium">PAGE 0{i + 1}</span>
@@ -448,9 +433,8 @@ export default function Page() {
                       <div className={`h-2 w-5/6 rounded-full ${isLight ? "bg-indigo-200/40" : "bg-indigo-300/15"}`} />
                       <div className={`h-2 w-4/6 rounded-full ${isLight ? "bg-indigo-200/30" : "bg-indigo-300/10"}`} />
 
-                      <div className={`mt-4 p-3 rounded-lg border text-[11px] font-serif leading-snug italic ${
-                        isLight ? "border-indigo-200/60 bg-indigo-50/50 text-indigo-900" : "border-indigo-500/20 bg-indigo-500/10 text-indigo-200"
-                      }`}>
+                      <div className={`mt-4 p-3 rounded-lg border text-[11px] font-serif leading-snug italic ${isLight ? "border-indigo-200/60 bg-indigo-50/50 text-indigo-900" : "border-indigo-500/20 bg-indigo-500/10 text-indigo-200"
+                        }`}>
                         "Chapter {i + 1}: The sequence began to unfold..."
                       </div>
                     </div>
@@ -479,9 +463,8 @@ export default function Page() {
             >
               <div className={`pl-6 sm:pl-10 border-l-2 py-4 relative ${isLight ? "border-slate-300" : "border-white/10"}`}>
                 <div className="mb-4 flex items-center gap-3">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider uppercase border ${
-                    isLight ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-indigo-500/10 border-indigo-500/20 text-indigo-300"
-                  }`}>Chapter 1</span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider uppercase border ${isLight ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-indigo-500/10 border-indigo-500/20 text-indigo-300"
+                    }`}>Chapter 1</span>
                   <span className={`text-xs mono ${isLight ? "text-slate-400" : "text-slate-500"}`}>Live Manuscript Preview</span>
                 </div>
 
@@ -503,9 +486,8 @@ export default function Page() {
 
             {/* Sidebar Floating Cards */}
             <div className="hidden lg:block w-2/5 pl-10 space-y-4">
-              <div className={`p-4 rounded-xl border backdrop-blur-md ${
-                isLight ? "bg-white/90 border-slate-200 text-slate-800 shadow-sm" : "bg-[#0b0c10]/90 border-white/10 text-slate-200"
-              }`}>
+              <div className={`p-4 rounded-xl border backdrop-blur-md ${isLight ? "bg-white/90 border-slate-200 text-slate-800 shadow-sm" : "bg-[#0b0c10]/90 border-white/10 text-slate-200"
+                }`}>
                 <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-amber-400 uppercase tracking-wider">
                   <Users /> Character Entity
                 </div>
@@ -513,9 +495,8 @@ export default function Page() {
                 <div className="text-xs text-slate-400 leading-relaxed">Rogue archivist decoding legacy sequences of the old world.</div>
               </div>
 
-              <div className={`p-4 rounded-xl border backdrop-blur-md ${
-                isLight ? "bg-white/90 border-slate-200 text-slate-800 shadow-sm" : "bg-[#0b0c10]/90 border-white/10 text-slate-200"
-              }`}>
+              <div className={`p-4 rounded-xl border backdrop-blur-md ${isLight ? "bg-white/90 border-slate-200 text-slate-800 shadow-sm" : "bg-[#0b0c10]/90 border-white/10 text-slate-200"
+                }`}>
                 <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-sky-400 uppercase tracking-wider">
                   <Zap /> Story Artifact
                 </div>
@@ -546,7 +527,7 @@ export default function Page() {
 
           {/* 6 Grid Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
+
             {/* 1. AI Outline Generator */}
             <FeatureCard
               delay={0}
@@ -684,11 +665,10 @@ export default function Page() {
           <div className={`hidden lg:block absolute left-[40px] top-[80px] w-3.5 h-3.5 rounded-full border-2 bg-indigo-600 transform -translate-x-1/2 z-20 ${isLight ? "border-slate-100" : "border-[#06070a]"}`} />
 
           <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative max-w-5xl mx-auto rounded-3xl p-[1px] overflow-hidden shadow-2xl">
-            <div className={`rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 backdrop-blur-xl border ${
-              isLight
+            <div className={`rounded-3xl p-8 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 backdrop-blur-xl border ${isLight
                 ? "bg-white/90 border-slate-200 shadow-xl"
                 : "bg-[#0b0c10]/90 border-white/10 shadow-black"
-            }`}>
+              }`}>
               <div className="relative z-10 text-center md:text-left flex-1">
                 <h2 className={`text-2xl md:text-4xl font-extrabold mb-3 outfit tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>
                   Your universe awaits.
@@ -708,9 +688,8 @@ export default function Page() {
         </section>
 
         {/* ── FOOTER ── */}
-        <footer className={`max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-10 mt-8 border-t text-xs transition-colors ${
-          isLight ? "border-slate-200 text-slate-500" : "border-white/10 text-slate-400"
-        }`}>
+        <footer className={`max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-10 mt-8 border-t text-xs transition-colors ${isLight ? "border-slate-200 text-slate-500" : "border-white/10 text-slate-400"
+          }`}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2.5">
               <div className="w-5 h-5 rounded bg-indigo-600 flex items-center justify-center font-bold text-[10px] text-white">N</div>
