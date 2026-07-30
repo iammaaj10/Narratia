@@ -697,10 +697,10 @@ export default function Page() {
             </div>
 
             <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-indigo-400 transition-colors">Terms</a>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Privacy</a>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Docs</a>
-              <a href="#" className="hover:text-indigo-400 transition-colors">Contact</a>
+              <a href="/terms" className="hover:text-indigo-400 transition-colors">Terms</a>
+              <a href="/privacy" className="hover:text-indigo-400 transition-colors">Privacy</a>
+              <a href="/docs" className="hover:text-indigo-400 transition-colors">Docs</a>
+              <a href="/contact" className="hover:text-indigo-400 transition-colors">Contact</a>
             </div>
 
             <div>
