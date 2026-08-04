@@ -52,13 +52,13 @@ export interface DirectMessage {
 
 export async function fetchCreatorProfile(username: string, currentUserId?: string): Promise<CreatorProfile | null> {
   try {
-    const { data: profile, error } = await supabase
+    const { data: profile } = await supabase
       .from("profiles")
       .select("*")
-      .eq("username", username)
-      .single();
+      .ilike("username", username)
+      .maybeSingle();
 
-    if (error || !profile) return null;
+    if (!profile) return null;
 
     // Fetch follower and following counts
     let followers_count = 0;
@@ -224,12 +224,13 @@ export async function updateCollabStatus(requestId: string, status: "accepted" |
     if (error) throw error;
 
     if (status === "accepted") {
-      // Add user to project_collaborators
+      // Add user to project_members
       try {
-        await supabase.from("project_collaborators").insert({
+        await supabase.from("project_members").insert({
           project_id: projectId,
           user_id: senderId,
           role: "editor",
+          status: "accepted",
         });
       } catch {
         // Table fallback

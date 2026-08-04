@@ -51,18 +51,28 @@ export default function PublicStoryPage() {
 
 
 
-      // Fetch public project - simpler query first
-      const { data: projectData, error: projectError } = await supabase
+      // Fetch public project - search by slug or ID
+      let { data: projectData } = await supabase
         .from("projects")
         .select("*")
         .eq("slug", slug)
         .eq("is_public", true)
-        .single();
+        .maybeSingle();
+
+      if (!projectData) {
+        const { data: idProject } = await supabase
+          .from("projects")
+          .select("*")
+          .eq("id", slug)
+          .eq("is_public", true)
+          .maybeSingle();
+        projectData = idProject;
+      }
 
 
 
-      if (projectError || !projectData) {
-        console.error(" Project not found");
+      if (!projectData) {
+        console.error("Project not found");
         setNotFound(true);
         setLoading(false);
         return;

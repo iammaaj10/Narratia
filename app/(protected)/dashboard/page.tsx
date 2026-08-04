@@ -16,7 +16,8 @@ import {
   User,
   Clock,
   MoreVertical,
-  BookOpen
+  BookOpen,
+  Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,6 +28,8 @@ type Project = {
   is_team: boolean;
   owner_id: string;
   archived: boolean;
+  is_public: boolean;
+  slug: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -70,7 +73,7 @@ export default function DashboardPage() {
     const { data: ownedProjects } = await supabase
       .from("projects")
       .select(
-        "id, title, description, is_team, owner_id, archived, created_at, updated_at"
+        "id, title, description, is_team, owner_id, archived, is_public, slug, created_at, updated_at"
       )
       .eq("owner_id", user.id);
 
@@ -86,6 +89,8 @@ export default function DashboardPage() {
           is_team,
           owner_id,
           archived,
+          is_public,
+          slug,
           created_at,
           updated_at
         )
@@ -207,6 +212,34 @@ export default function DashboardPage() {
 
     setProjects(projects.filter((p) => p.id !== projectId));
     // No alert needed for premium UI, just visual update
+  };
+
+  const togglePublish = async (projectId: string, currentPublic: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextState = !currentPublic;
+    const project = projects.find((p) => p.id === projectId);
+    let finalSlug = project?.slug;
+
+    if (nextState && !finalSlug && project) {
+      finalSlug = project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") || projectId;
+    }
+
+    const { error } = await supabase
+      .from("projects")
+      .update({ is_public: nextState, slug: nextState ? finalSlug : project?.slug })
+      .eq("id", projectId);
+
+    if (error) {
+      console.error("❌ Failed to update publish status:", error);
+      alert(`Failed to update status in database: ${error.message}`);
+      return;
+    }
+
+    setProjects(
+      projects.map((p) =>
+        p.id === projectId ? { ...p, is_public: nextState, slug: finalSlug ?? null } : p
+      )
+    );
   };
 
   if (loading) {
@@ -415,6 +448,13 @@ export default function DashboardPage() {
                       {project.is_team ? <Users className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
                       {project.is_team ? "Team" : "Solo"}
                     </span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider ${project.is_public
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20"
+                        : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20"
+                      }`}>
+                      <Globe className="w-3.5 h-3.5" />
+                      {project.is_public ? "Public" : "Private"}
+                    </span>
                     {isOwner && project.is_team && (
                       <span className="inline-flex items-center px-3 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
                         Owner
@@ -424,6 +464,17 @@ export default function DashboardPage() {
 
                   {isOwner && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-black/60 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/10 shadow-md">
+                      <button
+                        onClick={(e) => togglePublish(project.id, project.is_public, e)}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          project.is_public
+                            ? "text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/10"
+                            : "text-slate-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-300 hover:bg-emerald-500/10"
+                        }`}
+                        title={project.is_public ? "Unpublish from Community" : "🚀 Publish to Community"}
+                      >
+                        <Globe className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={(e) => toggleArchive(project.id, project.archived, e)}
                         className="p-1.5 rounded-lg text-slate-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-300 hover:bg-orange-500/10 transition-all"

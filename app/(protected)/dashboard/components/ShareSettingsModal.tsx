@@ -53,8 +53,8 @@ export default function ShareSettingsModal({
       .eq("id", projectId);
 
     if (error) {
-      console.error("❌ Error updating:", error);
-      alert("Failed to update settings");
+      console.error("❌ Error updating share settings:", error);
+      alert(`Failed to update settings in database: ${error.message}`);
       setLoading(false);
       return;
     }

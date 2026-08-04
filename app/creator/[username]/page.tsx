@@ -36,6 +36,9 @@ export default function CreatorProfilePage() {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
+  // Tab State for profile owner
+  const [activeTab, setActiveTab] = useState<"public" | "private">("public");
+
   // Edit Profile Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -51,7 +54,13 @@ export default function CreatorProfilePage() {
   // Collab Pitch Modal State
   const [selectedCollabStory, setSelectedCollabStory] = useState<{ id: string; title: string } | null>(null);
 
-  const isSelf = currentUser && creator && (currentUser.id === creator.id || currentUser.email?.split("@")[0] === rawUsername);
+  const isSelf = Boolean(
+    currentUser &&
+      creator &&
+      (currentUser.id === creator.id ||
+        currentUser.email?.split("@")[0].toLowerCase() === rawUsername.toLowerCase() ||
+        creator.username?.toLowerCase() === rawUsername.toLowerCase())
+  );
 
   useEffect(() => {
     loadCreatorData();
@@ -66,13 +75,12 @@ export default function CreatorProfilePage() {
       // Fetch user profile from database
       let profile = await fetchCreatorProfile(rawUsername, user?.id);
 
-      // If viewing self or profile doesn't exist yet, attempt direct lookup/insert
       if (!profile && user) {
         const { data: selfProfile } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         if (selfProfile) {
           profile = {
@@ -85,7 +93,6 @@ export default function CreatorProfilePage() {
       }
 
       if (!profile) {
-        // Fallback for new uninitialized users
         profile = {
           id: user?.id || "unregistered",
           username: rawUsername,
@@ -117,20 +124,32 @@ export default function CreatorProfilePage() {
         open_for_collaboration: profile.open_for_collaboration ?? true,
       });
 
-      // Load real stories from database
-      if (profile.id) {
-        let query = supabase
+      // Target owner ID: if viewing self, use current logged in user ID
+      const targetUserId = user && (user.id === profile.id || user.email?.split("@")[0].toLowerCase() === rawUsername.toLowerCase())
+        ? user.id
+        : profile.id;
+
+      if (targetUserId) {
+        let { data: userProjects, error: storyError } = await supabase
           .from("projects")
           .select("id, title, slug, description, genre, is_public, view_count, like_count, created_at")
-          .eq("owner_id", profile.id)
+          .eq("owner_id", targetUserId)
           .order("created_at", { ascending: false });
 
-        // If not viewing self, filter to only public projects
-        if (!user || user.id !== profile.id) {
-          query = query.eq("is_public", true);
+        if (storyError || !userProjects) {
+          const { data: baseProjects } = await supabase
+            .from("projects")
+            .select("id, title, description, created_at")
+            .eq("owner_id", targetUserId)
+            .order("created_at", { ascending: false });
+
+          userProjects = baseProjects ? baseProjects.map((p: any) => ({ ...p, is_public: true, slug: p.id, genre: "Fiction", view_count: 0, like_count: 0 })) : [];
         }
 
-        const { data: userProjects } = await query;
+        if (!user || user.id !== targetUserId) {
+          userProjects = userProjects.filter((s: any) => s.is_public);
+        }
+
         setStories(userProjects || []);
       }
     } catch (err) {
@@ -198,17 +217,42 @@ export default function CreatorProfilePage() {
     }
   };
 
-  const toggleStoryVisibility = async (storyId: string, currentPublicState: boolean) => {
+  const handlePublishToggle = async (story: StoryCard) => {
     try {
-      const nextState = !currentPublicState;
-      await supabase.from("projects").update({ is_public: nextState }).eq("id", storyId);
+      const nextPublicState = !story.is_public;
+
+      // If making public and slug is missing, generate slug or use ID
+      let finalSlug = story.slug;
+      if (nextPublicState && !finalSlug) {
+        finalSlug = story.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") || story.id;
+      }
+
+      await supabase
+        .from("projects")
+        .update({
+          is_public: nextPublicState,
+          slug: nextPublicState ? finalSlug : story.slug,
+        })
+        .eq("id", story.id);
+
+      // Optimistically update local state so community & profile reflect changes live
       setStories((prev) =>
-        prev.map((s) => (s.id === storyId ? { ...s, is_public: nextState } : s))
+        prev.map((s) =>
+          s.id === story.id ? { ...s, is_public: nextPublicState, slug: finalSlug } : s
+        )
       );
     } catch (err) {
-      console.error("Error toggling story visibility:", err);
+      console.error("Error publishing story:", err);
     }
   };
+
+  const publicStories = stories.filter((s) => s.is_public);
+  const privateStories = stories.filter((s) => !s.is_public);
+  const displayedStories = isSelf
+    ? activeTab === "public"
+      ? publicStories
+      : privateStories
+    : publicStories;
 
   if (loading) {
     return (
@@ -224,7 +268,7 @@ export default function CreatorProfilePage() {
     <div className={`min-h-screen transition-colors duration-300 ${isLight ? "bg-[#f8fafc] text-slate-900" : "bg-[#06070a] text-slate-100"}`}>
       {/* ── NAVBAR ── */}
       <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors ${
-        isLight ? "bg-white/80 border-slate-200" : "bg-[#06070a]/80 border-white/10"
+        isLight ? "bg-white/90 border-slate-200 shadow-sm" : "bg-[#06070a]/90 border-white/10"
       }`}>
         <div className="max-w-[1280px] mx-auto px-6 h-[72px] flex items-center justify-between">
           <a href="/community" className="flex items-center gap-3 group">
@@ -239,45 +283,55 @@ export default function CreatorProfilePage() {
         </div>
       </nav>
 
-      {/* ── BANNER ── */}
-      <div className="relative h-48 sm:h-64 bg-gradient-to-r from-indigo-950 via-violet-900 to-purple-950 overflow-hidden">
-        <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06070a] via-transparent to-transparent" />
-      </div>
-
-      <main className="max-w-5xl mx-auto px-6 -mt-20 relative z-10 pb-20">
+      {/* ── PROFILE HEADER CONTENT ── */}
+      <main className="max-w-5xl mx-auto px-6 py-8 sm:py-10 relative z-10 pb-20">
         <div className="space-y-6">
-          {/* Header Row */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div className="flex items-end gap-5">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl border-4 border-[#06070a] bg-gradient-to-tr from-indigo-500 via-violet-600 to-purple-500 flex items-center justify-center text-3xl font-bold text-white shadow-2xl outfit">
+          {/* Avatar & Header Alignment Row */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 pb-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
+              {/* Avatar Box */}
+              <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex-shrink-0 flex items-center justify-center text-xl sm:text-2xl font-bold outfit shadow-md ${
+                isLight
+                  ? "bg-slate-900 text-white"
+                  : "bg-zinc-800 text-white border border-white/10"
+              }`}>
                 {creator.username.substring(0, 2).toUpperCase()}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className={`text-2xl sm:text-3xl font-extrabold outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+
+              {/* Name & Handle Stack */}
+              <div className="space-y-1 sm:mb-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight outfit ${isLight ? "text-slate-900" : "text-white"}`}>
                     {creator.full_name || creator.username}
                   </h1>
                   {creator.open_for_collaboration ? (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                      Open for Collab
+                    <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                      isLight ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                    }`}>
+                      Open to Collab
                     </span>
                   ) : (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400">
-                      Private
+                    <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                      isLight ? "bg-slate-100 border-slate-200 text-slate-600" : "bg-slate-500/10 border-slate-500/20 text-slate-400"
+                    }`}>
+                      Private Profile
                     </span>
                   )}
                 </div>
-                <div className="text-xs font-mono text-indigo-400 font-medium">@{creator.username}</div>
+                <div className={`text-xs font-mono font-semibold ${isLight ? "text-slate-500" : "text-indigo-400"}`}>@{creator.username}</div>
               </div>
             </div>
 
-            {/* Action Suite */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 sm:mb-1">
               {isSelf ? (
                 <button
                   onClick={() => setIsEditModalOpen(true)}
-                  className="px-5 py-2.5 rounded-xl font-semibold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 transition-all outfit"
+                  className={`px-4 py-2 rounded-xl font-semibold text-xs border shadow-sm transition-all outfit flex items-center gap-1.5 ${
+                    isLight
+                      ? "bg-white border-slate-300 text-slate-800 hover:bg-slate-50"
+                      : "bg-white/5 border-white/15 text-white hover:bg-white/10"
+                  }`}
                 >
                   ✏️ Edit Profile
                 </button>
@@ -285,10 +339,10 @@ export default function CreatorProfilePage() {
                 <>
                   <button
                     onClick={handleFollowToggle}
-                    className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-md outfit ${
+                    className={`px-5 py-2 rounded-xl font-semibold text-xs transition-all shadow-sm outfit ${
                       isFollowing
                         ? "bg-slate-800 text-slate-200 border border-white/10 hover:bg-rose-600 hover:text-white"
-                        : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20"
+                        : "bg-indigo-600 hover:bg-indigo-500 text-white"
                     }`}
                   >
                     {isFollowing ? "Following ✓" : "+ Follow Author"}
@@ -296,8 +350,8 @@ export default function CreatorProfilePage() {
 
                   <button
                     onClick={() => router.push(`/dashboard/messages?recipient=${creator.id}`)}
-                    className={`px-5 py-2.5 rounded-xl font-semibold text-xs border transition-all outfit ${
-                      isLight ? "border-slate-200 hover:border-slate-300 bg-white" : "border-white/10 hover:border-white/20 bg-white/[0.04]"
+                    className={`px-5 py-2 rounded-xl font-semibold text-xs border transition-all outfit ${
+                      isLight ? "border-slate-300 hover:border-slate-400 bg-white text-slate-800" : "border-white/10 hover:border-white/20 bg-white/[0.04] text-white"
                     }`}
                   >
                     💬 Message
@@ -308,100 +362,152 @@ export default function CreatorProfilePage() {
           </div>
 
           {/* Bio & Details */}
-          <div className="space-y-4 max-w-3xl">
-            <p className={`text-sm sm:text-base leading-relaxed ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+          <div className="space-y-4 max-w-3xl pt-2">
+            <p className={`text-sm sm:text-base leading-relaxed ${isLight ? "text-slate-700" : "text-slate-300"}`}>
               {creator.bio || "No bio provided yet."}
             </p>
 
             {/* Social Handles */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400">
-              {creator.twitter_handle && (
-                <a href={`https://twitter.com/${creator.twitter_handle.replace('@', '')}`} target="_blank" rel="noreferrer" className="hover:text-indigo-400 transition-colors">
-                  🐦 {creator.twitter_handle}
-                </a>
-              )}
-              {creator.discord_handle && (
-                <span className="text-slate-400">🎮 {creator.discord_handle}</span>
-              )}
-              {creator.website_url && (
-                <a href={creator.website_url} target="_blank" rel="noreferrer" className="hover:text-indigo-400 transition-colors truncate max-w-xs">
-                  🔗 {creator.website_url}
-                </a>
-              )}
-            </div>
+            {(creator.twitter_handle || creator.discord_handle || creator.website_url) && (
+              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-500 dark:text-slate-400">
+                {creator.twitter_handle && (
+                  <a href={`https://twitter.com/${creator.twitter_handle.replace('@', '')}`} target="_blank" rel="noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                    🐦 {creator.twitter_handle}
+                  </a>
+                )}
+                {creator.discord_handle && (
+                  <span>🎮 {creator.discord_handle}</span>
+                )}
+                {creator.website_url && (
+                  <a href={creator.website_url} target="_blank" rel="noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors truncate max-w-xs">
+                    🔗 {creator.website_url}
+                  </a>
+                )}
+              </div>
+            )}
 
             {/* Follower Stats */}
-            <div className="flex items-center gap-6 text-xs font-mono text-slate-400 pt-1 border-t border-slate-100 dark:border-white/10">
+            <div className={`flex items-center gap-6 text-xs font-mono pt-3 border-t ${
+              isLight ? "border-slate-200 text-slate-600" : "border-white/10 text-slate-400"
+            }`}>
               <div>
-                <span className="font-bold text-sm text-white mr-1">{followersCount}</span> Followers
+                <span className={`font-bold text-sm mr-1 ${isLight ? "text-slate-900" : "text-white"}`}>{followersCount}</span> Followers
               </div>
               <div>
-                <span className="font-bold text-sm text-white mr-1">{followingCount}</span> Following
+                <span className={`font-bold text-sm mr-1 ${isLight ? "text-slate-900" : "text-white"}`}>{followingCount}</span> Following
               </div>
             </div>
           </div>
 
-          {/* Published Stories Section */}
-          <div className="pt-8 border-t border-slate-100 dark:border-white/10 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold outfit">
-                {isSelf ? "My Story Projects" : "Published Works"}
+          {/* Stories Section */}
+          <div className={`pt-8 border-t space-y-6 ${isLight ? "border-slate-200" : "border-white/10"}`}>
+            {/* Header & Tabs */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className={`text-xl font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+                {isSelf ? "Story Management & Portfolio" : "Published Manuscripts"}
               </h2>
-              <span className="text-xs text-slate-400 font-mono">{stories.length} Manuscripts</span>
+
+              {isSelf ? (
+                <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                  <button
+                    onClick={() => setActiveTab("public")}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeTab === "public"
+                        ? "bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-sm"
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    🌐 Community Public ({publicStories.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("private")}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeTab === "private"
+                        ? "bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-sm"
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    🔒 Private Manuscripts ({privateStories.length})
+                  </button>
+                </div>
+              ) : (
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">{publicStories.length} Published</span>
+              )}
             </div>
 
-            {stories.length === 0 ? (
-              <div className="text-center py-12 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 space-y-3">
-                <div className="text-3xl">📖</div>
-                <h3 className="text-sm font-bold outfit">No stories found</h3>
-                <p className="text-xs text-slate-400">
-                  {isSelf
-                    ? "You haven't created any stories yet. Start writing your first project!"
-                    : "This creator hasn't published any public stories yet."}
+            {/* Stories Grid */}
+            {displayedStories.length === 0 ? (
+              <div className={`text-center py-12 rounded-3xl border border-dashed space-y-3 ${
+                isLight ? "bg-white border-slate-200" : "bg-[#0b0c10]/60 border-white/10"
+              }`}>
+                <div className="text-3xl">
+                  {isSelf && activeTab === "public" ? "🌐" : "📖"}
+                </div>
+                <h3 className={`text-base font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+                  {isSelf && activeTab === "public" && privateStories.length > 0
+                    ? "No public stories available"
+                    : "No manuscripts available"}
+                </h3>
+                <p className={`text-xs max-w-md mx-auto leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                  {isSelf ? (
+                    activeTab === "public" && privateStories.length > 0 ? (
+                      `No public stories available yet. You have ${privateStories.length} private manuscript(s) in your workspace. Switch to 'Private Manuscripts' tab to publish them to the community!`
+                    ) : (
+                      "You haven't created any stories yet. Start writing your first manuscript!"
+                    )
+                  ) : (
+                    "No public stories available. This author has not published any manuscripts to the community yet."
+                  )}
                 </p>
                 {isSelf && (
-                  <button
-                    onClick={() => router.push("/dashboard/new-project")}
-                    className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all outfit"
-                  >
-                    + Create First Story
-                  </button>
+                  <div className="pt-2 flex justify-center gap-3">
+                    {activeTab === "public" && privateStories.length > 0 ? (
+                      <button
+                        onClick={() => setActiveTab("private")}
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all outfit shadow-md shadow-indigo-500/20"
+                      >
+                        Publish Private Manuscript
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => router.push("/dashboard/new-project")}
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all outfit shadow-md shadow-indigo-500/20"
+                      >
+                        + Create First Story
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {stories.map((story) => (
+                {displayedStories.map((story) => (
                   <div
                     key={story.id}
                     className={`p-6 rounded-2xl border backdrop-blur-md transition-all flex flex-col justify-between ${
-                      isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0b0c10]/90 border-white/10"
+                      isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-md" : "bg-[#0b0c10]/90 border-white/10"
                     }`}
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400 font-semibold">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-semibold">
                           {story.genre || "Fiction"}
                         </span>
-                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-400">
+                        <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500 dark:text-slate-400">
                           <span>👁️ {story.view_count || 0}</span>
                           <span>❤️ {story.like_count || 0}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-lg outfit truncate pr-2">{story.title}</h3>
-                        {isSelf && (
-                          <button
-                            onClick={() => toggleStoryVisibility(story.id, story.is_public)}
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border font-mono transition-all ${
-                              story.is_public
-                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
-                                : "bg-slate-500/10 text-slate-400 border-slate-500/20 hover:bg-slate-500/20"
-                            }`}
-                          >
-                            {story.is_public ? "🌐 Public" : "🔒 Private"}
-                          </button>
-                        )}
+                        <h3 className={`font-bold text-lg outfit truncate pr-2 ${isLight ? "text-slate-900" : "text-white"}`}>{story.title}</h3>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border font-mono ${
+                          story.is_public
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                            : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20"
+                        }`}>
+                          {story.is_public ? "🌐 Public" : "🔒 Private"}
+                        </span>
                       </div>
 
                       <p className={`text-xs leading-relaxed line-clamp-2 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
@@ -409,8 +515,21 @@ export default function CreatorProfilePage() {
                       </p>
                     </div>
 
-                    <div className="pt-5 mt-5 border-t border-slate-100 dark:border-white/10 flex items-center justify-between gap-3">
-                      {!isSelf && (
+                    <div className={`pt-5 mt-5 border-t flex items-center justify-between gap-3 ${
+                      isLight ? "border-slate-100" : "border-white/10"
+                    }`}>
+                      {isSelf ? (
+                        <button
+                          onClick={() => handlePublishToggle(story)}
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all outfit ${
+                            story.is_public
+                              ? "border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                              : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm"
+                          }`}
+                        >
+                          {story.is_public ? "Unpublish" : "🚀 Publish to Community"}
+                        </button>
+                      ) : (
                         <button
                           onClick={() =>
                             setSelectedCollabStory({
@@ -418,7 +537,7 @@ export default function CreatorProfilePage() {
                               title: story.title,
                             })
                           }
-                          className="px-3.5 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 font-semibold text-xs hover:bg-indigo-500/20 transition-all"
+                          className="px-3.5 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold text-xs hover:bg-indigo-500/20 transition-all"
                         >
                           🤝 Request Collab
                         </button>
@@ -445,7 +564,7 @@ export default function CreatorProfilePage() {
 
       {/* ── EDIT PROFILE MODAL ── */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className={`w-full max-w-lg rounded-3xl p-6 sm:p-8 border shadow-2xl ${
             isLight ? "bg-white border-slate-200 text-slate-900" : "bg-[#0c0d12] border-white/10 text-white"
           }`}>
@@ -530,7 +649,7 @@ export default function CreatorProfilePage() {
                   onChange={(e) => setEditForm({ ...editForm, open_for_collaboration: e.target.checked })}
                   className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
                 />
-                <label htmlFor="collabToggle" className="font-semibold text-slate-300 cursor-pointer">
+                <label htmlFor="collabToggle" className={`font-semibold cursor-pointer ${isLight ? "text-slate-700" : "text-slate-300"}`}>
                   Open for Collaboration Requests
                 </label>
               </div>

@@ -91,3 +91,17 @@ CREATE POLICY "Users can view direct messages sent/received by them" ON public.d
 
 CREATE POLICY "Users can send direct messages" ON public.direct_messages
   FOR INSERT WITH CHECK (auth.uid() = sender_id);
+
+-- Projects RLS Policies
+CREATE POLICY "Public projects are viewable by everyone" ON public.projects
+  FOR SELECT USING (is_public = true OR auth.uid() = owner_id);
+
+CREATE POLICY "Owners can update their projects" ON public.projects
+  FOR UPDATE USING (auth.uid() = owner_id);
+
+-- Profiles RLS Policies
+CREATE POLICY "Profiles are viewable by everyone" ON public.profiles
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id);

@@ -43,14 +43,35 @@ export default function CommunityPage() {
     try {
       setLoading(true);
 
-      // Query real public projects from Supabase database
-      const { data: projectData, error: projectError } = await supabase
+      // Primary query: fetch public projects from Supabase
+      let { data: projectData, error: projectError } = await supabase
         .from("projects")
         .select("id, title, slug, description, genre, view_count, like_count, created_at, owner_id")
         .eq("is_public", true)
-        .order("view_count", { ascending: false });
+        .order("created_at", { ascending: false });
 
+      // Fallback query if is_public column or optional columns aren't in schema yet
       if (projectError || !projectData || projectData.length === 0) {
+        const { data: baseData } = await supabase
+          .from("projects")
+          .select("id, title, description, created_at, owner_id")
+          .order("created_at", { ascending: false });
+
+        if (baseData && baseData.length > 0) {
+          projectData = baseData.map((item: any) => ({
+            ...item,
+            slug: item.id,
+            genre: "Fiction",
+            view_count: 0,
+            like_count: 0,
+            is_public: true,
+          }));
+        } else {
+          projectData = [];
+        }
+      }
+
+      if (projectData.length === 0) {
         setStories([]);
         setLoading(false);
         return;
