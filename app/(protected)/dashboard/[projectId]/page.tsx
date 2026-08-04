@@ -238,10 +238,10 @@ export default function ProjectDetailPage() {
             {isOwner && (
               <button
                 onClick={() => setShowShareSettings(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-800 dark:text-white shadow-sm transition-all group"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-sm font-semibold text-white shadow-md shadow-emerald-500/25 transition-all group outfit"
               >
-                <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
-                Share
+                <Share2 className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform" />
+                {project.is_public ? "Manage Community Link 🌐" : "Publish to Community 🌐"}
               </button>
             )}
 

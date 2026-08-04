@@ -8,7 +8,7 @@ import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
 import ThemeToggle from "@/components/ThemeToggle";
 import Link from "next/link";
-import { BarChart3, Menu, X, BookOpen, PlusCircle, LogOut } from "lucide-react";
+import { BarChart3, Menu, X, BookOpen, PlusCircle, LogOut, Compass, MessageSquare, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Profile = {
@@ -100,6 +100,8 @@ export default function DashboardLayout({
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BookOpen, path: "/dashboard" },
     { id: "new-project", label: "Create Story", icon: PlusCircle, path: "/dashboard/new-project" },
+    { id: "community", label: "Explore Community", icon: Compass, path: "/community" },
+    { id: "messages", label: "Messages", icon: MessageSquare, path: "/dashboard/messages" },
     { id: "stats", label: "Statistics", icon: BarChart3, path: "/dashboard/stats" },
   ];
 
@@ -107,6 +109,8 @@ export default function DashboardLayout({
   const getActiveId = () => {
     if (pathname === "/dashboard") return "dashboard";
     if (pathname.startsWith("/dashboard/new-project")) return "new-project";
+    if (pathname.startsWith("/community") || pathname.startsWith("/creator")) return "community";
+    if (pathname.startsWith("/dashboard/messages")) return "messages";
     if (pathname.startsWith("/dashboard/stats")) return "stats";
     return "";
   };
@@ -215,6 +219,14 @@ export default function DashboardLayout({
 
             {profile && (
               <>
+                <button
+                  onClick={() => router.push(`/creator/${profile.username}`)}
+                  title="View Public Profile"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all outline-none"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span className="hidden xl:block">My Profile</span>
+                </button>
                 <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
                 <NotificationBell />
                 <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
