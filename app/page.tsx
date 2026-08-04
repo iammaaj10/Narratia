@@ -212,6 +212,14 @@ export default function Page() {
   const isLight = theme === "light";
   const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const socialScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollSocial = (direction: "left" | "right") => {
+    if (socialScrollRef.current) {
+      const scrollAmount = direction === "left" ? -320 : 320;
+      socialScrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY);
@@ -507,7 +515,9 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ── FEATURES GRID ── */}
+        {/* ══════════════════════════════════════════════════════════════
+             SECTION 1: CORE CREATION ENGINE — BENTO GRID
+             ══════════════════════════════════════════════════════════════ */}
         <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
           <div className={`hidden lg:block absolute left-[40px] top-[100px] w-3.5 h-3.5 rounded-full border-2 bg-violet-600 transform -translate-x-1/2 z-20 ${isLight ? "border-slate-100" : "border-[#06070a]"}`} />
 
@@ -521,22 +531,15 @@ export default function Page() {
               Everything you need to <span className="bg-gradient-to-r from-indigo-400 via-violet-300 to-purple-400 bg-clip-text text-transparent">tell your story.</span>
             </h2>
             <p className={`text-base sm:text-lg max-w-2xl leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-              Write, world-build, and focus with a unified suite of AI tools engineered specifically for authors, screenwriters, and narrative creators.
+              18 integrated tools for writing, world-building, collaboration, and publishing — engineered for modern storytellers.
             </p>
           </div>
 
-          {/* 6 Grid Cards */}
+          {/* ── BENTO GRID: 6 Core Creation Features ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             {/* 1. AI Outline Generator */}
-            <FeatureCard
-              delay={0}
-              badge="Beat Breakdown"
-              title="AI Outline Generator"
-              description="Instantly generate structured, beat-by-beat plot outlines, act breakdowns, and scene lists tailored to your story tone."
-              icon={<OutlineIcon />}
-              accentColor="indigo"
-            >
+            <FeatureCard delay={0} badge="Beat Breakdown" title="AI Outline Generator" description="Instantly generate structured, beat-by-beat plot outlines, act breakdowns, and scene lists tailored to your story tone." icon={<OutlineIcon />} accentColor="indigo">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-400">
                   <span className="font-mono text-[11px] text-indigo-400 font-medium">ACT I: THE HOOK</span>
@@ -553,31 +556,28 @@ export default function Page() {
               </div>
             </FeatureCard>
 
-            {/* 2. Screenplay Mode */}
-            <FeatureCard
-              delay={0.1}
-              badge="Industry Format"
-              title="Screenplay & Script Mode"
-              description="Professional screenplay formatting engine with automated character sluglines, dialogue shortcuts, and Final Draft ready export."
-              icon={<ScreenplayIcon />}
-              accentColor="violet"
-            >
+            {/* 2. Rich Text Editor */}
+            <FeatureCard delay={0.1} badge="Pro Editor" title="Rich Text Editor" description="Full WYSIWYG editor with slash commands, inline formatting, headings, code blocks, and real-time autosave to cloud." icon={<ScreenplayIcon />} accentColor="violet">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-1.5 font-mono text-[11px]">
-                <div className="text-slate-400 uppercase tracking-wider text-[10px]">EXT. NEON DOCKS - NIGHT</div>
-                <div className="text-violet-400 font-semibold pl-10 text-[10px]">KAEL</div>
-                <div className="text-slate-600 dark:text-slate-300 pl-5 border-l border-violet-500/30 text-[11px] leading-snug">"The key wasn't lost. It was hidden."</div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex gap-1">
+                    <div className="w-4 h-4 rounded bg-violet-500/15 border border-violet-500/20 flex items-center justify-center text-violet-400 text-[9px] font-bold">B</div>
+                    <div className="w-4 h-4 rounded bg-violet-500/15 border border-violet-500/20 flex items-center justify-center text-violet-400 text-[9px] italic">I</div>
+                    <div className="w-4 h-4 rounded bg-violet-500/15 border border-violet-500/20 flex items-center justify-center text-violet-400 text-[9px]">H</div>
+                  </div>
+                  <span className="text-slate-400 text-[10px]">Toolbar</span>
+                </div>
+                <div className="text-slate-600 dark:text-slate-300 text-[11px] leading-snug border-l-2 border-violet-500/30 pl-2">Type <span className="text-violet-400 font-semibold">/</span> for slash commands...</div>
+                <div className="flex gap-1 flex-wrap mt-1">
+                  <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">/heading</span>
+                  <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">/ai-write</span>
+                  <span className="px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">/quote</span>
+                </div>
               </div>
             </FeatureCard>
 
-            {/* 3. Writing Sprint Timer */}
-            <FeatureCard
-              delay={0.2}
-              badge="Real-time Analytics"
-              title="Writing Sprints & Velocity"
-              description="Crush word count goals with timed writing sprints, real-time velocity tracking, word per minute analytics, and daily streaks."
-              icon={<SprintIcon />}
-              accentColor="rose"
-            >
+            {/* 3. Writing Sprints */}
+            <FeatureCard delay={0.2} badge="Real-time Analytics" title="Writing Sprints & Velocity" description="Crush word count goals with timed writing sprints, real-time velocity tracking, word per minute analytics, and daily streaks." icon={<SprintIcon />} accentColor="rose">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 font-mono text-[11px]">SPRINT TIMER</span>
@@ -594,14 +594,7 @@ export default function Page() {
             </FeatureCard>
 
             {/* 4. Interactive Character AI */}
-            <FeatureCard
-              delay={0.3}
-              badge="Persona Engine"
-              title="Interactive Character AI"
-              description="Chat in real time with your fictional characters, uncover deep psychological motivations, and auto-map relationship webs."
-              icon={<CharacterIcon />}
-              accentColor="amber"
-            >
+            <FeatureCard delay={0.3} badge="Persona Engine" title="Interactive Character AI" description="Chat in real time with your fictional characters, uncover deep psychological motivations, and auto-map relationship webs." icon={<CharacterIcon />} accentColor="amber">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-2 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-[10px] font-bold text-black">KV</div>
@@ -614,14 +607,7 @@ export default function Page() {
             </FeatureCard>
 
             {/* 5. Auto Story Wiki */}
-            <FeatureCard
-              delay={0.4}
-              badge="RAG Lore Memory"
-              title="Auto Story Wiki"
-              description="Gemini engine automatically extracts Characters, Locations, and Items as you write, keeping a living lore database."
-              icon={<Book />}
-              accentColor="sky"
-            >
+            <FeatureCard delay={0.4} badge="RAG Lore Memory" title="Auto Story Wiki" description="Gemini engine automatically extracts Characters, Locations, and Items as you write, keeping a living lore database." icon={<Book />} accentColor="sky">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] flex flex-wrap gap-1.5 text-xs">
                 <span className="px-2 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 dark:text-indigo-300 text-[10px] flex items-center gap-1">
                   <span className="w-1 h-1 rounded-full bg-indigo-400" /> Kael Vance
@@ -636,14 +622,7 @@ export default function Page() {
             </FeatureCard>
 
             {/* 6. Zen 3D Focus Mode */}
-            <FeatureCard
-              delay={0.5}
-              badge="Distraction Free"
-              title="Zen 3D Focus Mode"
-              description="Interactive 3D particle environments (Cosmic, Snow, Ember) that react dynamically to your typing speed and mood."
-              icon={<Zap />}
-              accentColor="emerald"
-            >
+            <FeatureCard delay={0.5} badge="Distraction Free" title="Zen 3D Focus Mode" description="Interactive 3D particle environments (Cosmic, Snow, Ember) that react dynamically to your typing speed and mood." icon={<Zap />} accentColor="emerald">
               <div className="mt-2 p-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/[0.05] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 text-[11px] flex items-center gap-1.5">
@@ -656,7 +635,241 @@ export default function Page() {
                 </div>
               </div>
             </FeatureCard>
+          </div>
+        </section>
 
+        {/* ══════════════════════════════════════════════════════════════
+             SECTION 2: SOCIAL & CREATOR NETWORK — HORIZONTAL SCROLL ORBIT
+             ══════════════════════════════════════════════════════════════ */}
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
+          <div className={`hidden lg:block absolute left-[40px] top-[80px] w-3.5 h-3.5 rounded-full border-2 bg-pink-500 transform -translate-x-1/2 z-20 ${isLight ? "border-slate-100" : "border-[#06070a]"}`} />
+
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-400 text-xs font-semibold uppercase tracking-wider mb-4 outfit">
+                <Users /> Creator Network
+              </div>
+              <h2 className={`text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+                Write alone. <span className="bg-gradient-to-r from-pink-400 via-rose-300 to-amber-400 bg-clip-text text-transparent">Publish together.</span>
+              </h2>
+              <p className={`text-sm sm:text-base max-w-2xl leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+                A full social layer to discover stories, follow creators, pitch collaborations, and build your audience.
+              </p>
+            </div>
+
+            {/* Scroll Control Arrow Buttons */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => scrollSocial("left")}
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-sm transition-all hover:scale-105 active:scale-95 ${
+                  isLight
+                    ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+                    : "bg-white/10 border-white/10 text-white hover:bg-white/15 hover:border-white/20"
+                }`}
+                title="Scroll Left"
+                aria-label="Scroll Left"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => scrollSocial("right")}
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-sm transition-all hover:scale-105 active:scale-95 ${
+                  isLight
+                    ? "bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+                    : "bg-white/10 border-white/10 text-white hover:bg-white/15 hover:border-white/20"
+                }`}
+                title="Scroll Right"
+                aria-label="Scroll Right"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          {/* Horizontal scroll strip of social feature cards */}
+          <div className="relative -mx-6 px-6">
+            <div
+              ref={socialScrollRef}
+              className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+
+              {/* Community Discovery */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white text-xs">🌐</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Community Hub</div>
+                    <div className="text-[10px] text-slate-400 font-mono">/community</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Discover published manuscripts from the community, filter by genre, search by author, and explore trending stories.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 text-[9px] border border-pink-500/20">Genre Filters</span>
+                  <span className="px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 text-[9px] border border-pink-500/20">Search</span>
+                  <span className="px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400 text-[9px] border border-pink-500/20">Trending</span>
+                </div>
+              </motion.div>
+
+              {/* Creator Profiles */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xs">👤</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Creator Profiles</div>
+                    <div className="text-[10px] text-slate-400 font-mono">/creator/[username]</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Public portfolio with follower stats, social links, published manuscripts, and collaboration availability badges.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">Follow</span>
+                  <span className="px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">Edit Bio</span>
+                  <span className="px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 text-[9px] border border-violet-500/20">Portfolio</span>
+                </div>
+              </motion.div>
+
+              {/* Direct Messages */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-600 flex items-center justify-center text-white text-xs">💬</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Direct Messaging</div>
+                    <div className="text-[10px] text-slate-400 font-mono">/dashboard/messages</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Real-time chat with other writers. Contact sidebar, threaded conversations, and read receipts — all database-backed.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 text-[9px] border border-sky-500/20">Real-time</span>
+                  <span className="px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 text-[9px] border border-sky-500/20">Threads</span>
+                </div>
+              </motion.div>
+
+              {/* Collaboration Pitch */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-xs">🤝</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Collaboration Pitch</div>
+                    <div className="text-[10px] text-slate-400 font-mono">Co-Writer Request</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Propose roles (Co-Writer, Line Editor, Beta Reader) with a pitch message. Accept/decline with 1-click notifications.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[9px] border border-amber-500/20">Co-Writer</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[9px] border border-amber-500/20">Editor</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[9px] border border-amber-500/20">Beta Reader</span>
+                </div>
+              </motion.div>
+
+              {/* One-Click Publishing */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs">🚀</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>1-Click Publishing</div>
+                    <div className="text-[10px] text-slate-400 font-mono">Publish to Community</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Toggle any manuscript to public with one click. Auto-generates URL slugs. Instantly appears on your profile and Community Hub.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] border border-emerald-500/20">Instant</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[9px] border border-emerald-500/20">Auto-Slug</span>
+                </div>
+              </motion.div>
+
+              {/* Public Story Reader */}
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }}
+                className={`flex-shrink-0 w-[300px] snap-center rounded-2xl p-5 border transition-all hover:-translate-y-1 ${isLight ? "bg-white border-slate-200 shadow-sm hover:shadow-lg" : "bg-[#0b0c10] border-white/10 hover:border-white/20"}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white text-xs">📖</div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Public Story Reader</div>
+                    <div className="text-[10px] text-slate-400 font-mono">/story/[slug]</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">Beautiful reading experience with view count tracking, social sharing, moderated reader comments, and rich HTML rendering.</p>
+                <div className="flex gap-1.5 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[9px] border border-indigo-500/20">Comments</span>
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[9px] border border-indigo-500/20">Share</span>
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-[9px] border border-indigo-500/20">Views</span>
+                </div>
+              </motion.div>
+            </div>
+            {/* Scroll fade hint */}
+            <div className={`absolute right-0 top-0 bottom-4 w-20 pointer-events-none bg-gradient-to-l z-10 ${isLight ? "from-[#f8fafc]" : "from-[#06070a]"}`} />
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════
+             SECTION 3: POWER TOOLS — STACKED SHOWCASE
+             ══════════════════════════════════════════════════════════════ */}
+        <section className="max-w-[1280px] mx-auto px-6 lg:pl-[120px] py-16 relative">
+          <div className={`hidden lg:block absolute left-[40px] top-[80px] w-3.5 h-3.5 rounded-full border-2 bg-emerald-500 transform -translate-x-1/2 z-20 ${isLight ? "border-slate-100" : "border-[#06070a]"}`} />
+
+          <div className="mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 outfit">
+              <Zap /> Power Stack
+            </div>
+            <h2 className={`text-3xl sm:text-4xl font-extrabold tracking-tight mb-3 outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+              Craft with <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">precision tools.</span>
+            </h2>
+            <p className={`text-sm sm:text-base max-w-2xl leading-relaxed ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+              Advanced professional-grade tools layered into every workspace for manuscript quality and productivity.
+            </p>
+          </div>
+
+          {/* Power tools grid — 2 columns of stacked mini cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { emoji: "🤖", title: "AI Writing Partner", desc: "Gemini-powered contextual assistant that continues your prose, suggests dialogue, and rewrites passages in your voice.", tag: "Gemini 2.5 Flash", color: "indigo" },
+              { emoji: "📤", title: "Multi-Format Export", desc: "Export manuscripts to PDF, DOCX, HTML, Markdown, and EPUB formats with chapter-aware table of contents.", tag: "5 Formats", color: "violet" },
+              { emoji: "🔔", title: "Smart Notifications", desc: "Real-time alerts for collaboration invites, new followers, comment approvals, and team activity in your workspace.", tag: "Live Push", color: "amber" },
+              { emoji: "🕐", title: "Version History", desc: "Full diff-based revision timeline. Restore any previous version of your story phase with one click.", tag: "Time Travel", color: "sky" },
+              { emoji: "📊", title: "Writing Analytics", desc: "Track total word count, writing velocity over time, daily streaks, most productive hours, and genre distribution.", tag: "Deep Stats", color: "rose" },
+              { emoji: "👥", title: "Team Workspace", desc: "Invite collaborators by email. Manage roles (Owner, Editor, Viewer). Shared modules, phases, and real-time edit access.", tag: "Multi-Player", color: "emerald" },
+              { emoji: "🔐", title: "RLS-Secured Database", desc: "Every table enforces Row Level Security. Only owners can update projects. Only participants can read private DMs.", tag: "Zero-Trust", color: "indigo" },
+              { emoji: "🎨", title: "Dual Theme Engine", desc: "Crisp light mode and immersive dark mode across every page — landing, dashboard, editor, community, and profiles.", tag: "Light & Dark", color: "violet" },
+            ].map((tool, i) => (
+              <motion.div
+                key={tool.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className={`flex items-start gap-4 p-4 rounded-xl border transition-all hover:-translate-y-0.5 ${
+                  isLight
+                    ? "bg-white/80 border-slate-200 hover:border-slate-300 hover:shadow-md"
+                    : "bg-[#0b0c10]/80 border-white/[0.08] hover:border-white/15 hover:shadow-lg"
+                }`}
+              >
+                <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg border ${
+                  isLight ? "bg-slate-50 border-slate-200" : "bg-white/[0.03] border-white/10"
+                }`}>
+                  {tool.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>{tool.title}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold border ${
+                      {
+                        indigo: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+                        violet: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+                        amber: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                        sky: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+                        rose: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+                        emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                      }[tool.color]
+                    }`}>{tool.tag}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{tool.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </section>
 

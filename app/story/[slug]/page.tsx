@@ -151,21 +151,30 @@ export default function PublicStoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 flex items-center justify-center">
-        <div className="text-white text-xl">Loading story...</div>
+      <div className="min-h-screen bg-[#06070a] text-white flex flex-col items-center justify-center space-y-3">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-bold text-sm text-white shadow-md animate-pulse outfit">
+          N
+        </div>
+        <div className="text-sm font-medium text-slate-400">Loading manuscript...</div>
       </div>
     );
   }
 
   if (notFound || !project) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-purple-950/20 to-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">404</h1>
-          <p className="text-gray-400 text-xl">Story not found</p>
-          <p className="text-gray-500 text-sm mt-2">
-            This story may be private or the link is incorrect.
+      <div className="min-h-screen bg-[#06070a] text-white flex items-center justify-center p-6">
+        <div className="text-center max-w-md space-y-4">
+          <div className="text-5xl">📖</div>
+          <h1 className="text-3xl font-extrabold outfit">Story Not Found</h1>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            This manuscript may be set to private by the author or the public URL slug might have changed.
           </p>
+          <a
+            href="/community"
+            className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all outfit shadow-lg shadow-indigo-500/20"
+          >
+            Explore Community Stories
+          </a>
         </div>
       </div>
     );
