@@ -43,7 +43,7 @@ export default function IncomingInvites() {
     }
 
     if (!user || !user.email) {
-      console.log("❌ No user or email found");
+      console.warn("No authenticated user found in IncomingInvites");
       setError("Not logged in");
       setLoading(false);
       return;

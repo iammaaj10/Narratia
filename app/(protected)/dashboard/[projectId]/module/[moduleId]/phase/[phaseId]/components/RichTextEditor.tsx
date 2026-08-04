@@ -103,7 +103,6 @@ export default function RichTextEditor({
       // Only update if content is different and not empty
       // This prevents infinite loops while ensuring content loads
       if (content !== currentContent) {
-        console.log("📝 Updating editor content, length:", content.length);
         editor.commands.setContent(content || "");
       }
     }

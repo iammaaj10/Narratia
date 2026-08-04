@@ -83,7 +83,7 @@ export default function ProjectDetailPage() {
 
       const { data: projectData, error: projectError } = await supabase
         .from("projects")
-        .select("*")
+        .select("id, title, description, is_team, owner_id, is_public, slug, view_count, created_at, updated_at")
         .eq("id", projectId)
         .single();
 

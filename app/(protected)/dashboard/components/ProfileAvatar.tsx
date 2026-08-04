@@ -105,7 +105,7 @@ export default function ProfileAvatar({
               e.currentTarget.style.display = "none";
             }}
             onLoad={() => {
-              console.log("✅ Image loaded successfully");
+              // Image loaded successfully
             }}
           />
         ) : (

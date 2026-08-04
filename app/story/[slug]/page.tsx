@@ -54,7 +54,7 @@ export default function PublicStoryPage() {
       // Fetch public project - search by slug or ID
       let { data: projectData } = await supabase
         .from("projects")
-        .select("*")
+        .select("id, title, description, owner_id, view_count, created_at, slug, genre")
         .eq("slug", slug)
         .eq("is_public", true)
         .maybeSingle();
@@ -62,7 +62,7 @@ export default function PublicStoryPage() {
       if (!projectData) {
         const { data: idProject } = await supabase
           .from("projects")
-          .select("*")
+          .select("id, title, description, owner_id, view_count, created_at, slug, genre")
           .eq("id", slug)
           .eq("is_public", true)
           .maybeSingle();

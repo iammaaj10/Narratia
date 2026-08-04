@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+
+// Max field lengths
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 254;
+const MAX_SUBJECT_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 5000;
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { name, email, subject, message } = body;
 
-    // Form Validation
+    // Form Validation with length caps
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return NextResponse.json({ error: "Please provide your full name." }, { status: 400 });
+    }
+    if (name.trim().length > MAX_NAME_LENGTH) {
+      return NextResponse.json({ error: "Name is too long." }, { status: 400 });
     }
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json({ error: "Please provide a valid email address." }, { status: 400 });
     }
+    if (email.trim().length > MAX_EMAIL_LENGTH) {
+      return NextResponse.json({ error: "Email address is too long." }, { status: 400 });
+    }
 
     if (!subject || typeof subject !== "string" || subject.trim().length === 0) {
       return NextResponse.json({ error: "Please select or enter a subject." }, { status: 400 });
+    }
+    if (subject.trim().length > MAX_SUBJECT_LENGTH) {
+      return NextResponse.json({ error: "Subject is too long." }, { status: 400 });
     }
 
     if (!message || typeof message !== "string" || message.trim().length < 10) {
@@ -25,12 +40,19 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    if (message.trim().length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        { error: `Message must be under ${MAX_MESSAGE_LENGTH} characters.` },
+        { status: 400 }
+      );
+    }
 
     const messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const createdAt = new Date().toISOString();
 
-    // Try inserting into Supabase contact_messages table if configured
+    // Use server-side Supabase client (correct for API routes)
     try {
+      const supabase = await createServerSupabaseClient();
       await supabase.from("contact_messages").insert([
         {
           id: messageId,
@@ -44,8 +66,6 @@ export async function POST(req: Request) {
     } catch (dbErr) {
       console.warn("Database save notice (handled):", dbErr);
     }
-
-    console.log(`[CONTACT FORM RECEIVED] ID: ${messageId} | From: ${name} (${email}) | Subject: ${subject}`);
 
     return NextResponse.json(
       {
