@@ -97,7 +97,8 @@ export default function CommunityPage() {
             created_at: item.created_at,
             owner: {
               id: item.owner_id,
-              username: profile?.username || "Author",
+              // Use username if set, otherwise fall back to owner_id so the link still works
+              username: profile?.username || item.owner_id,
               avatar_url: profile?.avatar_url || null,
               open_for_collaboration: profile?.open_for_collaboration ?? true,
             },

@@ -56,36 +56,18 @@ export default function RegisterPage() {
       if (signUpData.user) {
 
 
-        // Wait a moment for the trigger to fire
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const { data: profile, error: profileError } = await supabase
+        // Always upsert the profile to ensure username is set
+        // (trigger may have created the row but without username)
+        const { error: upsertError } = await supabase
           .from("profiles")
-          .select("id, username")
-          .eq("id", signUpData.user.id)
-          .maybeSingle();
+          .upsert({
+            id: signUpData.user.id,
+            username: username.trim(),
+            avatar_url: null,
+          }, { onConflict: "id" });
 
-        if (profileError) {
-          console.warn("⚠️ Could not verify profile:", profileError);
-        } else if (profile) {
-
-        } else {
-          console.warn("⚠️ Profile not found, creating manually...");
-
-          // Manually create profile if trigger didn't work
-          const { error: insertError } = await supabase
-            .from("profiles")
-            .insert({
-              id: signUpData.user.id,
-              username: username.trim(),
-              avatar_url: null,
-            });
-
-          if (insertError) {
-            console.error("❌ Failed to create profile:", insertError);
-          } else {
-
-          }
+        if (upsertError) {
+          console.warn("⚠️ Could not save profile username:", upsertError);
         }
       }
 

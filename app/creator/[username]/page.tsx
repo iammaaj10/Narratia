@@ -75,6 +75,8 @@ export default function CreatorProfilePage() {
       // Fetch user profile from database
       let profile = await fetchCreatorProfile(rawUsername, user?.id);
 
+      // If not found by username/uuid lookup, check if it's the logged-in user's own profile
+      // (their profile row may exist but have username = null, and URL may be their UUID)
       if (!profile && user) {
         const { data: selfProfile } = await supabase
           .from("profiles")
@@ -83,31 +85,43 @@ export default function CreatorProfilePage() {
           .maybeSingle();
 
         if (selfProfile) {
-          profile = {
-            ...selfProfile,
-            followers_count: 0,
-            following_count: 0,
-            is_following: false,
-          };
+          const storedUsername = selfProfile.username?.toLowerCase() ?? "";
+          const urlUsername = rawUsername.toLowerCase();
+          const authUsername = (user.user_metadata?.username as string | undefined)?.toLowerCase() ?? "";
+
+          // It's the user's own profile if:
+          // (a) stored DB username matches the URL, OR
+          // (b) username is null in DB but auth metadata username matches URL, OR
+          // (c) the URL is the user's own UUID (fallback from community page)
+          const isOwnProfile =
+            (storedUsername && storedUsername === urlUsername) ||
+            (!selfProfile.username && authUsername && authUsername === urlUsername) ||
+            rawUsername === user.id;
+
+          if (isOwnProfile) {
+            // Patch the username into the DB from auth metadata if it's missing
+            const nameToSet = selfProfile.username || authUsername || rawUsername;
+            if (!selfProfile.username && nameToSet !== user.id) {
+              await supabase
+                .from("profiles")
+                .update({ username: nameToSet.trim() })
+                .eq("id", user.id);
+            }
+            profile = {
+              ...selfProfile,
+              username: nameToSet !== user.id ? nameToSet : (selfProfile.username || "Author"),
+              followers_count: 0,
+              following_count: 0,
+              is_following: false,
+            };
+          }
         }
       }
 
+      // Truly not found — nobody owns this username
       if (!profile) {
-        profile = {
-          id: user?.id || "unregistered",
-          username: rawUsername,
-          full_name: user?.email?.split("@")[0] || rawUsername,
-          avatar_url: null,
-          banner_url: null,
-          bio: "Author & narrative creator on Narratia.",
-          open_for_collaboration: true,
-          twitter_handle: null,
-          discord_handle: null,
-          website_url: null,
-          followers_count: 0,
-          following_count: 0,
-          is_following: false,
-        };
+        setLoading(false);
+        return;
       }
 
       setCreator(profile);
@@ -262,7 +276,26 @@ export default function CreatorProfilePage() {
     );
   }
 
-  if (!creator) return null;
+  if (!creator) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center p-6 ${isLight ? "bg-[#f8fafc] text-slate-900" : "bg-[#06070a] text-white"}`}>
+        <div className="text-center max-w-sm space-y-4">
+          <div className="text-5xl">🔍</div>
+          <h1 className="text-2xl font-extrabold outfit">Creator Not Found</h1>
+          <p className={`text-sm leading-relaxed ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+            No creator profile exists for <span className="font-mono font-semibold text-indigo-400">@{rawUsername}</span>.
+            They may not have set up their profile yet.
+          </p>
+          <a
+            href="/community"
+            className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-500 transition-all outfit shadow-lg shadow-indigo-500/20"
+          >
+            Browse Community Stories
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isLight ? "bg-[#f8fafc] text-slate-900" : "bg-[#06070a] text-slate-100"}`}>

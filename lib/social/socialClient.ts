@@ -52,11 +52,30 @@ export interface DirectMessage {
 
 export async function fetchCreatorProfile(username: string, currentUserId?: string): Promise<CreatorProfile | null> {
   try {
-    const { data: profile } = await supabase
+    const { data: profileRows, error: profileError } = await supabase
       .from("profiles")
       .select("*")
       .ilike("username", username)
-      .maybeSingle();
+      .limit(1);
+
+    if (profileError) {
+      console.error("fetchCreatorProfile DB error:", profileError.message);
+    }
+
+    // If username lookup found nothing, try lookup by UUID (for profiles without a username set)
+    let profile = profileRows?.[0] ?? null;
+
+    if (!profile) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(username)) {
+        const { data: byIdRows } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", username)
+          .limit(1);
+        profile = byIdRows?.[0] ?? null;
+      }
+    }
 
     if (!profile) return null;
 
@@ -80,17 +99,18 @@ export async function fetchCreatorProfile(username: string, currentUserId?: stri
       following_count = following || 0;
 
       if (currentUserId) {
+        // Use maybeSingle() — .single() throws when no row is found
         const { data: followRecord } = await supabase
           .from("user_follows")
           .select("id")
           .eq("follower_id", currentUserId)
           .eq("following_id", profile.id)
-          .single();
+          .maybeSingle();
         
         is_following = !!followRecord;
       }
     } catch {
-      // Table fallback
+      // user_follows table may not exist yet — safe to ignore
     }
 
     return {
