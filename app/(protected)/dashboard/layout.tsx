@@ -184,11 +184,10 @@ export default function DashboardLayout({
                 <button
                   key={item.id}
                   onClick={() => router.push(item.path)}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 outline-none group ${
-                    isActive
+                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 outline-none group ${isActive
                       ? "text-purple-700 dark:text-white"
                       : "text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-white/5"
-                  }`}
+                    }`}
                 >
                   {isActive && (
                     <motion.div
@@ -306,11 +305,10 @@ export default function DashboardLayout({
                     <button
                       key={item.id}
                       onClick={() => { router.push(item.path); setIsMobileMenuOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
-                        isActive
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${isActive
                           ? "bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-white border border-purple-200/80 dark:border-purple-500/20"
                           : "text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                      }`}
+                        }`}
                     >
                       <Icon className={`w-4 h-4 ${isActive ? "text-purple-600 dark:text-purple-400" : ""}`} />
                       {item.label}

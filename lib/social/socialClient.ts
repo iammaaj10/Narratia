@@ -89,7 +89,7 @@ export async function fetchCreatorProfile(username: string, currentUserId?: stri
         .from("user_follows")
         .select("*", { count: "exact", head: true })
         .eq("following_id", profile.id);
-      
+
       const { count: following } = await supabase
         .from("user_follows")
         .select("*", { count: "exact", head: true })
@@ -106,7 +106,7 @@ export async function fetchCreatorProfile(username: string, currentUserId?: stri
           .eq("follower_id", currentUserId)
           .eq("following_id", profile.id)
           .maybeSingle();
-        
+
         is_following = !!followRecord;
       }
     } catch {
@@ -127,24 +127,26 @@ export async function fetchCreatorProfile(username: string, currentUserId?: stri
 
 export async function toggleFollowUser(targetUserId: string, followerId: string): Promise<boolean> {
   try {
-    // Check if following
+    // Check if already following — use maybeSingle() to avoid throw on 0 rows
     const { data: existing } = await supabase
       .from("user_follows")
       .select("id")
       .eq("follower_id", followerId)
       .eq("following_id", targetUserId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       await supabase.from("user_follows").delete().eq("id", existing.id);
       return false; // Now unfollowed
     } else {
-      await supabase.from("user_follows").insert({
+      const { error } = await supabase.from("user_follows").insert({
         follower_id: followerId,
         following_id: targetUserId,
       });
 
-      // Create notification
+      if (error) throw error;
+
+      // Create notification (non-critical)
       try {
         await supabase.from("notifications").insert({
           user_id: targetUserId,
@@ -153,14 +155,14 @@ export async function toggleFollowUser(targetUserId: string, followerId: string)
           message: "Someone started following your story journey!",
         });
       } catch {
-        // Notification table fallback
+        // Notification table may not exist yet
       }
 
       return true; // Now following
     }
   } catch (err) {
     console.error("Error toggling follow state:", err);
-    return false;
+    throw err; // Re-throw so caller can revert optimistic update
   }
 }
 
@@ -285,21 +287,20 @@ export async function fetchDirectMessages(currentUserId: string, otherUserId: st
 }
 
 export async function sendDirectMessage(senderId: string, recipientId: string, content: string): Promise<DirectMessage | null> {
-  try {
-    const { data, error } = await supabase
-      .from("direct_messages")
-      .insert({
-        sender_id: senderId,
-        recipient_id: recipientId,
-        content: content.trim(),
-      })
-      .select()
-      .single();
+  const { data, error } = await supabase
+    .from("direct_messages")
+    .insert({
+      sender_id: senderId,
+      recipient_id: recipientId,
+      content: content.trim(),
+    })
+    .select()
+    .single();
 
-    if (error || !data) throw error;
-    return data;
-  } catch (err) {
-    console.error("Error sending DM:", err);
-    return null;
+  if (error) {
+    console.error("Error sending DM:", error.message, "| code:", error.code, "| details:", error.details);
+    throw new Error(error.message || "Failed to send message");
   }
+
+  return data;
 }
