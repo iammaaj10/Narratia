@@ -26,6 +26,7 @@ export default function DashboardLayout({
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unauthenticated, setUnauthenticated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -40,8 +41,8 @@ export default function DashboardLayout({
         } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          console.error("❌ No authenticated user");
-          router.push("/login");
+          setUnauthenticated(true);
+          setLoading(false);
           return;
         }
 
@@ -360,6 +361,64 @@ export default function DashboardLayout({
 
         </div>
       </main>
+
+      {/* ══════════════════════════════════════
+          AUTHENTICATION REQUIRED POPUP MODAL
+      ══════════════════════════════════════ */}
+      <AnimatePresence>
+        {unauthenticated && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            {/* Backdrop Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md"
+            />
+
+            {/* Modal Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+              className="relative z-10 w-full max-w-md bg-white dark:bg-[#1a1921] rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center space-y-5"
+            >
+              {/* Icon Container */}
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                🔒
+              </div>
+
+              {/* Title & Body */}
+              <div className="space-y-2">
+                <h2 className="text-xl sm:text-2xl font-bold outfit text-slate-900 dark:text-white">
+                  Authentication Required
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
+                  Your session has expired or you are not signed in. Log in to access your Narratia author dashboard.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2.5 pt-2">
+                <button
+                  onClick={() => router.push("/login")}
+                  className="w-full py-3 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all shadow-md shadow-indigo-500/25 outfit"
+                >
+                  Log In to Continue
+                </button>
+
+                <button
+                  onClick={() => router.push("/community")}
+                  className="w-full py-2.5 px-5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-all outfit"
+                >
+                  Explore Community
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
