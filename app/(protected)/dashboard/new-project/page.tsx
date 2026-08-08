@@ -14,16 +14,28 @@ import {
   Loader2,
   Mail,
   ChevronLeft,
-  BookOpen,
-  ArrowRight
+  ArrowRight,
+  Feather,
+  Bookmark
 } from "lucide-react";
 import Link from "next/link";
 
 const MAX_TEAM_SIZE = 4;
 
+const GENRES = [
+  { id: "Fantasy", label: "Fantasy", icon: "🔮" },
+  { id: "Sci-Fi", label: "Sci-Fi", icon: "🚀" },
+  { id: "Mystery", label: "Mystery", icon: "🔍" },
+  { id: "Thriller", label: "Thriller", icon: "⚡" },
+  { id: "Romance", label: "Romance", icon: "💖" },
+  { id: "Drama", label: "Drama", icon: "🎭" },
+  { id: "Non-Fiction", label: "Non-Fiction", icon: "📜" },
+];
+
 export default function NewProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [genre, setGenre] = useState("Fantasy");
   const [isTeam, setIsTeam] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invites, setInvites] = useState<string[]>([]);
@@ -82,6 +94,7 @@ export default function NewProjectPage() {
         .insert({
           title: title.trim(),
           description: description.trim(),
+          genre: genre,
           owner_id: user.id,
           is_team: isTeam,
         })
@@ -173,253 +186,307 @@ export default function NewProjectPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="h-full flex flex-col max-w-5xl mx-auto pb-12 px-4"
-    >
-      {/* Top Nav */}
-      <div className="mb-6 lg:mb-8 pt-2 lg:pt-0">
+    <div className="w-full flex-1 flex flex-col relative min-h-full">
+      {/* Top Back Link */}
+      <div className="pb-4 mb-4 relative z-10">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm font-medium text-slate-500 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors group"
+          className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors group"
         >
-          <div className="w-8 h-8 rounded-full bg-slate-200/60 dark:bg-white/5 flex items-center justify-center mr-3 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
+          <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center mr-2 border border-slate-200 dark:border-white/10 group-hover:border-indigo-500/40 transition-colors">
             <ChevronLeft className="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" />
           </div>
           Back to Dashboard
         </Link>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
-        {/* Left Column: Context / Branding */}
-        <div className="lg:w-[35%] flex flex-col">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-[0_0_20px_-5px_rgba(168,85,247,0.2)] mb-5">
-              <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight mb-3 leading-tight">
-              Bring your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400">
-                imagination
-              </span>{" "}
-              to life.
+      {/* Main 2-Column Full-Screen Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 items-start relative z-10 pb-8">
+        {/* LEFT COLUMN: Story Context & Live Card Preview */}
+        <div className="lg:col-span-5 flex flex-col space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-2"
+          >
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight outfit leading-snug">
+              Create New Story
             </h1>
-            <p className="text-slate-600 dark:text-gray-400 text-[13px] leading-relaxed mb-6">
-              Every great masterpiece starts with a single idea. Give your story a name, a premise, and choose whether to write solo or invite collaborators to join your creative journey.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+              Define your title, premise, and genre to launch a new workspace.
             </p>
+          </motion.div>
 
-            <div className="hidden lg:block p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 relative overflow-hidden shadow-sm">
-              <div className="flex items-center gap-2 mb-2 relative z-10">
-                <Lightbulb className="text-amber-600 dark:text-amber-400 w-4 h-4" />
-                <h4 className="text-amber-900 dark:text-amber-200 font-medium text-[13px]">Writer's Tip</h4>
+          {/* Real-time Live Card Preview */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.05, duration: 0.25 }}
+            className="relative rounded-2xl p-5 border bg-white dark:bg-[#12131a] border-slate-200 dark:border-white/10 shadow-sm overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold font-mono tracking-widest uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-200 dark:border-indigo-500/20">
+                LIVE PREVIEW
+              </span>
+              <Bookmark className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 outfit">
+                  {GENRES.find((g) => g.id === genre)?.icon} {genre}
+                </span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300 border border-slate-200 dark:border-white/10 outfit">
+                  {isTeam ? "👥 Team Project" : "👤 Solo Writer"}
+                </span>
               </div>
-              <p className="text-amber-800/80 dark:text-amber-100/70 text-[12px] leading-relaxed relative z-10">
-                Start with a strong hook or an intriguing character. Don't worry about getting everything perfect right now—you can always revise and refine your title and synopsis later. Just start writing!
+
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white outfit line-clamp-2">
+                {title.trim() || "Untitled Story..."}
+              </h2>
+
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4 min-h-[50px]">
+                {description.trim() || "Your synopsis and story premise will appear here..."}
               </p>
+
+              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                <span className="flex items-center gap-1">
+                  <Feather className="w-3.5 h-3.5 text-indigo-500" /> RAG Context Ready
+                </span>
+                <span>0 Words</span>
+              </div>
             </div>
           </motion.div>
+
+          {/* Writer Prompt Tip Box */}
+          <div className="rounded-2xl p-4 bg-slate-50 dark:bg-[#12131a] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-xs outfit text-slate-900 dark:text-white">
+              <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <span>Writer's Tip</span>
+            </div>
+            <p className="text-xs leading-relaxed opacity-90 text-slate-600 dark:text-slate-400">
+              Start with a clear conflict or central hook in your premise. You can refine title and details anytime later.
+            </p>
+          </div>
         </div>
 
-        {/* Right Column: Form */}
-        <div className="flex-1">
+        {/* RIGHT COLUMN: Clean Solid Form Controls */}
+        <div className="lg:col-span-7 flex flex-col">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-[#0b0f19] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-indigo-500/20 shadow-xl shadow-slate-200/40 dark:shadow-none"
+            transition={{ delay: 0.1, duration: 0.25 }}
+            className="rounded-2xl p-6 sm:p-7 bg-white dark:bg-[#12131a] border border-slate-200 dark:border-white/10 shadow-sm space-y-5"
           >
-            <div className="space-y-6">
-              {/* Title Input */}
-              <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
-                  Story Title <span className="text-pink-500">*</span>
-                </label>
-                <input
-                  placeholder="e.g., The Midnight Library"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#131726] hover:bg-slate-100/80 dark:hover:bg-[#1a1f33] focus:bg-white dark:focus:bg-[#1a1f33] border border-slate-200 dark:border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-indigo-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-colors"
-                  autoFocus
-                />
-              </div>
+            {/* Story Title */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between outfit">
+                <span>Story Title <span className="text-pink-500">*</span></span>
+                <span className="text-[11px] font-mono text-slate-400">{title.length}/100</span>
+              </label>
+              <input
+                placeholder="e.g. The Midnight Library"
+                value={title}
+                maxLength={100}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-[#0b0c10] hover:bg-slate-100/70 dark:hover:bg-[#08090d] focus:bg-white dark:focus:bg-[#0b0c10] border border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none transition-all"
+                autoFocus
+              />
+            </div>
 
-              {/* Description Input */}
-              <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
-                  Synopsis / Premise
-                </label>
-                <textarea
-                  placeholder="A brief overview of your story's plot or themes..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#131726] hover:bg-slate-100/80 dark:hover:bg-[#1a1f33] focus:bg-white dark:focus:bg-[#1a1f33] border border-slate-200 dark:border-indigo-500/30 rounded-lg px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-indigo-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[100px] resize-none transition-colors"
-                />
-              </div>
-
-              {/* Project Type */}
-              <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-slate-700 dark:text-indigo-200 ml-1">
-                  Collaboration
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Solo Option */}
+            {/* Genre Selector Pills */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                Primary Genre
+              </label>
+              <div className="flex flex-wrap gap-2 pt-0.5">
+                {GENRES.map((g) => (
                   <button
-                    onClick={() => setIsTeam(false)}
-                    className={`relative p-3.5 rounded-xl border transition-colors text-left group ${!isTeam
-                        ? "bg-purple-50 dark:bg-indigo-500/10 border-purple-500 dark:border-indigo-400 ring-1 ring-purple-500 dark:ring-indigo-400"
-                        : "bg-slate-50 dark:bg-[#131726] border-slate-200 dark:border-indigo-500/20 hover:border-purple-300 dark:hover:border-indigo-500/40 hover:bg-slate-100 dark:hover:bg-[#1a1f33]"
-                      }`}
+                    key={g.id}
+                    type="button"
+                    onClick={() => setGenre(g.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 outfit cursor-pointer ${
+                      genre === g.id
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/10"
+                    }`}
                   >
-                    <div className="flex flex-col gap-2 relative z-10">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${!isTeam ? "bg-purple-100 text-purple-700 dark:bg-indigo-500/30 dark:text-indigo-200" : "bg-slate-200 text-slate-600 dark:bg-indigo-900/50 dark:text-indigo-300"}`}>
-                        <User className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h3 className={`font-semibold text-[14px] transition-colors ${!isTeam ? "text-purple-900 dark:text-white" : "text-slate-700 dark:text-indigo-200"}`}>
-                          Solo Project
-                        </h3>
-                        <p className={`text-[12px] mt-0.5 leading-relaxed ${!isTeam ? "text-purple-700 dark:text-indigo-200" : "text-slate-500 dark:text-indigo-300/70"}`}>
-                          Write independently.
-                        </p>
-                      </div>
-                    </div>
+                    <span>{g.icon}</span>
+                    <span>{g.label}</span>
                   </button>
-
-                  {/* Team Option */}
-                  <button
-                    onClick={() => setIsTeam(true)}
-                    className={`relative p-3.5 rounded-xl border transition-colors text-left group ${isTeam
-                        ? "bg-purple-50 dark:bg-indigo-500/10 border-purple-500 dark:border-indigo-400 ring-1 ring-purple-500 dark:ring-indigo-400"
-                        : "bg-slate-50 dark:bg-[#131726] border-slate-200 dark:border-indigo-500/20 hover:border-purple-300 dark:hover:border-indigo-500/40 hover:bg-slate-100 dark:hover:bg-[#1a1f33]"
-                      }`}
-                  >
-                    <div className="flex flex-col gap-2 relative z-10">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isTeam ? "bg-purple-100 text-purple-700 dark:bg-indigo-500/30 dark:text-indigo-200" : "bg-slate-200 text-slate-600 dark:bg-indigo-900/50 dark:text-indigo-300"}`}>
-                        <Users className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <h3 className={`font-semibold text-[14px] transition-colors ${isTeam ? "text-purple-900 dark:text-white" : "text-slate-700 dark:text-indigo-200"}`}>
-                          Team Project
-                        </h3>
-                        <p className={`text-[12px] mt-0.5 leading-relaxed ${isTeam ? "text-purple-700 dark:text-indigo-200" : "text-slate-500 dark:text-indigo-300/70"}`}>
-                          Collaborate with others.
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                </div>
+                ))}
               </div>
+            </div>
 
-              {/* Team Invites Section */}
-              <AnimatePresence>
-                {isTeam && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pt-1">
-                      <div className="p-4 rounded-xl border border-indigo-500/20 bg-[#131726] space-y-3.5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-white text-[14px]">Invite Writers</h3>
-                            <p className="text-[13px] text-indigo-300/70 mt-0.5">Add collaborators via email</p>
-                          </div>
-                          <div className="flex items-center justify-center px-2.5 py-1 rounded-md bg-indigo-500/20 border border-indigo-500/30">
-                            <span className="text-[12px] font-semibold text-indigo-200">
-                              {invites.length} / {MAX_TEAM_SIZE - 1}
-                            </span>
-                          </div>
-                        </div>
+            {/* Synopsis / Premise */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between outfit">
+                <span>Synopsis / Premise</span>
+                <span className="text-[11px] font-mono text-slate-400">Optional</span>
+              </label>
+              <textarea
+                placeholder="A brief overview of your story's plot, themes, or characters..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-[#0b0c10] hover:bg-slate-100/70 dark:hover:bg-[#08090d] focus:bg-white dark:focus:bg-[#0b0c10] border border-slate-200 dark:border-white/10 focus:border-indigo-500 dark:focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none min-h-[100px] resize-none transition-all"
+              />
+            </div>
 
-                        <div className="flex gap-2">
-                          <div className="relative flex-1 group">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <Mail className="w-4 h-4 text-indigo-300/50 group-focus-within:text-indigo-300 transition-colors" />
-                            </div>
-                            <input
-                              placeholder="writer@example.com"
-                              value={inviteEmail}
-                              onChange={(e) => setInviteEmail(e.target.value)}
-                              onKeyPress={(e) => e.key === "Enter" && addInvite()}
-                              className="w-full bg-[#0b0f19] hover:bg-[#1a1f33] focus:bg-[#1a1f33] border border-indigo-500/30 rounded-lg pl-9 pr-3 py-2.5 text-[14px] text-white placeholder:text-indigo-300/40 focus:outline-none focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400 transition-colors"
-                              disabled={invites.length >= MAX_TEAM_SIZE - 1}
-                            />
-                          </div>
-                          <button
-                            onClick={addInvite}
-                            disabled={!inviteEmail.trim() || invites.length >= MAX_TEAM_SIZE - 1}
-                            className="flex items-center justify-center w-10 h-10 bg-indigo-500 hover:bg-indigo-400 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Plus className="w-5 h-5" />
-                          </button>
-                        </div>
-
-                        <AnimatePresence>
-                          {invites.length > 0 && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="space-y-2 pt-1.5"
-                            >
-                              {invites.map((email) => (
-                                <motion.div
-                                  key={email}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95 }}
-                                  className="flex items-center justify-between bg-[#1a1f33] border border-indigo-500/20 px-3.5 py-2.5 rounded-lg"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 rounded-md bg-indigo-500/20 flex items-center justify-center">
-                                      <User className="w-3.5 h-3.5 text-indigo-200" />
-                                    </div>
-                                    <span className="text-indigo-50 font-medium text-[14px]">{email}</span>
-                                  </div>
-                                  <button
-                                    onClick={() => removeInvite(email)}
-                                    className="p-1.5 rounded-md text-indigo-300/50 hover:bg-red-500/20 hover:text-red-400 transition-colors"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
-                                </motion.div>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Submit Button */}
-              <div className="pt-4">
+            {/* Collaboration Mode Selector */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                Collaboration Mode
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
+                {/* Solo Mode */}
                 <button
-                  disabled={loading || !title.trim()}
-                  onClick={handleCreate}
-                  className="group relative w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white rounded-xl font-bold text-[14px] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                  type="button"
+                  onClick={() => setIsTeam(false)}
+                  className={`p-3.5 rounded-xl border transition-all text-left flex items-start gap-3 cursor-pointer ${
+                    !isTeam
+                      ? "bg-indigo-50/80 dark:bg-indigo-500/10 border-indigo-500 dark:border-indigo-500"
+                      : "bg-slate-50 dark:bg-[#0b0c10] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
+                  }`}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      Start Writing
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      !isTeam
+                        ? "bg-indigo-600 text-white"
+                        : "bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className={`text-xs font-bold outfit ${!isTeam ? "text-indigo-950 dark:text-white" : "text-slate-800 dark:text-slate-200"}`}>
+                      Solo Project
+                    </h4>
+                    <p className={`text-[11px] mt-0.5 leading-relaxed ${!isTeam ? "text-indigo-700 dark:text-indigo-300" : "text-slate-500 dark:text-slate-400"}`}>
+                      Write independently.
+                    </p>
+                  </div>
+                </button>
+
+                {/* Team Mode */}
+                <button
+                  type="button"
+                  onClick={() => setIsTeam(true)}
+                  className={`p-3.5 rounded-xl border transition-all text-left flex items-start gap-3 cursor-pointer ${
+                    isTeam
+                      ? "bg-indigo-50/80 dark:bg-indigo-500/10 border-indigo-500 dark:border-indigo-500"
+                      : "bg-slate-50 dark:bg-[#0b0c10] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isTeam
+                        ? "bg-indigo-600 text-white"
+                        : "bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className={`text-xs font-bold outfit ${isTeam ? "text-indigo-950 dark:text-white" : "text-slate-800 dark:text-slate-200"}`}>
+                      Team Project
+                    </h4>
+                    <p className={`text-[11px] mt-0.5 leading-relaxed ${isTeam ? "text-indigo-700 dark:text-indigo-300" : "text-slate-500 dark:text-slate-400"}`}>
+                      Collaborate with others.
+                    </p>
+                  </div>
                 </button>
               </div>
+            </div>
 
+            {/* Team Writer Invitations */}
+            <AnimatePresence>
+              {isTeam && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-1 space-y-3 p-4 rounded-xl bg-slate-50 dark:bg-[#0b0c10] border border-slate-200 dark:border-white/10">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                        Invite Writers
+                      </span>
+                      <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400">
+                        {invites.length} / {MAX_TEAM_SIZE - 1} Added
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                        <input
+                          placeholder="writer@example.com"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInvite())}
+                          className="w-full bg-white dark:bg-[#12131a] border border-slate-200 dark:border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
+                          disabled={invites.length >= MAX_TEAM_SIZE - 1}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={addInvite}
+                        disabled={!inviteEmail.trim() || invites.length >= MAX_TEAM_SIZE - 1}
+                        className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all disabled:opacity-40 flex items-center gap-1 outfit cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" /> Add
+                      </button>
+                    </div>
+
+                    {invites.length > 0 && (
+                      <div className="space-y-1.5 pt-1">
+                        {invites.map((email) => (
+                          <div
+                            key={email}
+                            className="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-[#12131a] border border-slate-200 dark:border-white/5 text-xs"
+                          >
+                            <span className="font-mono text-slate-700 dark:text-slate-300">{email}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeInvite(email)}
+                              className="text-slate-400 hover:text-red-500 p-1"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Launch Action Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                disabled={loading || !title.trim()}
+                onClick={handleCreate}
+                className="w-full py-3.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 outfit cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating Project...
+                  </>
+                ) : (
+                  <>
+                    Start Writing <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
             </div>
           </motion.div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
