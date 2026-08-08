@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 
-async function callAI(prompt: string, model = "gemini-1.5-flash"): Promise<string> {
+async function callAI(prompt: string, model = "gemini-2.5-flash"): Promise<string> {
   const { data: { session } } = await supabase.auth.getSession();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (session?.access_token) {

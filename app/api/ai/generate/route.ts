@@ -40,17 +40,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    let { prompt, model: requestedModel = "gemini-1.5-flash" } = body;
+    let { prompt, model: requestedModel = "gemini-2.5-flash" } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "Invalid or empty prompt" }, { status: 400 });
     }
 
-    // Default to gemini-1.5-flash if invalid model passed
-    let modelName = ALLOWED_MODELS.has(requestedModel) ? requestedModel : "gemini-1.5-flash";
-    if (modelName === "gemini-2.5-flash") {
-      modelName = "gemini-1.5-flash";
-    }
+    // Default to gemini-2.5-flash if invalid model passed
+    let modelName = ALLOWED_MODELS.has(requestedModel) ? requestedModel : "gemini-2.5-flash";
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: modelName });
