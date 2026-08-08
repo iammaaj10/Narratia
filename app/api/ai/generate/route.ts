@@ -2,65 +2,68 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-// Whitelist of allowed model names to prevent model injection / billing abuse
+// Whitelist of allowed model names
 const ALLOWED_MODELS = new Set([
-  "gemini-2.5-flash",
-  "gemini-2.0-flash",
   "gemini-1.5-flash",
+  "gemini-2.0-flash",
   "gemini-1.5-pro",
+  "gemini-2.5-flash",
 ]);
 
-// Fail fast if the API key is not configured
-if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY environment variable is not set.");
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export async function POST(req: NextRequest) {
-  // Guard: API key must be present
-  if (!process.env.GEMINI_API_KEY) {
+  // 1️⃣ Guard: API key must be present on server
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("❌ GEMINI_API_KEY environment variable is not set.");
     return NextResponse.json(
-      { error: "AI service is not configured" },
+      { error: "GEMINI_API_KEY is not configured in environment variables. Please add GEMINI_API_KEY in your hosting dashboard." },
       { status: 503 }
     );
   }
 
   try {
-    // Verify the caller is an authenticated user
+    // 2️⃣ Verify user via cookies first, fallback to Authorization Bearer token
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    let { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const authHeader = req.headers.get("authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.substring(7);
+        const { data: userData } = await supabase.auth.getUser(token);
+        user = userData.user;
+      }
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized. Please log in again." }, { status: 401 });
     }
 
     const body = await req.json();
-    const { prompt, model: modelName = "gemini-2.5-flash" } = body;
+    let { prompt, model: requestedModel = "gemini-1.5-flash" } = body;
 
     if (!prompt || typeof prompt !== "string") {
-      return NextResponse.json({ error: "Invalid prompt" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid or empty prompt" }, { status: 400 });
     }
 
-    // Guard: Only allow whitelisted model names (prevent billing abuse / model injection)
-    if (!ALLOWED_MODELS.has(modelName)) {
-      return NextResponse.json({ error: "Invalid model name" }, { status: 400 });
+    // Default to gemini-1.5-flash if invalid model passed
+    let modelName = ALLOWED_MODELS.has(requestedModel) ? requestedModel : "gemini-1.5-flash";
+    if (modelName === "gemini-2.5-flash") {
+      modelName = "gemini-1.5-flash";
     }
 
-    // Limit prompt length to prevent abuse
-    const trimmedPrompt = prompt.slice(0, 20000);
-
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: modelName });
+    const trimmedPrompt = prompt.slice(0, 25000);
+
     const result = await model.generateContent(trimmedPrompt);
     const text = result.response.text();
 
     return NextResponse.json({ text });
   } catch (error: any) {
-    console.error("AI API route error:", error?.message || "Unknown error");
+    console.error("AI API route error:", error?.message || error);
     return NextResponse.json(
-      { error: "AI request failed" },
+      { error: error?.message || "AI request failed" },
       { status: 500 }
     );
   }

@@ -1,14 +1,15 @@
-// ============================================
-// Gemini Client — calls the secure server-side
-// API route (/api/ai/generate) instead of
-// talking to Gemini directly from the browser.
-// The API key never reaches the client bundle.
-// ============================================
+import { supabase } from "@/lib/supabase/client";
 
-async function callAI(prompt: string, model = "gemini-2.5-flash"): Promise<string> {
+async function callAI(prompt: string, model = "gemini-1.5-flash"): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
+
   const res = await fetch("/api/ai/generate", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ prompt, model }),
   });
 

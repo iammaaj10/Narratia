@@ -1,9 +1,15 @@
 import { supabase } from "@/lib/supabase/client";
 
 async function callAI(prompt: string): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
+
   const res = await fetch("/api/ai/generate", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ prompt }),
   });
   if (!res.ok) {
