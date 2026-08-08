@@ -6,6 +6,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
+import TextAlign from "@tiptap/extension-text-align";
 import AIToolbar, { AIToolbarRef } from "./AIToolbar";
 import { SlashCommand, getSuggestionItems, renderItems } from "./SlashCommandExtension";
 
@@ -25,6 +26,10 @@ import {
   Redo,
   Link as LinkIcon,
   Code,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
 } from "lucide-react";
 import { useCallback, useEffect, useState, useRef } from "react";
 
@@ -52,6 +57,10 @@ export default function RichTextEditor({
         },
       }),
       Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right", "justify"],
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -153,6 +162,20 @@ export default function RichTextEditor({
     }
   };
 
+  const handleSetAlign = (alignment: string) => {
+    if (!editor) return;
+    try {
+      const chain = editor.chain().focus() as any;
+      if (typeof chain.setTextAlign === "function") {
+        chain.setTextAlign(alignment).run();
+      } else {
+        editor.chain().focus().updateAttributes("paragraph", { textAlign: alignment }).run();
+      }
+    } catch (e) {
+      console.warn("TextAlign fallback:", e);
+    }
+  };
+
   if (!editor) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -220,6 +243,54 @@ export default function RichTextEditor({
               title="Strikethrough"
             >
               <Strikethrough className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Text Alignment */}
+          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+            <button
+              onClick={() => handleSetAlign("left")}
+              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
+                editor.isActive({ textAlign: "left" })
+                  ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
+                  : "text-slate-600 dark:text-gray-400"
+              }`}
+              title="Align Left"
+            >
+              <AlignLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleSetAlign("center")}
+              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
+                editor.isActive({ textAlign: "center" })
+                  ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
+                  : "text-slate-600 dark:text-gray-400"
+              }`}
+              title="Align Center"
+            >
+              <AlignCenter className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleSetAlign("right")}
+              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
+                editor.isActive({ textAlign: "right" })
+                  ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
+                  : "text-slate-600 dark:text-gray-400"
+              }`}
+              title="Align Right"
+            >
+              <AlignRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleSetAlign("justify")}
+              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
+                editor.isActive({ textAlign: "justify" })
+                  ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
+                  : "text-slate-600 dark:text-gray-400"
+              }`}
+              title="Justify Text"
+            >
+              <AlignJustify className="w-4 h-4" />
             </button>
           </div>
 

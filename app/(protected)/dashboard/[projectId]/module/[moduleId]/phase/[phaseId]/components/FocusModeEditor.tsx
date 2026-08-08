@@ -8,6 +8,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
+import TextAlign from "@tiptap/extension-text-align";
 import { X, Compass } from "lucide-react";
 import ZenBackground, { ZenScene } from "./ZenBackground";
 import { analyzeParagraphEmotion } from "@/lib/ai/geminiClient";
@@ -47,6 +48,10 @@ export default function FocusModeEditor({
     extensions: [
       StarterKit,
       Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right", "justify"],
+      }),
       Link.configure({
         openOnClick: false,
       }),
