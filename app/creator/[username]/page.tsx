@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { fetchCreatorProfile, toggleFollowUser, CreatorProfile } from "@/lib/social/socialClient";
+import {
+  fetchCreatorProfile,
+  toggleFollowUser,
+  fetchUserFollowers,
+  fetchUserFollowing,
+  CreatorProfile,
+  FollowerUser,
+} from "@/lib/social/socialClient";
 import CollabRequestModal from "@/components/social/CollabRequestModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
@@ -36,6 +43,13 @@ export default function CreatorProfilePage() {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
+  // Followers & Following Modal State
+  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
+  const [followersModalTab, setFollowersModalTab] = useState<"followers" | "following">("followers");
+  const [followersList, setFollowersList] = useState<FollowerUser[]>([]);
+  const [followingList, setFollowingList] = useState<FollowerUser[]>([]);
+  const [loadingFollowersData, setLoadingFollowersData] = useState(false);
+
   // Tab State for profile owner
   const [activeTab, setActiveTab] = useState<"public" | "private">("public");
 
@@ -53,6 +67,26 @@ export default function CreatorProfilePage() {
 
   // Collab Pitch Modal State
   const [selectedCollabStory, setSelectedCollabStory] = useState<{ id: string; title: string } | null>(null);
+
+  const openFollowModal = async (initialTab: "followers" | "following") => {
+    if (!creator) return;
+    setFollowersModalTab(initialTab);
+    setIsFollowersModalOpen(true);
+    setLoadingFollowersData(true);
+
+    try {
+      const [followers, following] = await Promise.all([
+        fetchUserFollowers(creator.id),
+        fetchUserFollowing(creator.id),
+      ]);
+      setFollowersList(followers);
+      setFollowingList(following);
+    } catch (err) {
+      console.error("Error fetching followers/following list:", err);
+    } finally {
+      setLoadingFollowersData(false);
+    }
+  };
 
   // Only true if the logged-in user's ID matches the profile being viewed
   // NOTE: the old conditions (email prefix / username match) were always true
@@ -418,15 +452,27 @@ export default function CreatorProfilePage() {
               </div>
             )}
 
-            {/* Follower Stats */}
-            <div className={`flex items-center gap-6 text-xs font-mono pt-3 border-t ${isLight ? "border-slate-200 text-slate-600" : "border-white/10 text-slate-400"
-              }`}>
-              <div>
-                <span className={`font-bold text-sm mr-1 ${isLight ? "text-slate-900" : "text-white"}`}>{followersCount}</span> Followers
-              </div>
-              <div>
-                <span className={`font-bold text-sm mr-1 ${isLight ? "text-slate-900" : "text-white"}`}>{followingCount}</span> Following
-              </div>
+            {/* Follower Stats — Clickable */}
+            <div className={`flex items-center gap-6 text-xs font-mono pt-3 border-t ${isLight ? "border-slate-200 text-slate-600" : "border-white/10 text-slate-400"}`}>
+              <button
+                onClick={() => openFollowModal("followers")}
+                className="hover:text-indigo-500 transition-colors cursor-pointer group flex items-center gap-1"
+              >
+                <span className={`font-bold text-sm ${isLight ? "text-slate-900 group-hover:text-indigo-600" : "text-white group-hover:text-indigo-400"}`}>
+                  {followersCount}
+                </span>
+                <span className="underline decoration-dotted underline-offset-4">Followers</span>
+              </button>
+
+              <button
+                onClick={() => openFollowModal("following")}
+                className="hover:text-indigo-500 transition-colors cursor-pointer group flex items-center gap-1"
+              >
+                <span className={`font-bold text-sm ${isLight ? "text-slate-900 group-hover:text-indigo-600" : "text-white group-hover:text-indigo-400"}`}>
+                  {followingCount}
+                </span>
+                <span className="underline decoration-dotted underline-offset-4">Following</span>
+              </button>
             </div>
           </div>
 
@@ -703,6 +749,195 @@ export default function CreatorProfilePage() {
           recipientId={creator.id}
           senderId={currentUser?.id || ""}
         />
+      )}
+
+      {/* ── FOLLOWERS & FOLLOWING LIST MODAL ── */}
+      {isFollowersModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            onClick={() => setIsFollowersModalOpen(false)}
+          />
+
+          {/* Modal Container */}
+          <div
+            className={`relative z-10 w-full max-w-[440px] rounded-3xl border shadow-2xl overflow-hidden ${
+              isLight
+                ? "bg-white border-slate-200/80"
+                : "bg-[#111318] border-white/[0.08]"
+            }`}
+            style={{
+              animation: "modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            {/* Gradient Accent Bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+
+            {/* Header */}
+            <div className="px-6 pt-5 pb-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-lg font-extrabold tracking-tight outfit ${isLight ? "text-slate-900" : "text-white"}`}>
+                  {creator?.username ? `@${creator.username}` : "Creator"}
+                </h2>
+                <button
+                  onClick={() => setIsFollowersModalOpen(false)}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all text-sm ${
+                    isLight
+                      ? "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800"
+                      : "bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Tab Switcher */}
+              <div className={`flex rounded-2xl p-1 ${isLight ? "bg-slate-100" : "bg-white/[0.04]"}`}>
+                <button
+                  onClick={() => setFollowersModalTab("followers")}
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold outfit transition-all ${
+                    followersModalTab === "followers"
+                      ? isLight
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                      : isLight
+                        ? "text-slate-500 hover:text-slate-700"
+                        : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  👥 Followers
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                    followersModalTab === "followers"
+                      ? isLight ? "bg-slate-100 text-slate-700" : "bg-white/20 text-white"
+                      : isLight ? "bg-slate-200 text-slate-500" : "bg-white/5 text-slate-500"
+                  }`}>
+                    {followersList.length}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => setFollowersModalTab("following")}
+                  className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold outfit transition-all ${
+                    followersModalTab === "following"
+                      ? isLight
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                      : isLight
+                        ? "text-slate-500 hover:text-slate-700"
+                        : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  ✨ Following
+                  <span className={`ml-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                    followersModalTab === "following"
+                      ? isLight ? "bg-slate-100 text-slate-700" : "bg-white/20 text-white"
+                      : isLight ? "bg-slate-200 text-slate-500" : "bg-white/5 text-slate-500"
+                  }`}>
+                    {followingList.length}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className={`mx-6 border-t ${isLight ? "border-slate-100" : "border-white/5"}`} />
+
+            {/* List Body */}
+            <div className="px-4 py-4 max-h-[400px] overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
+              {loadingFollowersData ? (
+                <div className="py-16 text-center space-y-3">
+                  <div className="relative mx-auto w-10 h-10">
+                    <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20" />
+                    <div className="absolute inset-0 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+                  </div>
+                  <p className={`text-xs font-medium ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                    Discovering creators...
+                  </p>
+                </div>
+              ) : (followersModalTab === "followers" ? followersList : followingList).length === 0 ? (
+                <div className="py-14 text-center space-y-3">
+                  <div className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl ${
+                    isLight ? "bg-slate-50" : "bg-white/[0.03]"
+                  }`}>
+                    {followersModalTab === "followers" ? "🫂" : "🔭"}
+                  </div>
+                  <div>
+                    <p className={`text-sm font-bold outfit ${isLight ? "text-slate-800" : "text-white"}`}>
+                      {followersModalTab === "followers" ? "No followers yet" : "Not following anyone"}
+                    </p>
+                    <p className={`text-xs mt-1 max-w-[240px] mx-auto leading-relaxed ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                      {followersModalTab === "followers"
+                        ? "When other creators follow this profile, they'll appear here."
+                        : "Creators followed by this profile will show up here."}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {(followersModalTab === "followers" ? followersList : followingList).map((user) => (
+                    <a
+                      key={user.id}
+                      href={`/creator/${user.username}`}
+                      className={`group flex items-center gap-3.5 p-3 rounded-2xl transition-all duration-200 ${
+                        isLight
+                          ? "hover:bg-slate-50 active:bg-slate-100"
+                          : "hover:bg-white/[0.04] active:bg-white/[0.07]"
+                      }`}
+                    >
+                      {/* Avatar with Gradient Ring */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 p-[2px]">
+                          <div className={`w-full h-full rounded-[10px] flex items-center justify-center font-bold text-sm outfit ${
+                            isLight ? "bg-white text-slate-800" : "bg-[#111318] text-white"
+                          }`}>
+                            {(user.username || "A").substring(0, 2).toUpperCase()}
+                          </div>
+                        </div>
+                        {/* Online indicator dot */}
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#111318]" />
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className={`text-sm font-bold outfit truncate group-hover:text-indigo-500 transition-colors ${
+                          isLight ? "text-slate-900" : "text-white"
+                        }`}>
+                          {user.full_name || user.username}
+                        </h4>
+                        <p className={`text-[11px] font-mono truncate ${isLight ? "text-slate-400" : "text-slate-500"}`}>
+                          @{user.username}
+                        </p>
+                      </div>
+
+                      {/* Arrow Icon */}
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0 ${
+                        isLight ? "bg-slate-100 text-slate-600" : "bg-white/5 text-slate-400"
+                      }`}>
+                        →
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className={`px-6 py-3 border-t text-center ${isLight ? "border-slate-100" : "border-white/5"}`}>
+              <p className={`text-[10px] font-mono ${isLight ? "text-slate-300" : "text-slate-600"}`}>
+                Narratia Creator Network
+              </p>
+            </div>
+          </div>
+
+          {/* Animation Keyframes */}
+          <style>{`
+            @keyframes modalSlideUp {
+              from { opacity: 0; transform: translateY(16px) scale(0.97); }
+              to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+          `}</style>
+        </div>
       )}
     </div>
   );

@@ -166,6 +166,74 @@ export async function toggleFollowUser(targetUserId: string, followerId: string)
   }
 }
 
+export interface FollowerUser {
+  id: string;
+  username: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+}
+
+export async function fetchUserFollowers(targetUserId: string): Promise<FollowerUser[]> {
+  try {
+    const { data: follows, error: followErr } = await supabase
+      .from("user_follows")
+      .select("follower_id")
+      .eq("following_id", targetUserId);
+
+    if (followErr || !follows || follows.length === 0) return [];
+
+    const followerIds = follows.map((f) => f.follower_id);
+
+    const { data: profiles, error: profileErr } = await supabase
+      .from("profiles")
+      .select("*")
+      .in("id", followerIds);
+
+    if (profileErr || !profiles) return [];
+    return profiles.map((p: any) => ({
+      id: p.id,
+      username: p.username || "Unknown",
+      full_name: p.full_name || null,
+      avatar_url: p.avatar_url || null,
+      bio: p.bio || null,
+    }));
+  } catch (err) {
+    console.error("Error fetching followers:", err);
+    return [];
+  }
+}
+
+export async function fetchUserFollowing(targetUserId: string): Promise<FollowerUser[]> {
+  try {
+    const { data: follows, error: followErr } = await supabase
+      .from("user_follows")
+      .select("following_id")
+      .eq("follower_id", targetUserId);
+
+    if (followErr || !follows || follows.length === 0) return [];
+
+    const followingIds = follows.map((f) => f.following_id);
+
+    const { data: profiles, error: profileErr } = await supabase
+      .from("profiles")
+      .select("*")
+      .in("id", followingIds);
+
+    if (profileErr || !profiles) return [];
+    return profiles.map((p: any) => ({
+      id: p.id,
+      username: p.username || "Unknown",
+      full_name: p.full_name || null,
+      avatar_url: p.avatar_url || null,
+      bio: p.bio || null,
+    }));
+  } catch (err) {
+    console.error("Error fetching following:", err);
+    return [];
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────
 // COLLABORATION REQUESTS API
 // ─────────────────────────────────────────────────────────────────
