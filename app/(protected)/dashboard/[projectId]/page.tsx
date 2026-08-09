@@ -376,13 +376,14 @@ export default function ProjectDetailPage() {
 
           {/* Quick Actions */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-wrap items-center gap-3 shrink-0">
-            {project.is_team && isOwner && (
+            {isOwner && (
               <button
                 onClick={() => router.push(`/dashboard/${projectId}/team`)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-sm font-semibold text-slate-800 dark:text-white shadow-sm transition-all group"
+                title="Manage story collaborators and roles"
               >
                 <Users className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
-                Team
+                <span>Team & Collaborators</span>
               </button>
             )}
 

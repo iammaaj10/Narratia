@@ -184,35 +184,41 @@ export default function ModuleDetailPage() {
       if (projectData) {
         setIsOwner(projectData.owner_id === user.id);
 
-        if (projectData.is_team) {
-          const { data: membersData } = await supabase
-            .from("project_members")
-            .select("user_id, role")
-            .eq("project_id", projectId)
-            .eq("status", "accepted")
-            .not("user_id", "is", null);
+        // Fetch accepted members from project_members
+        const { data: membersData } = await supabase
+          .from("project_members")
+          .select("user_id")
+          .eq("project_id", projectId)
+          .eq("status", "accepted")
+          .not("user_id", "is", null);
 
-          if (membersData && membersData.length > 0) {
-            const userIds = membersData.map((m) => m.user_id);
+        // Fetch accepted collaborators from collaboration_requests
+        const { data: collabData } = await supabase
+          .from("collaboration_requests")
+          .select("sender_id, recipient_id")
+          .eq("project_id", projectId)
+          .eq("status", "accepted");
 
-            const { data: profilesData } = await supabase
-              .from("profiles")
-              .select("id, username, avatar_url")
-              .in("id", userIds);
+        const memberIds = membersData?.map((m) => m.user_id).filter(Boolean) || [];
+        const collabIds = collabData?.flatMap((c) => [c.sender_id, c.recipient_id]).filter(Boolean) || [];
 
-            if (profilesData) {
-              const combined = userIds
-                .map((userId) => {
-                  const profile = profilesData.find((p) => p.id === userId);
-                  return {
-                    user_id: userId,
-                    profiles: profile || null,
-                  };
-                })
-                .filter((m) => m.profiles !== null);
+        // Include owner_id and unique collaborator IDs
+        const allUserIds = Array.from(
+          new Set([projectData.owner_id, ...memberIds, ...collabIds])
+        );
 
-              setTeamMembers(combined as TeamMember[]);
-            }
+        if (allUserIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from("profiles")
+            .select("id, username, avatar_url")
+            .in("id", allUserIds);
+
+          if (profilesData) {
+            const combined = profilesData.map((profile) => ({
+              user_id: profile.id,
+              profiles: profile,
+            }));
+            setTeamMembers(combined as TeamMember[]);
           }
         }
       }
@@ -611,25 +617,23 @@ export default function ModuleDetailPage() {
                   className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 min-h-[90px] resize-none"
                 />
               </div>
-              {teamMembers.length > 0 && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
-                    Assign Writer
-                  </label>
-                  <select
-                    value={editPhaseAssignedTo || ""}
-                    onChange={(e) => setEditPhaseAssignedTo(e.target.value || null)}
-                    className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
-                  >
-                    <option value="">Unassigned</option>
-                    {teamMembers.map((m) => (
-                      <option key={m.user_id} value={m.user_id}>
-                        {m.profiles?.username || m.user_id}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                  Assign Writer / Collaborator
+                </label>
+                <select
+                  value={editPhaseAssignedTo || ""}
+                  onChange={(e) => setEditPhaseAssignedTo(e.target.value || null)}
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="">Unassigned (All Collaborators Can Edit)</option>
+                  {teamMembers.map((m) => (
+                    <option key={m.user_id} value={m.user_id}>
+                      ✍️ {m.profiles?.username || m.user_id}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"

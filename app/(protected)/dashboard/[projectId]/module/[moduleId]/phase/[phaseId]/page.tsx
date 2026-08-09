@@ -196,8 +196,42 @@ export default function WritingEditorPage() {
       if (projectData) {
         const ownerCheck = projectData.owner_id === user.id;
         const isAssigned = phaseData.assigned_to === user.id;
+        let isAcceptedCollaborator = false;
+
+        if (!ownerCheck && !isAssigned) {
+          // Check project_members role
+          const { data: member } = await supabase
+            .from("project_members")
+            .select("role")
+            .eq("project_id", projectId)
+            .eq("user_id", user.id)
+            .eq("status", "accepted")
+            .maybeSingle();
+
+          if (member) {
+            const role = (member.role || "").toLowerCase();
+            // All roles except viewer/beta_reader have write/edit access
+            isAcceptedCollaborator = !["viewer", "reader", "beta_reader"].includes(role);
+          }
+
+          // Check collaboration_requests
+          if (!isAcceptedCollaborator) {
+            const { data: collab } = await supabase
+              .from("collaboration_requests")
+              .select("id")
+              .eq("project_id", projectId)
+              .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+              .eq("status", "accepted")
+              .maybeSingle();
+
+            if (collab) {
+              isAcceptedCollaborator = true;
+            }
+          }
+        }
+
         setIsOwner(ownerCheck);
-        setCanEdit(ownerCheck || isAssigned);
+        setCanEdit(ownerCheck || isAssigned || isAcceptedCollaborator);
       }
     } catch (err) {
       console.error("❌ Error loading phase:", err);
