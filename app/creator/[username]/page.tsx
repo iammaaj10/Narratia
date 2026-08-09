@@ -1071,6 +1071,21 @@ export default function CreatorProfilePage() {
           `}</style>
         </div>
       )}
+
+      {/* Hidden File Input for Profile Photo Upload */}
+      <input
+        ref={profileImageInputRef}
+        type="file"
+        hidden
+        accept="image/jpeg,image/png,image/jpg,image/webp"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleProfilePhotoUpload(file);
+          }
+          e.target.value = "";
+        }}
+      />
     </div>
   );
 }
