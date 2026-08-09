@@ -68,8 +68,9 @@ export default function DashboardPage() {
     if (!user) return;
 
     setCurrentUserId(user.id);
+    const userEmail = user.email?.toLowerCase() || "";
 
-    // 1️⃣ Solo projects (owner)
+    // 1️⃣ Solo / Owned projects
     const { data: ownedProjects } = await supabase
       .from("projects")
       .select(
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       )
       .eq("owner_id", user.id);
 
-    // 2️⃣ Team projects (accepted member)
+    // 2️⃣ Team projects (accepted member by user_id or email)
     const { data: memberProjects } = await supabase
       .from("project_members")
       .select(
@@ -96,15 +97,44 @@ export default function DashboardPage() {
         )
       `
       )
-      .eq("user_id", user.id)
+      .or(`user_id.eq.${user.id},invited_email.eq.${userEmail}`)
+      .eq("status", "accepted");
+
+    // 3️⃣ Collaboration pitch projects (accepted sender/recipient)
+    const { data: collabProjects } = await supabase
+      .from("collaboration_requests")
+      .select(
+        `
+        project:projects (
+          id,
+          title,
+          description,
+          is_team,
+          owner_id,
+          archived,
+          is_public,
+          slug,
+          created_at,
+          updated_at
+        )
+      `
+      )
+      .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
       .eq("status", "accepted");
 
     const teamProjects =
       memberProjects?.map((m: any) => m.project).filter(Boolean) ?? [];
 
-    // 3️⃣ Merge + remove duplicates
-    const allProjects = [...(ownedProjects ?? []), ...teamProjects].filter(
-      (p, index, self) => index === self.findIndex((x) => x.id === p.id)
+    const collabStories =
+      collabProjects?.map((c: any) => c.project).filter(Boolean) ?? [];
+
+    // 4️⃣ Merge + remove duplicates
+    const allProjects = [
+      ...(ownedProjects ?? []),
+      ...teamProjects,
+      ...collabStories,
+    ].filter(
+      (p, index, self) => p && index === self.findIndex((x) => x && x.id === p.id)
     );
 
     setProjects(allProjects);

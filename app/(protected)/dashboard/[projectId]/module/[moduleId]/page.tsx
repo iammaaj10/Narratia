@@ -59,6 +59,88 @@ export default function ModuleDetailPage() {
   const [isOwner, setIsOwner] = useState(false);
   const [showCreatePhase, setShowCreatePhase] = useState(false);
 
+  // Edit Module Modal State
+  const [showEditModuleModal, setShowEditModuleModal] = useState(false);
+  const [editModuleTitle, setEditModuleTitle] = useState("");
+  const [editModuleDescription, setEditModuleDescription] = useState("");
+  const [savingModule, setSavingModule] = useState(false);
+
+  // Edit Phase Modal State
+  const [showEditPhaseModal, setShowEditPhaseModal] = useState(false);
+  const [editingPhase, setEditingPhase] = useState<Phase | null>(null);
+  const [editPhaseTitle, setEditPhaseTitle] = useState("");
+  const [editPhaseDescription, setEditPhaseDescription] = useState("");
+  const [editPhaseAssignedTo, setEditPhaseAssignedTo] = useState<string | null>(null);
+  const [savingPhase, setSavingPhase] = useState(false);
+
+  const openEditModuleModal = () => {
+    if (!module) return;
+    setEditModuleTitle(module.title);
+    setEditModuleDescription(module.description || "");
+    setShowEditModuleModal(true);
+  };
+
+  const handleSaveModuleInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!module || !editModuleTitle.trim()) return;
+    setSavingModule(true);
+
+    try {
+      const { error } = await supabase
+        .from("modules")
+        .update({
+          title: editModuleTitle.trim(),
+          description: editModuleDescription.trim() || null,
+        })
+        .eq("id", module.id);
+
+      if (error) throw error;
+
+      setModule((prev) =>
+        prev ? { ...prev, title: editModuleTitle.trim(), description: editModuleDescription.trim() || null } : null
+      );
+      setShowEditModuleModal(false);
+    } catch (err: any) {
+      alert("Failed to update module info: " + (err.message || err));
+    } finally {
+      setSavingModule(false);
+    }
+  };
+
+  const openEditPhaseModal = (phaseToEdit: Phase) => {
+    setEditingPhase(phaseToEdit);
+    setEditPhaseTitle(phaseToEdit.title);
+    setEditPhaseDescription(phaseToEdit.description || "");
+    setEditPhaseAssignedTo(phaseToEdit.assigned_to);
+    setShowEditPhaseModal(true);
+  };
+
+  const handleSavePhaseInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPhase || !editPhaseTitle.trim()) return;
+    setSavingPhase(true);
+
+    try {
+      const { error } = await supabase
+        .from("phases")
+        .update({
+          title: editPhaseTitle.trim(),
+          description: editPhaseDescription.trim() || null,
+          assigned_to: editPhaseAssignedTo || null,
+        })
+        .eq("id", editingPhase.id);
+
+      if (error) throw error;
+
+      await loadModuleData();
+      setShowEditPhaseModal(false);
+    } catch (err: any) {
+      alert("Failed to update phase: " + (err.message || err));
+    } finally {
+      setSavingPhase(false);
+    }
+  };
+
   useEffect(() => {
     loadModuleData();
   }, [moduleId]);
@@ -221,15 +303,34 @@ export default function ModuleDetailPage() {
               </div>
             </motion.div>
             
-            <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">
-              {module.title}
-            </motion.h1>
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="flex flex-wrap items-center gap-3 mb-2">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
+                {module.title}
+              </h1>
+              {isOwner && (
+                <button
+                  onClick={openEditModuleModal}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all text-xs font-bold outfit cursor-pointer shrink-0 mt-1 shadow-sm"
+                  title="Edit Module Title & Description"
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                  <span>Edit Module Info</span>
+                </button>
+              )}
+            </motion.div>
             
-            {module.description && (
+            {module.description ? (
               <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-slate-600 dark:text-gray-400 text-base lg:text-lg max-w-3xl leading-relaxed">
                 {module.description}
               </motion.p>
-            )}
+            ) : isOwner ? (
+              <button
+                onClick={openEditModuleModal}
+                className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1.5 pt-1"
+              >
+                + Add module description
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -368,17 +469,18 @@ export default function ModuleDetailPage() {
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-black/40 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none">
+                    {/* Actions — Always visible */}
+                    <div className="relative z-10 flex items-center gap-2 self-end sm:self-auto bg-slate-100/90 dark:bg-black/50 backdrop-blur-md rounded-xl p-1 border border-slate-200 dark:border-white/10 shadow-sm">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/dashboard/${projectId}/module/${moduleId}/phase/${phase.id}`);
+                          openEditPhaseModal(phase);
                         }}
-                        className="p-2 rounded-lg text-slate-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/20 transition-all"
-                        title="Edit Phase"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all cursor-pointer"
+                        title="Edit Phase Title & Details"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>Edit Details</span>
                       </button>
 
                       {isOwner && (
@@ -414,6 +516,139 @@ export default function ModuleDetailPage() {
             loadModuleData();
           }}
         />
+      )}
+
+      {/* Edit Module Modal */}
+      {showEditModuleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-white dark:bg-[#181724] rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-slate-200 dark:border-white/10 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white outfit">Edit Module Details</h3>
+              <button
+                onClick={() => setShowEditModuleModal(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSaveModuleInfo} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                  Module Title <span className="text-pink-500">*</span>
+                </label>
+                <input
+                  value={editModuleTitle}
+                  onChange={(e) => setEditModuleTitle(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 font-medium"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                  Module Description / Overview
+                </label>
+                <textarea
+                  value={editModuleDescription}
+                  onChange={(e) => setEditModuleDescription(e.target.value)}
+                  placeholder="Summary of chapters or plot arc contained in this module..."
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 min-h-[90px] resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModuleModal(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 outfit"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingModule || !editModuleTitle.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md transition-all disabled:opacity-50 outfit flex items-center justify-center gap-2"
+                >
+                  {savingModule ? "Saving..." : "Save Module Info"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Phase Modal */}
+      {showEditPhaseModal && editingPhase && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-white dark:bg-[#181724] rounded-2xl p-6 w-full max-w-lg shadow-2xl border border-slate-200 dark:border-white/10 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white outfit">Edit Phase / Scene</h3>
+              <button
+                onClick={() => setShowEditPhaseModal(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSavePhaseInfo} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                  Phase Title <span className="text-pink-500">*</span>
+                </label>
+                <input
+                  value={editPhaseTitle}
+                  onChange={(e) => setEditPhaseTitle(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 font-medium"
+                  required
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                  Description / Scene Goal
+                </label>
+                <textarea
+                  value={editPhaseDescription}
+                  onChange={(e) => setEditPhaseDescription(e.target.value)}
+                  placeholder="Outline the scene goals, characters present, or plot beats for this phase..."
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 min-h-[90px] resize-none"
+                />
+              </div>
+              {teamMembers.length > 0 && (
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 outfit">
+                    Assign Writer
+                  </label>
+                  <select
+                    value={editPhaseAssignedTo || ""}
+                    onChange={(e) => setEditPhaseAssignedTo(e.target.value || null)}
+                    className="w-full p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0c0c14] text-sm text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="">Unassigned</option>
+                    {teamMembers.map((m) => (
+                      <option key={m.user_id} value={m.user_id}>
+                        {m.profiles?.username || m.user_id}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditPhaseModal(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 outfit"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingPhase || !editPhaseTitle.trim()}
+                  className="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md transition-all disabled:opacity-50 outfit flex items-center justify-center gap-2"
+                >
+                  {savingPhase ? "Saving..." : "Save Phase Info"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </motion.div>
   );

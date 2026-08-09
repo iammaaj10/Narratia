@@ -66,7 +66,7 @@ export default function IncomingInvites() {
         )
       `
       )
-      .eq("invited_email", user.email.toLowerCase())
+      .or(`invited_email.eq.${user.email.toLowerCase()},user_id.eq.${user.id}`)
       .eq("status", "pending");
 
 
@@ -102,6 +102,12 @@ export default function IncomingInvites() {
 
 
       if (accept) {
+        // Ensure project.is_team = true
+        await supabase
+          .from("projects")
+          .update({ is_team: true })
+          .eq("id", projectId);
+
         const { error } = await supabase
           .from("project_members")
           .update({
@@ -120,8 +126,49 @@ export default function IncomingInvites() {
           return;
         }
 
+        // Notify Project Owner and log activity
+        try {
+          const targetInvite = invites.find((i) => i.id === id);
+          const { data: project } = await supabase
+            .from("projects")
+            .select("owner_id, title")
+            .eq("id", projectId)
+            .single();
 
-        alert("Invite accepted! Redirecting...");
+          if (project?.owner_id) {
+            // Get user username if available
+            const { data: userProfile } = await supabase
+              .from("profiles")
+              .select("username")
+              .eq("id", user.id)
+              .single();
+
+            const nameToDisplay = userProfile?.username || user.email;
+
+            // 1. Insert notification for owner
+            await supabase.from("notifications").insert({
+              user_id: project.owner_id,
+              type: "invite",
+              title: "Invitation Accepted 🎉",
+              message: `${nameToDisplay} accepted your invitation to collaborate on "${project.title}"`,
+              link: `/dashboard/${projectId}/team`,
+              project_id: projectId,
+              read: false,
+            });
+
+            // 2. Insert team activity log
+            await supabase.from("project_activity").insert({
+              project_id: projectId,
+              user_id: user.id,
+              action_type: "member_joined",
+              action_details: `${nameToDisplay} joined the team as ${targetInvite?.role || "collaborator"}`,
+            });
+          }
+        } catch (notifErr) {
+          console.warn("⚠️ Notification warning:", notifErr);
+        }
+
+        alert("Invite accepted! Redirecting to workspace...");
         window.location.href = `/dashboard/${projectId}`;
       } else {
         const { error } = await supabase

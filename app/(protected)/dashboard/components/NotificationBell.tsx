@@ -11,6 +11,7 @@ type Notification = {
   title: string;
   message: string;
   link: string | null;
+  project_id: string | null;
   read: boolean;
   created_at: string;
 };
@@ -135,13 +136,181 @@ export default function NotificationBell() {
     }
   };
 
+  const handleAcceptInvite = async (notification: Notification) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      let targetProjectId = notification.project_id;
+
+      // 1. Check collaboration_requests table
+      const { data: collabRequests } = await supabase
+        .from("collaboration_requests")
+        .select("*")
+        .eq("recipient_id", user.id)
+        .eq("status", "pending");
+
+      if (collabRequests && collabRequests.length > 0) {
+        const req = collabRequests[0];
+        targetProjectId = targetProjectId || req.project_id;
+
+        // Update collab request status
+        await supabase
+          .from("collaboration_requests")
+          .update({ status: "accepted" })
+          .eq("id", req.id);
+
+        // Add member to project_members
+        if (req.project_id) {
+          await supabase.from("project_members").insert({
+            project_id: req.project_id,
+            user_id: user.id,
+            role: req.proposed_role || "editor",
+            status: "accepted",
+          });
+
+          // Notify sender
+          await supabase.from("notifications").insert({
+            user_id: req.sender_id,
+            type: "invite",
+            title: "Collaboration Accepted 🎉",
+            message: `Your request to collaborate as ${req.proposed_role || "editor"} was accepted!`,
+            link: `/dashboard/${req.project_id}`,
+            project_id: req.project_id,
+            read: false,
+          });
+        }
+      }
+
+      // 2. Also check project_members table for pending email/user invites
+      if (targetProjectId) {
+        // Ensure project has is_team = true so collaborator isn't redirected
+        await supabase
+          .from("projects")
+          .update({ is_team: true })
+          .eq("id", targetProjectId);
+
+        const { data: members } = await supabase
+          .from("project_members")
+          .select("id")
+          .eq("project_id", targetProjectId)
+          .or(`user_id.eq.${user.id},invited_email.eq.${user.email?.toLowerCase()}`);
+
+        if (members && members.length > 0) {
+          await supabase
+            .from("project_members")
+            .update({
+              status: "accepted",
+              user_id: user.id,
+            })
+            .eq("id", members[0].id);
+        }
+
+        // Notify Project Owner if different from user
+        const { data: project } = await supabase
+          .from("projects")
+          .select("owner_id, title")
+          .eq("id", targetProjectId)
+          .single();
+
+        if (project?.owner_id && project.owner_id !== user.id) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("username")
+            .eq("id", user.id)
+            .single();
+
+          const name = profile?.username || user.email;
+
+          await supabase.from("notifications").insert({
+            user_id: project.owner_id,
+            type: "invite",
+            title: "Invitation Accepted 🎉",
+            message: `${name} accepted your invitation to join "${project.title}"`,
+            link: `/dashboard/${targetProjectId}/team`,
+            project_id: targetProjectId,
+            read: false,
+          });
+        }
+      }
+
+      await markAsRead(notification.id);
+      setShowDropdown(false);
+
+      if (targetProjectId) {
+        router.push(`/dashboard/${targetProjectId}`);
+      } else if (notification.link) {
+        router.push(notification.link);
+      }
+    } catch (err: any) {
+      console.error("Error accepting invite:", err);
+      if (notification.link) router.push(notification.link);
+    }
+  };
+
+  const handleDeclineInvite = async (notification: Notification) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Decline collab requests
+      await supabase
+        .from("collaboration_requests")
+        .update({ status: "declined" })
+        .eq("recipient_id", user.id)
+        .eq("status", "pending");
+
+      // Decline project members
+      if (notification.project_id) {
+        const { data: members } = await supabase
+          .from("project_members")
+          .select("id")
+          .eq("project_id", notification.project_id)
+          .or(`user_id.eq.${user.id},invited_email.eq.${user.email?.toLowerCase()}`);
+
+        if (members && members.length > 0) {
+          await supabase
+            .from("project_members")
+            .update({ status: "rejected" })
+            .eq("id", members[0].id);
+        }
+      }
+
+      await deleteNotification(notification.id);
+    } catch (err) {
+      console.error("Error declining invite:", err);
+    }
+  };
+
+  const isPendingAction = (notification: Notification) => {
+    const title = notification.title.toLowerCase();
+    if (title.includes("accepted") || title.includes("declined") || title.includes("rejected")) {
+      return false;
+    }
+
+    return (
+      notification.type === "collab_request" ||
+      title.includes("collaboration request") ||
+      title.includes("project invitation") ||
+      title.includes("new invitation")
+    );
+  };
+
   const handleNotificationClick = (notification: Notification) => {
+    // If it's a pending invite requiring action, clicking the card body shouldn't trigger navigation
+    if (isPendingAction(notification)) return;
+
     if (!notification.read) {
       markAsRead(notification.id);
     }
 
-    if (notification.link) {
-      router.push(notification.link);
+    const destination = notification.link || (notification.project_id ? `/dashboard/${notification.project_id}` : null);
+    if (destination) {
+      router.push(destination);
       setShowDropdown(false);
     }
   };
@@ -253,6 +422,23 @@ export default function NotificationBell() {
                         <p className="text-xs text-slate-600 dark:text-gray-400 mb-2 line-clamp-2 leading-relaxed">
                           {notification.message}
                         </p>
+                        {isPendingAction(notification) && (
+                          <div className="flex items-center gap-2 my-2 pt-1" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={() => handleAcceptInvite(notification)}
+                              className="flex-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Accept Request</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeclineInvite(notification)}
+                              className="py-1.5 px-3 rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-red-500/20 text-slate-700 dark:text-gray-300 hover:text-red-500 text-xs font-semibold transition-all cursor-pointer"
+                            >
+                              Decline
+                            </button>
+                          </div>
+                        )}
                         <p className="text-[11px] text-slate-400 dark:text-gray-500">
                           {new Date(notification.created_at).toLocaleDateString()}{" "}
                           at{" "}

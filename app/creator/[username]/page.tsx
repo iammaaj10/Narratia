@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { Camera, Loader2, User } from "lucide-react";
 import {
   fetchCreatorProfile,
   toggleFollowUser,
@@ -64,6 +65,64 @@ export default function CreatorProfilePage() {
     open_for_collaboration: true,
   });
   const [updatingProfile, setUpdatingProfile] = useState(false);
+  const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false);
+
+  const handleProfilePhotoUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Only images are allowed");
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Image must be under 4MB");
+      return;
+    }
+
+    setUploadingProfilePhoto(true);
+
+    try {
+      let finalUrl: string | null = null;
+
+      try {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `avatar_${Date.now()}.${fileExt}`;
+        const filePath = `${creator?.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(filePath, file, { cacheControl: "3600", upsert: true });
+
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
+          finalUrl = urlData.publicUrl;
+        }
+      } catch (storageErr) {
+        console.warn("Storage upload fallback:", storageErr);
+      }
+
+      if (!finalUrl) {
+        finalUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (creator?.id) {
+        const { error } = await supabase.from("profiles").update({ avatar_url: finalUrl }).eq("id", creator.id);
+        if (error) throw error;
+        setCreator((prev) => (prev ? { ...prev, avatar_url: finalUrl } : null));
+        alert("Profile picture updated successfully!");
+      }
+    } catch (err: any) {
+      console.error("Failed to update profile photo:", err);
+      alert("Failed to update profile photo: " + (err.message || err));
+    } finally {
+      setUploadingProfilePhoto(false);
+    }
+  };
 
   // Collab Pitch Modal State
   const [selectedCollabStory, setSelectedCollabStory] = useState<{ id: string; title: string } | null>(null);
@@ -362,11 +421,44 @@ export default function CreatorProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 pb-2">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
               {/* Avatar Box */}
-              <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex-shrink-0 flex items-center justify-center text-xl sm:text-2xl font-bold outfit shadow-md ${isLight
-                  ? "bg-slate-900 text-white"
-                  : "bg-zinc-800 text-white border border-white/10"
-                }`}>
-                {creator.username.substring(0, 2).toUpperCase()}
+              <div
+                onClick={() => isSelf && !uploadingProfilePhoto && profileImageInputRef.current?.click()}
+                className={`relative group/creatoravatar overflow-hidden rounded-2xl ${
+                  isSelf ? "cursor-pointer" : ""
+                }`}
+                title={isSelf ? "Click to change profile picture" : creator.username}
+              >
+                {creator.avatar_url ? (
+                  <img
+                    src={creator.avatar_url}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-md border border-white/10"
+                    alt={creator.username}
+                  />
+                ) : (
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex-shrink-0 flex items-center justify-center text-xl sm:text-2xl font-bold outfit shadow-md ${
+                      isLight
+                        ? "bg-slate-900 text-white"
+                        : "bg-zinc-800 text-white border border-white/10"
+                    }`}
+                  >
+                    {creator.username.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+
+                {/* Camera overlay for owner */}
+                {isSelf && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-xs opacity-0 group-hover/creatoravatar:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white rounded-2xl">
+                    {uploadingProfilePhoto ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <Camera className="w-5 h-5 mb-0.5" />
+                        <span className="text-[10px] font-bold outfit uppercase">Change</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Name & Handle Stack */}
@@ -643,6 +735,46 @@ export default function CreatorProfilePage() {
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-4 text-xs">
+              {/* Profile Photo Upload Field */}
+              <div className="p-3 rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.04] flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {creator.avatar_url ? (
+                    <img
+                      src={creator.avatar_url}
+                      className="w-12 h-12 rounded-xl object-cover border border-white/10"
+                      alt="Profile preview"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-300 flex items-center justify-center font-bold text-sm">
+                      {creator.username.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-bold text-xs outfit">Profile Picture</div>
+                    <div className="text-[11px] text-slate-400">JPG, PNG, WebP up to 4MB</div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => profileImageInputRef.current?.click()}
+                  disabled={uploadingProfilePhoto}
+                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                >
+                  {uploadingProfilePhoto ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Upload Photo</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               <div>
                 <label className="block font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
                 <input
