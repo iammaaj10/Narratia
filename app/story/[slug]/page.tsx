@@ -51,31 +51,65 @@ export default function PublicStoryPage() {
 
 
 
-      // Fetch public project - search by slug or ID
+      // Fetch project - search by slug or ID
       let { data: projectData } = await supabase
         .from("projects")
-        .select("id, title, description, owner_id, view_count, created_at, slug, genre")
+        .select("id, title, description, owner_id, view_count, created_at, slug, genre, is_public")
         .eq("slug", slug)
-        .eq("is_public", true)
         .maybeSingle();
 
       if (!projectData) {
         const { data: idProject } = await supabase
           .from("projects")
-          .select("id, title, description, owner_id, view_count, created_at, slug, genre")
+          .select("id, title, description, owner_id, view_count, created_at, slug, genre, is_public")
           .eq("id", slug)
-          .eq("is_public", true)
           .maybeSingle();
         projectData = idProject;
       }
 
-
-
       if (!projectData) {
-        console.error("Project not found");
         setNotFound(true);
         setLoading(false);
         return;
+      }
+
+      // If story is private, check if current user is owner or an allowed private reader
+      if (!projectData.is_public) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+
+        const isOwner = projectData.owner_id === user.id;
+        if (!isOwner) {
+          const { data: readerProfile } = await supabase
+            .from("profiles")
+            .select("username")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          const rName = readerProfile?.username || "";
+
+          const userEmail = user.email || "";
+
+          const { data: allowedMembers } = await supabase
+            .from("project_members")
+            .select("id")
+            .eq("project_id", projectData.id)
+            .eq("status", "accepted")
+            .or(`user_id.eq."${user.id}"${userEmail ? `,invited_email.eq."${userEmail}"` : ""}${rName ? `,invited_email.eq."${rName}"` : ""}`);
+
+          if (!allowedMembers || allowedMembers.length === 0) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+          }
+        }
       }
 
       // Get owner profile separately

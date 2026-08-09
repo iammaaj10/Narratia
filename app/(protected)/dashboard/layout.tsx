@@ -53,9 +53,10 @@ export default function DashboardLayout({
           .maybeSingle();
 
         if (!data) {
-          const newUsername = user.email?.split("@")[0] || "Writer";
+          const baseUsername = user.email?.split("@")[0] || "Writer";
+          let newUsername = baseUsername;
 
-          const { data: newProfile, error: insertError } = await supabase
+          let { data: newProfile, error: insertError } = await supabase
             .from("profiles")
             .insert({
               id: user.id,
@@ -65,8 +66,25 @@ export default function DashboardLayout({
             .select("username, avatar_url")
             .single();
 
+          // If insert failed due to duplicate username, try with a random suffix
           if (insertError) {
-            console.error("❌ Failed to create profile:", insertError);
+            newUsername = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+            const retry = await supabase
+              .from("profiles")
+              .insert({
+                id: user.id,
+                username: newUsername,
+                avatar_url: null,
+              })
+              .select("username, avatar_url")
+              .single();
+            
+            newProfile = retry.data;
+            insertError = retry.error;
+          }
+
+          if (insertError) {
+            console.error("❌ Failed to create profile:", insertError.message || JSON.stringify(insertError));
             data = { username: newUsername, avatar_url: null };
           } else {
             data = newProfile;

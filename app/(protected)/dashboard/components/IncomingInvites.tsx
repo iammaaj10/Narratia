@@ -51,35 +51,38 @@ export default function IncomingInvites() {
 
 
 
-    // 2. Query with detailed error logging
+    // 2. Query with detailed error logging & fallback
     const { data, error: queryError } = await supabase
       .from("project_members")
-      .select(
-        `
-        id,
-        project_id,
-        role,
-        invited_email,
-        status,
-        projects (
-          title
-        )
-      `
-      )
-      .or(`invited_email.eq.${user.email.toLowerCase()},user_id.eq.${user.id}`)
+      .select("id, project_id, role, invited_email, status")
+      .or(`invited_email.eq."${user.email.toLowerCase()}",user_id.eq."${user.id}"`)
       .eq("status", "pending");
 
-
-
     if (queryError) {
-      console.error("❌ Query error:", queryError);
-      setError("Failed to load invitations. Please try again.");
+      console.error("❌ Query error:", queryError.message || JSON.stringify(queryError));
+      setInvites([]);
       setLoading(false);
       return;
     }
 
+    if (data && data.length > 0) {
+      const projectIds = data.map((m) => m.project_id).filter(Boolean);
+      const { data: projData } = await supabase
+        .from("projects")
+        .select("id, title")
+        .in("id", projectIds);
 
-    setInvites((data as unknown as Invite[]) || []);
+      const projMap = new Map(projData?.map((p) => [p.id, p.title]) || []);
+      const formattedInvites: Invite[] = data.map((m) => ({
+        ...m,
+        projects: {
+          title: projMap.get(m.project_id) || "Untitled Project",
+        },
+      }));
+      setInvites(formattedInvites);
+    } else {
+      setInvites([]);
+    }
   } catch (err) {
     console.error("❌ Unexpected error:", err);
     setError(err instanceof Error ? err.message : "Unknown error");

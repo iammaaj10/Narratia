@@ -78,7 +78,7 @@ export default function DashboardPage() {
       )
       .eq("owner_id", user.id);
 
-    // 2️⃣ Team projects (accepted member by user_id or email)
+    // 2️⃣ Team projects (accepted member with editing/owner roles only, excluding read-only viewers)
     const { data: memberProjects } = await supabase
       .from("project_members")
       .select(
@@ -98,7 +98,8 @@ export default function DashboardPage() {
       `
       )
       .or(`user_id.eq.${user.id},invited_email.eq.${userEmail}`)
-      .eq("status", "accepted");
+      .eq("status", "accepted")
+      .not("role", "in", "(viewer,reader)");
 
     // 3️⃣ Collaboration pitch projects (accepted sender/recipient)
     const { data: collabProjects } = await supabase

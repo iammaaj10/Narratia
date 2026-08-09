@@ -115,12 +115,13 @@ export default function ProjectDetailPage() {
 
       // Security: verify user has access to this project
       if (!owner) {
-        // Check project_members table
+        // Check project_members table by user_id or invited_email
+        const userEmail = user.email?.toLowerCase() || "";
         const { data: membership } = await supabase
           .from("project_members")
           .select("id")
           .eq("project_id", projectId)
-          .eq("user_id", user.id)
+          .or(`user_id.eq.${user.id}${userEmail ? `,invited_email.eq.${userEmail}` : ""}`)
           .eq("status", "accepted")
           .maybeSingle();
 

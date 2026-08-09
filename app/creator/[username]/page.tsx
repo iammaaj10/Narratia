@@ -235,27 +235,83 @@ export default function CreatorProfilePage() {
         : profile.id;
 
       if (targetUserId) {
-        let { data: userProjects, error: storyError } = await supabase
-          .from("projects")
-          .select("id, title, slug, description, genre, is_public, view_count, like_count, created_at")
-          .eq("owner_id", targetUserId)
-          .order("created_at", { ascending: false });
+        const isSelfProfile = Boolean(user && user.id === targetUserId);
+        let userProjects: any[] = [];
 
-        if (storyError || !userProjects) {
-          const { data: baseProjects } = await supabase
+        if (isSelfProfile) {
+          // Owner sees all their projects (public and private)
+          const { data } = await supabase
             .from("projects")
-            .select("id, title, description, created_at")
+            .select("id, title, slug, description, genre, is_public, view_count, like_count, created_at")
             .eq("owner_id", targetUserId)
             .order("created_at", { ascending: false });
+          userProjects = data || [];
+        } else {
+          // Visitor:
+          // 1. Fetch public projects owned by this creator
+          const { data: publicProjects } = await supabase
+            .from("projects")
+            .select("id, title, slug, description, genre, is_public, view_count, like_count, created_at")
+            .eq("owner_id", targetUserId)
+            .eq("is_public", true)
+            .order("created_at", { ascending: false });
 
-          userProjects = baseProjects ? baseProjects.map((p: any) => ({ ...p, is_public: true, slug: p.id, genre: "Fiction", view_count: 0, like_count: 0 })) : [];
+          userProjects = publicProjects || [];
+
+          // 2. If logged in visitor, check for private projects granted to this user via project_members
+          if (user) {
+            const rEmail = user.email?.toLowerCase() || "";
+            const { data: rProfile } = await supabase
+              .from("profiles")
+              .select("username")
+              .eq("id", user.id)
+              .maybeSingle();
+
+            const rName = rProfile?.username || "";
+            const rNameLower = rName.toLowerCase();
+
+            // Match user_id OR invited_email (email / username / lowercase username)
+            const conditions = [`user_id.eq."${user.id}"`];
+            if (rEmail) conditions.push(`invited_email.eq."${rEmail}"`);
+            if (rName) conditions.push(`invited_email.eq."${rName}"`);
+            if (rNameLower && rNameLower !== rName) conditions.push(`invited_email.eq."${rNameLower}"`);
+
+            const { data: memberRows, error: memberErr } = await supabase
+              .from("project_members")
+              .select("project_id")
+              .eq("status", "accepted")
+              .or(conditions.join(","));
+
+            console.log("DEBUG CREATOR PAGE - visitor:", user.email, "target:", targetUserId);
+            console.log("DEBUG CREATOR PAGE - memberRows:", memberRows, "error:", memberErr);
+
+            if (memberRows && memberRows.length > 0) {
+              const allowedIds = Array.from(new Set(memberRows.map((m) => m.project_id))).filter(Boolean);
+              
+              if (allowedIds.length > 0) {
+                const { data: allowedPrivateProjects, error: projErr } = await supabase
+                  .from("projects")
+                  .select("id, title, slug, description, genre, is_public, view_count, like_count, created_at")
+                  .eq("owner_id", targetUserId)
+                  .eq("is_public", false)
+                  .in("id", allowedIds);
+
+                console.log("DEBUG CREATOR PAGE - allowedPrivateProjects:", allowedPrivateProjects, "error:", projErr);
+
+                if (allowedPrivateProjects && allowedPrivateProjects.length > 0) {
+                  const existingIds = new Set(userProjects.map((p: any) => p.id));
+                  for (const p of allowedPrivateProjects) {
+                    if (!existingIds.has(p.id)) {
+                      userProjects.push(p);
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
 
-        if (!user || user.id !== targetUserId) {
-          userProjects = userProjects.filter((s: any) => s.is_public);
-        }
-
-        setStories(userProjects || []);
+        setStories(userProjects);
       }
     } catch (err) {
       console.error("Error loading creator data:", err);
@@ -361,11 +417,12 @@ export default function CreatorProfilePage() {
 
   const publicStories = stories.filter((s) => s.is_public);
   const privateStories = stories.filter((s) => !s.is_public);
-  const displayedStories = isSelf
-    ? activeTab === "public"
-      ? publicStories
-      : privateStories
-    : publicStories;
+  const displayedStories =
+    isSelf || privateStories.length > 0
+      ? activeTab === "public"
+        ? publicStories
+        : privateStories
+      : publicStories;
 
   if (loading) {
     return (
@@ -573,10 +630,10 @@ export default function CreatorProfilePage() {
             {/* Header & Tabs */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className={`text-xl font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>
-                {isSelf ? "Story Management & Portfolio" : "Published Manuscripts"}
+                {isSelf ? "Story Management & Portfolio" : "Author Manuscripts"}
               </h2>
 
-              {isSelf ? (
+              {isSelf || privateStories.length > 0 ? (
                 <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                   <button
                     onClick={() => setActiveTab("public")}
