@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/client";
 
-type NotificationType = "invite" | "comment" | "assignment" | "mention" | "phase_complete";
+type NotificationType = "invite" | "collab_request" | "comment" | "assignment" | "mention" | "phase_complete";
 
 type CreateNotificationParams = {
   userId: string;
