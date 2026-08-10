@@ -29,6 +29,9 @@ import {
   Users,
   Flame,
   Edit,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 
 type Phase = {
@@ -79,6 +82,16 @@ export default function WritingEditorPage() {
   const [sprintTimeLeft, setSprintTimeLeft] = useState("");
   const [sprintWordsWritten, setSprintWordsWritten] = useState(0);
   const [isSyncingMemory, setIsSyncingMemory] = useState(false);
+  const [isTeam, setIsTeam] = useState(false);
+  const [modulePhases, setModulePhases] = useState<{ id: string; title: string }[]>([]);
+
+  const handleSwitchPhase = (targetPhaseId: string) => {
+    if (!targetPhaseId || targetPhaseId === phaseId) return;
+    if (content !== lastSavedContentRef.current) {
+      saveContent();
+    }
+    router.push(`/dashboard/${projectId}/module/${moduleId}/phase/${targetPhaseId}`);
+  };
 
   // Edit Phase Title & Description Modal State
   const [showEditPhaseModal, setShowEditPhaseModal] = useState(false);
@@ -189,14 +202,30 @@ export default function WritingEditorPage() {
 
       const { data: projectData } = await supabase
         .from("projects")
-        .select("owner_id")
+        .select("owner_id, is_team")
         .eq("id", projectId)
         .single();
 
       if (projectData) {
+        const teamMode = Boolean(projectData.is_team);
+        setIsTeam(teamMode);
+
         const ownerCheck = projectData.owner_id === user.id;
         const isAssigned = phaseData.assigned_to === user.id;
         let isAcceptedCollaborator = false;
+
+        // If SOLO project (is_team is false), fetch all phases in this module for scene switcher
+        if (!teamMode) {
+          const { data: allPhases } = await supabase
+            .from("phases")
+            .select("id, title")
+            .eq("module_id", moduleId)
+            .order("created_at", { ascending: true });
+
+          setModulePhases(allPhases || []);
+        } else {
+          setModulePhases([]);
+        }
 
         if (!ownerCheck && !isAssigned) {
           // Check project_members role
@@ -688,9 +717,58 @@ export default function WritingEditorPage() {
               </button>
 
               <div className="border-l border-slate-200 dark:border-white/10 pl-3 min-w-0 flex-1 flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white truncate">
-                  {phase.title}
-                </h1>
+                {!isTeam && modulePhases.length > 1 ? (
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {(() => {
+                      const idx = modulePhases.findIndex((p) => p.id === phaseId);
+                      const prevPhase = idx > 0 ? modulePhases[idx - 1] : null;
+                      const nextPhase = idx < modulePhases.length - 1 ? modulePhases[idx + 1] : null;
+                      return (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => prevPhase && handleSwitchPhase(prevPhase.id)}
+                            disabled={!prevPhase}
+                            className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                            title={prevPhase ? `Previous Scene: ${prevPhase.title}` : "First Scene"}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+
+                          <div className="relative inline-block text-left max-w-[160px] sm:max-w-[240px]">
+                            <select
+                              value={phaseId}
+                              onChange={(e) => handleSwitchPhase(e.target.value)}
+                              className="appearance-none bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-purple-900 dark:text-purple-200 font-bold text-xs sm:text-sm rounded-lg pl-2.5 pr-7 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 truncate cursor-pointer w-full"
+                            >
+                              {modulePhases.map((p, index) => (
+                                <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                                  Scene {index + 1}: {p.title}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="w-3.5 h-3.5 text-purple-500 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => nextPhase && handleSwitchPhase(nextPhase.id)}
+                            disabled={!nextPhase}
+                            className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                            title={nextPhase ? `Next Scene: ${nextPhase.title}` : "Last Scene"}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </>
+                      );
+                    })()}
+                  </div>
+                ) : (
+                  <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white truncate">
+                    {phase.title}
+                  </h1>
+                )}
+
                 {canEdit && (
                   <button
                     onClick={openEditPhaseModal}
