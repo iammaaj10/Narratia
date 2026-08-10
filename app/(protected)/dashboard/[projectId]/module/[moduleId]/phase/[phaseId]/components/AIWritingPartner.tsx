@@ -159,17 +159,9 @@ Your response as AI Writing Partner:`;
   ];
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[100]"
-        onClick={onClose}
-      />
-
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-slate-900/98 dark:bg-[#16151f]/98 backdrop-blur-xl border-l border-slate-200/80 dark:border-white/[0.08] shadow-2xl flex flex-col z-[101]">
+    <div className="fixed right-0 top-14 bottom-0 w-full sm:w-96 bg-slate-900/98 dark:bg-[#16151f]/98 backdrop-blur-xl border-l border-slate-200/80 dark:border-white/[0.08] shadow-2xl flex flex-col z-40">
       {/* Header */}
-      <div className="pt-14 sm:pt-4 pb-4 px-4 border-b border-white/10 bg-purple-500/10">
+      <div className="p-4 border-b border-white/10 bg-purple-500/10 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bot className="w-6 h-6 text-purple-400" />
@@ -293,6 +285,5 @@ Your response as AI Writing Partner:`;
         </p>
       </div>
     </div>
-  </>
-);
+  );
 }

@@ -13,6 +13,7 @@ import {
   ChevronUp,
   Loader2,
   BookMarked,
+  X,
 } from "lucide-react";
 
 type Entity = {
@@ -25,6 +26,7 @@ type Entity = {
 
 type Props = {
   projectId: string;
+  onClose?: () => void;
 };
 
 const ENTITY_CONFIG = {
@@ -35,7 +37,7 @@ const ENTITY_CONFIG = {
   concept: { icon: Brain, color: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/20", label: "Concepts" },
 };
 
-export default function StoryWiki({ projectId }: Props) {
+export default function StoryWiki({ projectId, onClose }: Props) {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
@@ -94,14 +96,25 @@ export default function StoryWiki({ projectId }: Props) {
           </div>
         </div>
 
-        <a
-          href={`/dashboard/${projectId}/characters`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[11px] font-semibold text-purple-400 hover:text-purple-300 transition-colors bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20"
-        >
-          Characters →
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href={`/dashboard/${projectId}/characters`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] font-semibold text-purple-400 hover:text-purple-300 transition-colors bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20"
+          >
+            Characters →
+          </a>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 flex items-center gap-1 text-xs font-semibold"
+              title="Close Story Wiki"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (

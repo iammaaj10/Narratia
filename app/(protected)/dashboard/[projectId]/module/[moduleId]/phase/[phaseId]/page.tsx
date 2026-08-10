@@ -498,13 +498,13 @@ export default function WritingEditorPage() {
       {/* Mobile Slide-out Menu */}
       <div
         className={`
-        fixed top-0 right-0 h-full w-80 z-50
+        fixed top-14 right-0 bottom-0 w-80 z-50
         bg-gray-900 backdrop-blur-xl border-l border-white/10
         transform transition-transform duration-300 ease-in-out lg:hidden
         ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
       `}
       >
-        <div className="pt-14 pb-4 px-4 border-b border-white/10 flex items-center justify-between bg-slate-950/80">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-950/80">
           <h3 className="text-lg font-bold text-white">Editor Tools</h3>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
@@ -920,7 +920,7 @@ export default function WritingEditorPage() {
         {/* Story Wiki Panel - Desktop */}
         {showWiki && !showComments && (
           <div className="hidden lg:block w-80 h-full border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto p-4 flex-shrink-0 z-20">
-            <StoryWiki projectId={projectId} />
+            <StoryWiki projectId={projectId} onClose={() => setShowWiki(false)} />
           </div>
         )}
 
@@ -935,6 +935,7 @@ export default function WritingEditorPage() {
               moduleId={moduleId}
               phaseTitle={phase?.title || ""}
               assignedTo={phase?.assigned_to || null}
+              onClose={() => setShowComments(false)}
             />
           </div>
         )}

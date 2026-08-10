@@ -11,6 +11,7 @@ import {
   Trash2,
   MoreVertical,
   User as UserIcon,
+  X,
 } from "lucide-react";
 
 type Comment = {
@@ -36,6 +37,7 @@ type CommentsPanelProps = {
   moduleId: string;
   phaseTitle: string;
   assignedTo: string | null;
+  onClose?: () => void;
 };
 
 export default function CommentsPanel({
@@ -46,6 +48,7 @@ export default function CommentsPanel({
   moduleId,
   phaseTitle,
   assignedTo,
+  onClose,
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -290,12 +293,23 @@ export default function CommentsPanel({
             </span>
           </div>
 
-          <button
-            onClick={() => setShowResolved(!showResolved)}
-            className="text-xs text-gray-400 hover:text-white transition-colors"
-          >
-            {showResolved ? "Hide" : "Show"} resolved
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowResolved(!showResolved)}
+              className="text-xs text-gray-400 hover:text-white transition-colors mr-1"
+            >
+              {showResolved ? "Hide" : "Show"} resolved
+            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 flex items-center gap-1 text-xs font-semibold"
+                title="Close Comments"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="flex gap-2">
