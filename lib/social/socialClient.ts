@@ -3,7 +3,6 @@ import { supabase } from "@/lib/supabase/client";
 export interface CreatorProfile {
   id: string;
   username: string;
-  full_name: string | null;
   avatar_url: string | null;
   banner_url: string | null;
   bio: string | null;

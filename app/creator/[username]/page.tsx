@@ -57,7 +57,6 @@ export default function CreatorProfilePage() {
   // Edit Profile Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState({
-    full_name: "",
     bio: "",
     twitter_handle: "",
     discord_handle: "",
@@ -221,7 +220,6 @@ export default function CreatorProfilePage() {
       setFollowingCount(profile.following_count || 0);
 
       setEditForm({
-        full_name: profile.full_name || "",
         bio: profile.bio || "",
         twitter_handle: profile.twitter_handle || "",
         discord_handle: profile.discord_handle || "",
@@ -352,7 +350,6 @@ export default function CreatorProfilePage() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: editForm.full_name.trim(),
           bio: editForm.bio.trim(),
           twitter_handle: editForm.twitter_handle.trim() || null,
           discord_handle: editForm.discord_handle.trim() || null,
@@ -367,7 +364,6 @@ export default function CreatorProfilePage() {
         prev
           ? {
             ...prev,
-            full_name: editForm.full_name.trim(),
             bio: editForm.bio.trim(),
             twitter_handle: editForm.twitter_handle.trim() || null,
             discord_handle: editForm.discord_handle.trim() || null,
@@ -522,7 +518,7 @@ export default function CreatorProfilePage() {
               <div className="space-y-1 sm:mb-1">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight outfit ${isLight ? "text-slate-900" : "text-white"}`}>
-                    {creator.full_name || creator.username}
+                    {creator.username}
                   </h1>
                   {creator.open_for_collaboration ? (
                     <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${isLight ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
@@ -830,18 +826,6 @@ export default function CreatorProfilePage() {
                     </>
                   )}
                 </button>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-slate-400 uppercase tracking-wider mb-1">Full Name</label>
-                <input
-                  type="text"
-                  value={editForm.full_name}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                  placeholder="e.g. Maaj Bhadgaonkar"
-                  className={`w-full px-4 py-2.5 rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLight ? "bg-slate-50 border-slate-200 text-slate-900" : "bg-white/[0.03] border-white/10 text-white"
-                    }`}
-                />
               </div>
 
               <div>
