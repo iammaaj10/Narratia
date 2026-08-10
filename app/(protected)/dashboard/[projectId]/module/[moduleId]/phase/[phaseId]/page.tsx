@@ -670,7 +670,7 @@ export default function WritingEditorPage() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#181724] px-4 sm:px-6 py-2.5 flex-shrink-0 z-30 transition-colors">
+      <div className="sticky top-14 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#181724] px-4 sm:px-6 py-2.5 flex-shrink-0 z-30 transition-colors">
         <div className="w-full flex items-center justify-between gap-4">
           {/* Left: Back button and title */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -908,8 +908,8 @@ export default function WritingEditorPage() {
       )}
 
       {/* Main Editor & Side Panels Container */}
-      <div className="flex-1 flex min-h-[550px] overflow-hidden bg-white dark:bg-[#13121a]">
-        <div className="flex-1 min-w-0 h-full overflow-hidden">
+      <div className="flex-1 flex min-h-[550px] bg-white dark:bg-[#13121a]">
+        <div className="flex-1 min-w-0 h-full">
           <RichTextEditor
             content={content}
             onChange={handleContentChange}

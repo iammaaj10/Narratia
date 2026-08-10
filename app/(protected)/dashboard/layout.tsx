@@ -368,7 +368,7 @@ export default function DashboardLayout({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 bg-white/90 dark:bg-[#1a1921] backdrop-blur-2xl dark:backdrop-blur-none rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden relative flex flex-col"
+            className="flex-1 bg-white/90 dark:bg-[#1a1921] backdrop-blur-2xl dark:backdrop-blur-none rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xl shadow-slate-200/50 dark:shadow-none relative flex flex-col"
           >
             {/* Subtle inner ring */}
             <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-200/60 dark:ring-0 pointer-events-none" />
