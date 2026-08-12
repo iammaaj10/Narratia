@@ -997,14 +997,14 @@ export default function WritingEditorPage() {
 
         {/* Story Wiki Panel - Desktop */}
         {showWiki && !showComments && (
-          <div className="hidden lg:block w-80 h-full border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto p-4 flex-shrink-0 z-20">
+          <div className="hidden lg:block w-80 sticky top-[106px] h-[calc(100vh-106px)] border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto p-4 flex-shrink-0 z-20">
             <StoryWiki projectId={projectId} onClose={() => setShowWiki(false)} />
           </div>
         )}
 
         {/* Comments Panel - Desktop */}
         {showComments && (
-          <div className="hidden lg:block w-80 h-full border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto flex-shrink-0 z-20">
+          <div className="hidden lg:block w-80 sticky top-[106px] h-[calc(100vh-106px)] border-l border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#16151f] overflow-y-auto flex-shrink-0 z-20">
             <CommentsPanel
               phaseId={phaseId}
               currentUserId={currentUserId}

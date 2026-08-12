@@ -340,19 +340,36 @@ export default function Page() {
                 </button>
               </div>
 
-              {/* Stats */}
-              <div className={`flex flex-wrap gap-8 border-t pt-6 max-w-xl ${isLight ? "border-slate-200" : "border-white/10"}`}>
-                <div>
-                  <div className={`text-2xl font-bold mb-0.5 outfit ${isLight ? "text-slate-900" : "text-white"}`}><Counter target={2} suffix="M+" /></div>
-                  <div className={`text-xs font-medium uppercase tracking-wider outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>Stories Created</div>
+              {/* Authentic Feature Highlights */}
+              <div className={`flex flex-wrap gap-6 sm:gap-8 border-t pt-6 max-w-xl ${isLight ? "border-slate-200" : "border-white/10"}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-base shrink-0">
+                    🧠
+                  </div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>AI Lore Memory</div>
+                    <div className={`text-xs font-medium outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>Smart RAG Vector Engine</div>
+                  </div>
                 </div>
-                <div>
-                  <div className={`text-2xl font-bold mb-0.5 outfit ${isLight ? "text-slate-900" : "text-white"}`}><Counter target={100} suffix="K+" /></div>
-                  <div className={`text-xs font-medium uppercase tracking-wider outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>Active Writers</div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-base shrink-0">
+                    👥
+                  </div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Solo & Team Mode</div>
+                    <div className={`text-xs font-medium outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>Multi-Author Collaboration</div>
+                  </div>
                 </div>
-                <div>
-                  <div className={`text-2xl font-bold mb-0.5 outfit ${isLight ? "text-slate-900" : "text-white"}`}><Counter target={99} suffix=".9%" /></div>
-                  <div className={`text-xs font-medium uppercase tracking-wider outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>Uptime Guarantee</div>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-base shrink-0">
+                    🎬
+                  </div>
+                  <div>
+                    <div className={`text-sm font-bold outfit ${isLight ? "text-slate-900" : "text-white"}`}>Multi-Format Export</div>
+                    <div className={`text-xs font-medium outfit ${isLight ? "text-slate-500" : "text-slate-400"}`}>PDF, ePub, FDX & Script</div>
+                  </div>
                 </div>
               </div>
             </motion.div>
