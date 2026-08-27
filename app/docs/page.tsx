@@ -678,50 +678,76 @@ export default function DocsPage() {
     <div className={`min-h-screen font-sans transition-colors duration-200 ${
       isLight ? "bg-white text-neutral-900" : "bg-[#000000] text-neutral-100"
     }`}>
-      {/* ── 1. NEXT.JS STYLE TOP NAVBAR ── */}
-      <header className={`sticky top-0 z-40 h-16 w-full border-b backdrop-blur-md transition-colors ${
-        isLight ? "bg-white/85 border-neutral-200" : "bg-[#000000]/80 border-neutral-800"
+      {/* ── 1. NARRATIA BRANDED TOP NAVBAR ── */}
+      <header className={`sticky top-0 z-40 h-14 sm:h-16 w-full border-b backdrop-blur-xl transition-colors ${
+        isLight ? "bg-white/85 border-slate-200" : "bg-[#040408]/90 border-white/[0.08]"
       }`}>
         <div className="max-w-[1536px] mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
-          {/* Left: Brand + Section Link */}
+          {/* Left: Narratia Logo + Navigation Links */}
           <div className="flex items-center gap-6">
             <a href="/" className="flex items-center gap-2.5 group">
-              <div className="w-6 h-6 rounded-md bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-xs tracking-tighter shadow-sm">
-                N
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-md shadow-purple-500/25 group-hover:scale-105 transition-transform">
+                <span className="text-white font-extrabold text-sm sm:text-base tracking-tight">N</span>
               </div>
-              <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">Narratia</span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+              <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white group-hover:text-purple-500 transition-colors">
+                Narratia
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-600 dark:text-purple-300 border border-purple-500/20">
                 Docs
               </span>
             </a>
 
-            <nav className="hidden md:flex items-center gap-5 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
-              <a href="/docs" className="text-neutral-900 dark:text-neutral-100 font-semibold">Documentation</a>
-              <a href="/dashboard" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Dashboard</a>
-              <a href="/community" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Showcase</a>
-              <a href="/contact" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Support</a>
+            <div className="h-4 w-px bg-slate-200 dark:bg-white/10 hidden md:block" />
+
+            <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+              <a
+                href="/docs"
+                className="px-3 py-1.5 rounded-lg text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-500/15 border border-purple-200/80 dark:border-purple-500/20"
+              >
+                Documentation
+              </a>
+              <a
+                href="/dashboard"
+                className="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 transition-all"
+              >
+                Dashboard
+              </a>
+              <a
+                href="/community"
+                className="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 transition-all"
+              >
+                Showcase
+              </a>
+              <a
+                href="/contact"
+                className="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 transition-all"
+              >
+                Support
+              </a>
             </nav>
           </div>
 
-          {/* Right: Next.js Style Search Bar + Actions */}
+          {/* Right: Quick Search Bar + Theme Toggle */}
           <div className="flex items-center gap-3">
             {/* Search Trigger Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className={`flex items-center justify-between gap-3 px-3 py-1.5 w-44 sm:w-64 rounded-lg border text-xs text-neutral-500 dark:text-neutral-400 transition-all cursor-pointer ${
-                isLight ? "bg-neutral-100/80 hover:bg-neutral-200/60 border-neutral-200" : "bg-neutral-900 hover:bg-neutral-800/80 border-neutral-800"
+              className={`flex items-center justify-between gap-3 px-3 py-1.5 w-40 sm:w-60 rounded-xl border text-xs text-slate-500 dark:text-slate-400 transition-all cursor-pointer shadow-sm ${
+                isLight
+                  ? "bg-slate-100/80 hover:bg-slate-200/60 border-slate-200"
+                  : "bg-white/[0.04] hover:bg-white/[0.08] border-white/10"
               }`}
             >
               <div className="flex items-center gap-2 truncate">
-                <Search className="w-3.5 h-3.5 shrink-0" />
+                <Search className="w-3.5 h-3.5 shrink-0 text-purple-500" />
                 <span className="truncate">Search docs...</span>
               </div>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 font-mono text-[10px] text-neutral-500 dark:text-neutral-400">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md border border-slate-300 dark:border-white/15 bg-white dark:bg-white/10 font-mono text-[10px] text-slate-500 dark:text-slate-300">
                 <span>⌘</span>K
               </kbd>
             </button>
 
-            <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
+            <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
             <ThemeToggle />
           </div>
         </div>
@@ -873,17 +899,6 @@ export default function DocsPage() {
                   {sub.title}
                 </button>
               ))}
-            </div>
-
-            <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-2 text-neutral-500">
-              <a href="/contact" className="flex items-center gap-1.5 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>Ask questions on Discord</span>
-              </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Edit this page on GitHub</span>
-              </a>
             </div>
           </div>
         </aside>
