@@ -168,6 +168,42 @@ export default function NotificationBell() {
     }
   };
 
+  const clearAllNotifications = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", user.id);
+
+    if (!error) {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
+  const clearReadNotifications = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("read", true);
+
+    if (!error) {
+      setNotifications((prev) => prev.filter((n) => !n.read));
+    }
+  };
+
   const deleteNotification = async (notificationId: string) => {
     const target = notifications.find((n) => n.id === notificationId);
     const { error } = await supabase
@@ -413,14 +449,25 @@ export default function NotificationBell() {
                   <button
                     onClick={markAllAsRead}
                     className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    title="Mark all as read"
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
-                    <span>Mark all read</span>
+                    <span className="hidden sm:inline">Mark read</span>
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button
+                    onClick={clearAllNotifications}
+                    className="text-xs font-semibold text-slate-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 flex items-center gap-1 transition-colors cursor-pointer"
+                    title="Clear all notifications"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Clear all</span>
                   </button>
                 )}
                 <button
                   onClick={() => setShowDropdown(false)}
-                  className="p-1 rounded-lg text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+                  className="p-1 rounded-lg text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors cursor-pointer"
                   title="Close Notifications"
                 >
                   <X className="w-4 h-4" />
@@ -501,7 +548,7 @@ export default function NotificationBell() {
                             e.stopPropagation();
                             deleteNotification(notification.id);
                           }}
-                          className="p-1 opacity-0 group-hover:opacity-100 text-slate-400 dark:text-gray-500 hover:text-red-500 transition-all flex-shrink-0"
+                          className="p-1 opacity-0 group-hover:opacity-100 text-slate-400 dark:text-gray-500 hover:text-red-500 transition-all flex-shrink-0 cursor-pointer"
                           title="Delete notification"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -512,6 +559,32 @@ export default function NotificationBell() {
                 </div>
               )}
             </div>
+
+            {/* Footer Clear Bar */}
+            {notifications.length > 0 && (
+              <div className="p-3 px-4 border-t border-slate-200/80 dark:border-white/[0.08] bg-slate-50/90 dark:bg-white/[0.02] flex items-center justify-between text-xs">
+                <span className="text-slate-500 dark:text-gray-400 font-medium">
+                  {notifications.length} {notifications.length === 1 ? "notification" : "notifications"}
+                </span>
+                <div className="flex items-center gap-3">
+                  {notifications.some((n) => n.read) && (
+                    <button
+                      onClick={clearReadNotifications}
+                      className="text-xs font-medium text-slate-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                    >
+                      Clear read
+                    </button>
+                  )}
+                  <button
+                    onClick={clearAllNotifications}
+                    className="text-xs font-semibold text-slate-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear all</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
