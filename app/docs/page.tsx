@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -30,7 +30,28 @@ import {
   Clock,
   Shield,
   HelpCircle,
+  Terminal,
+  ExternalLink,
+  Laptop,
+  Share2,
+  Sliders,
+  Feather,
+  Edit3,
+  Bookmark,
+  ChevronDown,
+  Command,
+  CornerDownLeft,
+  X,
+  MessageCircle,
+  Hash,
+  FileCode,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface SubHeading {
+  id: string;
+  title: string;
+}
 
 interface DocTopic {
   id: string;
@@ -39,6 +60,7 @@ interface DocTopic {
   title: string;
   badge?: string;
   summary: string;
+  subheadings: SubHeading[];
   content: React.ReactNode;
 }
 
@@ -48,14 +70,45 @@ export default function DocsPage() {
 
   const [activeTopicId, setActiveTopicId] = useState("quickstart");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
-  const [simulatedCmd, setSimulatedCmd] = useState<string | null>(null);
+  const [simulatedCmd, setSimulatedCmd] = useState<string | null>("continue");
+  const [codeTab, setCodeTab] = useState<"slash" | "sdk" | "json">("slash");
   const [helpfulFeedback, setHelpfulFeedback] = useState<"yes" | "no" | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut for search (Cmd+K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setIsSearchOpen((prev) => !prev);
+      }
+      if (e.key === "Escape") {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [isSearchOpen]);
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedSnippet(id);
     setTimeout(() => setCopiedSnippet(null), 2000);
+  };
+
+  const scrollToHeading = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   const topics: DocTopic[] = [
@@ -65,45 +118,95 @@ export default function DocsPage() {
       categoryIcon: Compass,
       title: "Quick Start Guide",
       badge: "Essential",
-      summary: "Learn how Narratia works and start writing your first novel or screenplay in 2 minutes.",
+      summary: "Understand the core architecture of Narratia and start writing your first story in under 2 minutes.",
+      subheadings: [
+        { id: "overview", title: "Overview" },
+        { id: "core-concept", title: "Living AI Story Memory" },
+        { id: "3-step-workflow", title: "3-Step Workflow" },
+        { id: "next-steps", title: "Next Steps" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Welcome to <strong>Narratia</strong> — an advanced, distraction-free storytelling workspace built for authors, novelists, screenwriters, and creative teams. Narratia combines an interactive TipTap text editor with context-aware AI memory, real-time collaboration, and immersive focus environments.
-          </p>
-
-          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 text-xs sm:text-sm space-y-2">
-            <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
-              <Sparkles className="w-4 h-4" />
-              <span>Core Concept: Living AI Memory</span>
-            </div>
-            <p className="leading-relaxed">
-              Narratia automatically extracts <strong>Characters, Locations, and Artifacts</strong> from your scenes into a living <strong>Story Wiki</strong>. When you invoke AI features, Narratia injects your lore into the AI prompt so your story stays 100% consistent!
+        <div className="space-y-8">
+          <div id="overview" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2 group">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Overview
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              <strong>Narratia</strong> is an advanced story engineering environment tailored for novelists, screenwriters, worldbuilders, and collaborative creative teams. It couples a headless TipTap rich-text canvas with a localized RAG vector lore memory, real-time collaboration, and immersive focus environments.
             </p>
           </div>
 
-          <h3 className="text-lg font-bold outfit text-slate-900 dark:text-white pt-2">3-Step Workflow to Launch Your Story:</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
-            <div className="p-4 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-2.5">
-              <div className="w-7 h-7 rounded-xl bg-purple-600 text-white font-extrabold flex items-center justify-center text-xs">1</div>
-              <div className="font-bold text-slate-900 dark:text-white text-sm">Create Project</div>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-xs">
-                Start a <strong>Solo Story</strong> or a <strong>Team Collaboration</strong> project. You can also generate a full 3-Act plot structure with the AI Outline Generator.
-              </p>
+          {/* Next.js style Callout */}
+          <div id="core-concept" className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4.5 space-y-2">
+            <div className="flex items-center gap-2 font-semibold text-neutral-900 dark:text-neutral-200 text-sm">
+              <Sparkles className="w-4 h-4 text-purple-500" />
+              <span>Good to know: Living AI Story Memory</span>
             </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-2.5">
-              <div className="w-7 h-7 rounded-xl bg-purple-600 text-white font-extrabold flex items-center justify-center text-xs">2</div>
-              <div className="font-bold text-slate-900 dark:text-white text-sm">Write & Switch Scenes</div>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-xs">
-                Use the sticky formatting toolbar, inline AI slash commands (<code className="px-1 py-0.5 rounded bg-purple-500/10 text-purple-400 font-mono">/ai</code>), and quick Scene Switcher controls.
-              </p>
+            <p className="text-neutral-600 dark:text-neutral-400 text-xs sm:text-sm leading-relaxed">
+              Unlike generic word processors or standard LLM chats, Narratia continuously breaks your story into ~500-word logical chunks and automatically parses entities (characters, locations, relics, rules) into a live <strong>Story Wiki</strong>. When AI actions are requested, relevant lore is dynamically retrieved and injected into prompt context.
+            </p>
+          </div>
+
+          <div id="3-step-workflow" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              3-Step Workflow
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="p-4.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 space-y-2.5">
+                <div className="w-6 h-6 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-black font-mono font-bold text-xs flex items-center justify-center">1</div>
+                <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">Create Project</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Start a <strong>Solo Story</strong> or a <strong>Team Collaboration</strong> project, or generate a 3-Act plot structure with the AI Outline Generator.
+                </p>
+              </div>
+
+              <div className="p-4.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 space-y-2.5">
+                <div className="w-6 h-6 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-black font-mono font-bold text-xs flex items-center justify-center">2</div>
+                <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">Write & Switch Scenes</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Use the sticky editor toolbar, inline slash commands (<code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-neutral-800 dark:text-neutral-300 text-xs">/ai</code>), and instant Scene Switcher controls.
+                </p>
+              </div>
+
+              <div className="p-4.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 space-y-2.5">
+                <div className="w-6 h-6 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-black font-mono font-bold text-xs flex items-center justify-center">3</div>
+                <h3 className="font-semibold text-sm text-neutral-900 dark:text-neutral-100">Export Anywhere</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                  Export publication-ready manuscripts to PDF, ePub (eBook), clean Markdown, or industry standard Final Draft (.fdx).
+                </p>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-2.5">
-              <div className="w-7 h-7 rounded-xl bg-purple-600 text-white font-extrabold flex items-center justify-center text-xs">3</div>
-              <div className="font-bold text-slate-900 dark:text-white text-sm">Export & Publish</div>
-              <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-xs">
-                Export your manuscript to PDF, ePub, Markdown, or Final Draft (.fdx) format when ready.
-              </p>
+          </div>
+
+          {/* Next.js style Code Window */}
+          <div id="next-steps" className="space-y-3">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Quick Commands
+            </h2>
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-neutral-950 text-neutral-200">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-800 bg-neutral-900/80 text-xs font-mono text-neutral-400">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-3.5 h-3.5 text-neutral-400" />
+                  <span>Interactive Editor Shortcuts</span>
+                </div>
+                <button
+                  onClick={() => handleCopy("/ai continue\nCtrl+Shift+Z\nCtrl+Shift+S", "quick-copy")}
+                  className="flex items-center gap-1 hover:text-white transition-colors"
+                >
+                  {copiedSnippet === "quick-copy" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedSnippet === "quick-copy" ? "Copied" : "Copy"}</span>
+                </button>
+              </div>
+              <div className="p-4 font-mono text-xs space-y-1.5">
+                <div className="text-neutral-500">// Keyboard shortcuts inside TipTap Editor</div>
+                <div><span className="text-purple-400">/ai continue</span> <span className="text-neutral-500">→ Continue prose at cursor</span></div>
+                <div><span className="text-purple-400">Ctrl + Shift + Z</span> <span className="text-neutral-500">→ Toggle Zen 3D Focus Mode</span></div>
+                <div><span className="text-purple-400">Ctrl + Shift + S</span> <span className="text-neutral-500">→ Start Pomodoro Writing Sprint</span></div>
+              </div>
             </div>
           </div>
         </div>
@@ -113,127 +216,158 @@ export default function DocsPage() {
       id: "solo-vs-team",
       category: "Getting Started",
       categoryIcon: Compass,
-      title: "Solo vs. Team Mode & Scene Navigation",
-      badge: "Workflow",
-      summary: "Understand project modes and how scene switching works for Solo and Team projects.",
+      title: "Solo vs. Team Mode Workflows",
+      badge: "Architecture",
+      summary: "Understand the differences between solo author linear writing and team-based phase assignments.",
+      subheadings: [
+        { id: "comparison", title: "Feature Comparison" },
+        { id: "solo-mode", title: "Solo Mode Workflow" },
+        { id: "team-mode", title: "Team Mode & Roles" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Narratia supports two distinct project workflows designed specifically for individual authors vs. collaborative teams.
-          </p>
+        <div className="space-y-8">
+          <div id="comparison" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Feature Comparison
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Narratia customizes the editor interface based on the project's <code className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-xs font-mono">is_team</code> flag.
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-            {/* Solo Mode */}
-            <div className="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/20 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-purple-600 dark:text-purple-300 text-base">📖 Solo Mode</span>
-                <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold">Default</span>
-              </div>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-                Designed for single authors. Includes the <strong>Inline Scene Switcher</strong> inside the editor header!
-              </p>
-              <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                  <span>Scene Dropdown selector in editor sticky bar</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                  <span>1-click <strong>Previous (`&lt;`)</strong> and <strong>Next (`&gt;`)</strong> scene navigation</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                  <span>Automatic auto-save when switching scenes</span>
-                </li>
-              </ul>
+            <div className="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-800">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 font-semibold">
+                    <th className="py-3 px-4">Feature</th>
+                    <th className="py-3 px-4">Solo Story (<code className="font-mono">is_team: false</code>)</th>
+                    <th className="py-3 px-4">Team Story (<code className="font-mono">is_team: true</code>)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800 text-neutral-700 dark:text-neutral-300">
+                  <tr>
+                    <td className="py-3 px-4 font-semibold text-neutral-900 dark:text-neutral-100">Scene Switcher</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-medium">✓ Dropdown + Prev/Next arrows in header</td>
+                    <td className="py-3 px-4 text-neutral-400">Disabled (locked to assigned scene)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-semibold text-neutral-900 dark:text-neutral-100">Auto-Save Switch</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-medium">✓ Auto-saves before switching scenes</td>
+                    <td className="py-3 px-4 text-neutral-400">Manual / background periodic save</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-semibold text-neutral-900 dark:text-neutral-100">Collaborator Assignment</td>
+                    <td className="py-3 px-4 text-neutral-400">Not required</td>
+                    <td className="py-3 px-4 text-purple-600 dark:text-purple-400 font-medium">✓ Role-based permissions per scene</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 font-semibold text-neutral-900 dark:text-neutral-100">Team Invites Hub</td>
+                    <td className="py-3 px-4 text-neutral-400">Hidden</td>
+                    <td className="py-3 px-4 text-purple-600 dark:text-purple-400 font-medium">✓ Realtime invitations & roles panel</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+          </div>
 
-            {/* Team Mode */}
-            <div className="p-5 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-indigo-600 dark:text-indigo-300 text-base">👥 Team Mode</span>
-                <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">Collaborative</span>
-              </div>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-                Designed for multi-author writers room. Team members work strictly on scenes assigned to them.
+          <div id="solo-mode" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Solo Mode Workflow
+            </h2>
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950 space-y-3">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                When writing as a solo author, jumping between chapters is frictionless. The sticky header includes a scene selector dropdown displaying <code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-purple-500 font-bold">Scene 1: The Arrival</code> alongside <code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-neutral-400">&lt;</code> and <code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-neutral-400">&gt;</code> navigation arrows.
               </p>
-              <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>Assign specific scenes/phases to team members</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>Prevents accidental overwrite of co-authors' work</span>
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>Role-based permissions (Editor, Co-Author, Beta Reader)</span>
-                </li>
-              </ul>
+              <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-700 dark:text-purple-300">
+                💡 <strong>Zero Data Loss:</strong> Switching scenes automatically detects dirty editor state and saves your active manuscript before loading the destination scene.
+              </div>
+            </div>
+          </div>
+
+          <div id="team-mode" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Team Mode & Permissions
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 space-y-1.5">
+                <div className="font-bold text-xs text-purple-600 dark:text-purple-400">Co-Author</div>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400">Full editing and writing access to assigned scenes.</p>
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 space-y-1.5">
+                <div className="font-bold text-xs text-blue-600 dark:text-blue-400">Line Editor</div>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400">Leave comments, suggestion threads, and structural notes.</p>
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 space-y-1.5">
+                <div className="font-bold text-xs text-emerald-600 dark:text-emerald-400">Beta Reader</div>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400">Read-only review permissions with chapter reaction tools.</p>
+              </div>
             </div>
           </div>
         </div>
       ),
     },
     {
-      id: "ai-writing-partner",
-      category: "AI Engine",
-      categoryIcon: Sparkles,
-      title: "AI Writing Partner & Lore Sync",
-      badge: "AI Feature",
-      summary: "How to use the AI Writing Partner sidebar and auto-sync story memory.",
+      id: "rich-text-editor",
+      category: "Editor & AI Engine",
+      categoryIcon: FileText,
+      title: "TipTap Rich-Text Editor & Sticky Suite",
+      badge: "Core",
+      summary: "Detailed overview of the sticky formatting toolbar, text styling, and custom extensions.",
+      subheadings: [
+        { id: "sticky-architecture", title: "Sticky Docking System" },
+        { id: "formatting-controls", title: "Formatting Controls" },
+        { id: "keyboard-shortcuts", title: "Keyboard Shortcuts" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Click the <strong>AI button (`Wand2`)</strong> in the editor header to open your <strong>AI Writing Partner</strong>.
-          </p>
-
-          <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-3">
-            <h4 className="text-xs font-mono uppercase tracking-wider text-purple-400 font-bold">Key Capabilities:</h4>
-            <ul className="space-y-2 text-xs text-slate-300">
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span><strong>Simultaneous Editing:</strong> The AI sidebar opens without any dimming or backdrop blur so you can edit text and chat with the AI at the same time!</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span><strong>Plot & Dialogue Advice:</strong> Ask for plot twists, character reactions, dialogue fixes, or scene pacing ideas.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-purple-400 font-bold">•</span>
-                <span><strong>Lore Memory Sync:</strong> Click the <strong>Memory (`RefreshCw`)</strong> button to re-scan your scenes and update the AI vector database.</span>
-              </li>
-            </ul>
+        <div className="space-y-8">
+          <div id="sticky-architecture" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Sticky Docking System
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              The editor architecture ensures editing tools never scroll away during deep writing sessions.
+            </p>
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-4 space-y-2 text-xs font-mono">
+              <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
+                <span>Top App Navbar</span>
+                <span className="text-purple-500 font-bold">sticky top-0 z-50 (56px)</span>
+              </div>
+              <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
+                <span>Scene Title & Info Bar</span>
+                <span className="text-purple-500 font-bold">sticky top-14 z-30 (50px)</span>
+              </div>
+              <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
+                <span>RichTextEditor Toolbar</span>
+                <span className="text-purple-500 font-bold">sticky top-[106px] z-20 (46px)</span>
+              </div>
+              <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
+                <span>Side Panels (Comments / Wiki)</span>
+                <span className="text-purple-500 font-bold">sticky top-[106px] h-[calc(100vh-106px)]</span>
+              </div>
+            </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      id: "story-wiki",
-      category: "AI Engine",
-      categoryIcon: Sparkles,
-      title: "Story Wiki & Entity Extraction",
-      badge: "Core Lore",
-      summary: "Automatic lore extraction for characters, locations, items, events, and concepts.",
-      content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Click the <strong>BookMarked icon</strong> in the editor toolbar to toggle the <strong>Story Wiki Drawer</strong>.
-          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            <div className="p-3.5 rounded-2xl border border-purple-500/30 bg-purple-500/10 space-y-1">
-              <span className="font-bold text-purple-400 text-sm">👤 Characters</span>
-              <p className="text-slate-400 leading-relaxed">Tracks character names, traits, and first appearances.</p>
-            </div>
-            <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 space-y-1">
-              <span className="font-bold text-emerald-400 text-sm">📍 Locations</span>
-              <p className="text-slate-400 leading-relaxed">Stores cities, buildings, rooms, and fantasy worlds.</p>
-            </div>
-            <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 space-y-1">
-              <span className="font-bold text-amber-400 text-sm">🗝️ Items & Lore</span>
-              <p className="text-slate-400 leading-relaxed">Logs weapons, relic documents, magic items, and events.</p>
+          <div id="formatting-controls" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Formatting Controls
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <div className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 text-center font-medium">
+                <strong>Bold / Italic / Strike</strong>
+              </div>
+              <div className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 text-center font-medium">
+                <strong>H1, H2, H3 Headers</strong>
+              </div>
+              <div className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 text-center font-medium">
+                <strong>Bullet & Ordered Lists</strong>
+              </div>
+              <div className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 text-center font-medium">
+                <strong>Blockquotes & Code</strong>
+              </div>
             </div>
           </div>
         </div>
@@ -241,62 +375,145 @@ export default function DocsPage() {
     },
     {
       id: "slash-commands",
-      category: "Editor Tools",
-      categoryIcon: FileText,
-      title: "Slash Commands & Formatting Toolbar",
-      badge: "Editor",
-      summary: "Trigger inline AI transformations and text formatting directly inside the editor.",
+      category: "Editor & AI Engine",
+      categoryIcon: Zap,
+      title: "Inline AI Commands (/ai)",
+      badge: "Interactive",
+      summary: "Trigger inline AI transformations and text expansions directly inside TipTap.",
+      subheadings: [
+        { id: "simulator", title: "Interactive Simulator" },
+        { id: "command-reference", title: "Command Reference" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Type <code className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-mono">/</code> on a blank line or highlight any sentence to open the inline AI toolbar.
-          </p>
+        <div className="space-y-8">
+          <div id="simulator" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Interactive Simulator
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Type <code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-xs font-mono text-purple-500 font-bold">/</code> on a blank line or highlight any sentence to invoke the inline AI toolbar.
+            </p>
 
-          <div className="p-4 rounded-2xl bg-slate-950 border border-white/10 space-y-3">
-            <div className="text-xs font-mono text-slate-400 flex items-center justify-between">
-              <span>TRY INLINE COMMAND GENERATOR</span>
-              <span className="text-purple-400">Click to preview</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSimulatedCmd("continue")}
-                className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
-                  simulatedCmd === "continue" ? "bg-purple-600 text-white border-purple-500" : "bg-white/5 border-white/10 text-slate-300 hover:border-white/20"
-                }`}
-              >
-                /ai continue
-              </button>
-              <button
-                onClick={() => setSimulatedCmd("polish")}
-                className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
-                  simulatedCmd === "polish" ? "bg-indigo-600 text-white border-indigo-500" : "bg-white/5 border-white/10 text-slate-300 hover:border-white/20"
-                }`}
-              >
-                /ai polish
-              </button>
-              <button
-                onClick={() => setSimulatedCmd("sensory")}
-                className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all ${
-                  simulatedCmd === "sensory" ? "bg-emerald-600 text-white border-emerald-500" : "bg-white/5 border-white/10 text-slate-300 hover:border-white/20"
-                }`}
-              >
-                /ai sensory
-              </button>
-            </div>
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-neutral-950 text-white">
+              <div className="p-4 border-b border-neutral-800 bg-neutral-900/80 flex items-center justify-between">
+                <span className="text-xs font-mono text-neutral-400">Select an inline AI transformation:</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSimulatedCmd("continue")}
+                    className={`px-2.5 py-1 rounded text-xs font-mono transition-all ${
+                      simulatedCmd === "continue" ? "bg-purple-600 text-white" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                    }`}
+                  >
+                    /ai continue
+                  </button>
+                  <button
+                    onClick={() => setSimulatedCmd("polish")}
+                    className={`px-2.5 py-1 rounded text-xs font-mono transition-all ${
+                      simulatedCmd === "polish" ? "bg-purple-600 text-white" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                    }`}
+                  >
+                    /ai polish
+                  </button>
+                  <button
+                    onClick={() => setSimulatedCmd("sensory")}
+                    className={`px-2.5 py-1 rounded text-xs font-mono transition-all ${
+                      simulatedCmd === "sensory" ? "bg-purple-600 text-white" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                    }`}
+                  >
+                    /ai sensory
+                  </button>
+                </div>
+              </div>
 
-            <div className="p-4 rounded-xl bg-black/50 border border-white/5 font-mono text-xs text-slate-300 leading-relaxed min-h-[70px] flex items-center">
-              {simulatedCmd === "continue" && (
-                <span className="text-purple-300">"The neon rain glistened off Kael's coat as he stepped into the shadowed alleyway..."</span>
-              )}
-              {simulatedCmd === "polish" && (
-                <span className="text-indigo-300">"Silence descended upon the docks—heavy, suffused with the scent of ozone and salt."</span>
-              )}
-              {simulatedCmd === "sensory" && (
-                <span className="text-emerald-300">"The cold metal terminal hummed against his fingertips, vibrating with low electrical warmth."</span>
-              )}
-              {!simulatedCmd && (
-                <span className="text-slate-500 italic">Select a slash command above to see live simulated generation...</span>
-              )}
+              <div className="p-5 font-mono text-xs leading-relaxed text-neutral-300 min-h-[90px] flex items-center">
+                {simulatedCmd === "continue" && (
+                  <span className="text-purple-300">"The rain poured over the battlements of Winterhold as Lord Cedric unsheathed his blade, knowing the archivist had not come alone..."</span>
+                )}
+                {simulatedCmd === "polish" && (
+                  <span className="text-blue-300">"Silence descended upon the docks—heavy and suffocating, laced with the sharp tang of salt and ozone."</span>
+                )}
+                {simulatedCmd === "sensory" && (
+                  <span className="text-emerald-300">"The cold steel hilt bit into his palm; the scent of burning pine smoke hung thick in the damp evening air."</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div id="command-reference" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Command Reference
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30">
+                <code className="font-bold text-purple-600 dark:text-purple-400 font-mono">/ai continue</code>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-1">Generates the next logical narrative paragraph based on previous scene context.</p>
+              </div>
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30">
+                <code className="font-bold text-blue-600 dark:text-blue-400 font-mono">/ai polish</code>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-1">Refines phrasing, eliminates passive voice, and elevates narrative rhythm.</p>
+              </div>
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30">
+                <code className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">/ai sensory</code>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-1">Enhances world atmosphere with sight, sound, smell, and tactile details.</p>
+              </div>
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30">
+                <code className="font-bold text-amber-600 dark:text-amber-400 font-mono">/ai dialogue</code>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-1">Sharpens character voice, subtext, and natural spoken flow.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "story-wiki-memory",
+      category: "Editor & AI Engine",
+      categoryIcon: BookMarked,
+      title: "Story Wiki & Vector RAG Memory",
+      badge: "RAG Engine",
+      summary: "How Narratia automatically extracts lore entities and indexes scene memory for generative consistency.",
+      subheadings: [
+        { id: "entity-extraction", title: "Automatic Entity Extraction" },
+        { id: "memory-sync", title: "Memory Sync & Vector Search" },
+      ],
+      content: (
+        <div className="space-y-8">
+          <div id="entity-extraction" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Automatic Entity Extraction
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              When scenes are saved, background Named Entity Recognition (NER) identifies 5 core lore categories and stores them in <code className="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs">story_entities</code>:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 space-y-1">
+                <span className="font-bold text-purple-600 dark:text-purple-400 text-sm">👤 Characters</span>
+                <p className="text-neutral-600 dark:text-neutral-400">Names, physical traits, motivations, and first appearances.</p>
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 space-y-1">
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">📍 Locations</span>
+                <p className="text-neutral-600 dark:text-neutral-400">Cities, landmarks, rooms, and fantasy geography.</p>
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 space-y-1">
+                <span className="font-bold text-amber-600 dark:text-amber-400 text-sm">🗝️ Items & Lore</span>
+                <p className="text-neutral-600 dark:text-neutral-400">Weapons, relics, political factions, and magic systems.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="memory-sync" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Memory Sync & RAG Querying
+            </h2>
+            <div className="p-4.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 space-y-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400">
+              <p>
+                Clicking the <strong>Memory Sync (<RefreshCw className="w-3.5 h-3.5 inline text-purple-500" />)</strong> button in the editor triggers a full re-scan. Manuscript chunks are scored with PostgreSQL keyword index matching to feed relevant lore into AI requests.
+              </p>
             </div>
           </div>
         </div>
@@ -306,35 +523,43 @@ export default function DocsPage() {
       id: "focus-and-sprints",
       category: "Productivity",
       categoryIcon: Flame,
-      title: "Zen 3D Focus Mode & Writing Sprints",
-      badge: "Flow State",
-      summary: "Distraction-free ambient environments, Pomodoro timers, and live WPM tracking.",
+      title: "Zen 3D Focus Mode & Sprints",
+      badge: "Flow",
+      summary: "Full-screen distraction-free typing environments with ambient 3D particles and Pomodoro timers.",
+      subheadings: [
+        { id: "focus-mode", title: "Zen 3D Focus Mode" },
+        { id: "writing-sprints", title: "Writing Sprints & WPM" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Boost your writing velocity with built-in productivity companions designed for authors.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-            <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-2">
-              <div className="flex items-center gap-2 font-bold text-amber-500 text-base">
-                <Flame className="w-5 h-5" />
-                <span>Writing Sprint Companion</span>
+        <div className="space-y-8">
+          <div id="focus-mode" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Zen 3D Focus Mode
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Press <code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-purple-500 font-bold">Ctrl+Shift+Z</code> to enter full-screen distraction-free mode.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 space-y-1">
+                <span className="font-bold text-neutral-900 dark:text-neutral-100">🌌 Ambient Particles</span>
+                <p className="text-neutral-600 dark:text-neutral-400">Choose between Cosmic Starfield, Winter Snowfall, and Campfire Embers.</p>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-                Set a 15, 25, or 45-minute timed sprint goal. Tracks your <strong>Words Per Minute (WPM)</strong> and total words written in real time.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-2">
-              <div className="flex items-center gap-2 font-bold text-indigo-500 text-base">
-                <Maximize className="w-5 h-5" />
-                <span>Zen 3D Focus Mode</span>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 space-y-1">
+                <span className="font-bold text-neutral-900 dark:text-neutral-100">⌨️ Typewriter Scrolling</span>
+                <p className="text-neutral-600 dark:text-neutral-400">Keeps the active sentence vertically centered on your screen.</p>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs">
-                Hides all UI distractions and lets you write against immersive 3D particle backgrounds (Galaxy, Snowfall, Ember Storm, Typewriter mode).
-              </p>
             </div>
+          </div>
+
+          <div id="writing-sprints" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Writing Sprints & WPM Tracker
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Set 15, 25, or 45-minute timed sprint goals. Narratia calculates your live Words Per Minute velocity and provides detailed session reports upon completion.
+            </p>
           </div>
         </div>
       ),
@@ -343,60 +568,93 @@ export default function DocsPage() {
       id: "collaboration-notifications",
       category: "Collaboration",
       categoryIcon: Users,
-      title: "Team Invites, Roles & Real-Time Notifications",
+      title: "Real-Time Notifications & Social Hub",
       badge: "Realtime",
-      summary: "Manage team invitations, role permissions, inline comments, and notifications.",
+      summary: "Scoped WebSocket notification streams, comment threads, and creator profile showcases.",
+      subheadings: [
+        { id: "notifications-engine", title: "Real-Time Notification Engine" },
+        { id: "creator-hub", title: "Creator Hub & Profiles" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Narratia features a real-time notification engine scoped to your user account.
-          </p>
+        <div className="space-y-8">
+          <div id="notifications-engine" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Real-Time Notification Engine
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Narratia connects to a user-filtered Supabase WebSocket stream (<code className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 font-mono text-xs text-purple-500 font-bold">user_id=eq.$&#123;user.id&#125;</code>) for instantaneous notification delivery with zero database polling.
+            </p>
+            <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 space-y-2 text-xs text-neutral-600 dark:text-neutral-400">
+              <div className="flex items-center gap-2 font-bold text-neutral-900 dark:text-neutral-100">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>1-Click Interactive Invites</span>
+              </div>
+              <p>Project invitations can be accepted or declined directly inside the notification dropdown card without navigating away from your work.</p>
+            </div>
+          </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 space-y-3 text-xs text-slate-300">
-            <div className="font-bold text-purple-400 text-sm">Notification Types:</div>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold">Invite</span>
-                <span>Receive collaboration invitations with 1-click Accept / Decline buttons directly in your notification bell.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold">Comments</span>
-                <span>Get notified whenever a co-author leaves or replies to a comment on your scenes.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Assignments</span>
-                <span>Instant alert when a scene or module is assigned to you in Team mode.</span>
-              </li>
-            </ul>
+          <div id="creator-hub" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Creator Hub & WhatsApp-Style Avatar Preview
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Clicking your avatar in the navigation bar opens a sleek preview modal to inspect your picture or upload a new photo live.
+            </p>
           </div>
         </div>
       ),
     },
     {
-      id: "screenplay-and-exports",
+      id: "publishing-exports",
       category: "Publishing",
       categoryIcon: Film,
-      title: "Screenplay Mode & Export Options",
-      badge: "Publishing",
-      summary: "Format feature scripts and export to PDF, ePub, Markdown, or Final Draft (.fdx).",
+      title: "Screenplay Mode & Export Formats",
+      badge: "Exports",
+      summary: "Industry standard screenplay auto-formatting and client-side multi-format manuscript exports.",
+      subheadings: [
+        { id: "screenplay-formatting", title: "Screenplay Formatting" },
+        { id: "export-formats", title: "Supported Export Formats" },
+      ],
       content: (
-        <div className="space-y-6">
-          <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            Export your stories anytime into industry-standard publishing formats.
-          </p>
+        <div className="space-y-8">
+          <div id="screenplay-formatting" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Screenplay Formatting
+            </h2>
+            <p className="text-[15px] leading-relaxed text-neutral-600 dark:text-neutral-400">
+              Switching any chapter to Screenplay Mode enforces Hollywood-standard formatting rules:
+            </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 text-center font-bold text-purple-400 bg-purple-500/5">
-              📄 PDF
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 font-mono text-xs bg-neutral-950 text-neutral-200 space-y-1.5">
+              <div className="text-neutral-400 font-bold">EXT. ABANDONED OBSERVATORY - NIGHT</div>
+              <div className="text-neutral-500 pl-4">A gust of wind sweeps dry leaves across the broken glass dome.</div>
+              <div className="text-purple-400 text-center font-bold pt-2">ELENA</div>
+              <div className="text-neutral-400 text-center italic">(whispering into her comms)</div>
+              <div className="text-neutral-200 text-center max-w-sm mx-auto">"The signal isn't coming from the city. It's coming from above."</div>
             </div>
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 text-center font-bold text-indigo-400 bg-indigo-500/5">
-              📚 ePub (eBook)
-            </div>
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 text-center font-bold text-emerald-400 bg-emerald-500/5">
-              📝 Markdown
-            </div>
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 text-center font-bold text-pink-400 bg-pink-500/5">
-              🎬 Final Draft (.fdx)
+          </div>
+
+          <div id="export-formats" className="space-y-4">
+            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <span className="text-neutral-400 dark:text-neutral-600 font-mono text-sm">#</span>
+              Supported Export Formats
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 text-center font-bold text-neutral-900 dark:text-neutral-100">
+                📄 PDF
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 text-center font-bold text-neutral-900 dark:text-neutral-100">
+                📚 ePub (eBook)
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 text-center font-bold text-neutral-900 dark:text-neutral-100">
+                📝 Markdown
+              </div>
+              <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/30 text-center font-bold text-neutral-900 dark:text-neutral-100">
+                🎬 Final Draft (.fdx)
+              </div>
             </div>
           </div>
         </div>
@@ -412,136 +670,299 @@ export default function DocsPage() {
   );
 
   const activeTopic = topics.find((t) => t.id === activeTopicId) || topics[0];
+  const activeIndex = topics.findIndex((t) => t.id === activeTopic.id);
+  const prevTopic = activeIndex > 0 ? topics[activeIndex - 1] : null;
+  const nextTopic = activeIndex < topics.length - 1 ? topics[activeIndex + 1] : null;
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isLight ? "bg-[#f8fafc] text-slate-900" : "bg-[#06070a] text-slate-100"}`}>
-      {/* ── NAVBAR ── */}
-      <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors ${
-        isLight ? "bg-white/80 border-slate-200" : "bg-[#06070a]/80 border-white/10"
+    <div className={`min-h-screen font-sans transition-colors duration-200 ${
+      isLight ? "bg-white text-neutral-900" : "bg-[#000000] text-neutral-100"
+    }`}>
+      {/* ── 1. NEXT.JS STYLE TOP NAVBAR ── */}
+      <header className={`sticky top-0 z-40 h-16 w-full border-b backdrop-blur-md transition-colors ${
+        isLight ? "bg-white/85 border-neutral-200" : "bg-[#000000]/80 border-neutral-800"
       }`}>
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <a href="/dashboard" className={`flex items-center gap-1.5 text-xs font-semibold hover:text-purple-500 transition-colors ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Dashboard</span>
-            </a>
-            <div className="h-5 w-px bg-slate-200 dark:bg-white/10" />
+        <div className="max-w-[1536px] mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
+          {/* Left: Brand + Section Link */}
+          <div className="flex items-center gap-6">
             <a href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center font-extrabold text-sm text-white shadow-md shadow-purple-500/20">N</div>
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight outfit">Narratia Docs</span>
+              <div className="w-6 h-6 rounded-md bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-xs tracking-tighter shadow-sm">
+                N
+              </div>
+              <span className="font-bold text-sm tracking-tight text-neutral-900 dark:text-neutral-100">Narratia</span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+                Docs
+              </span>
             </a>
+
+            <nav className="hidden md:flex items-center gap-5 text-[13px] font-medium text-neutral-600 dark:text-neutral-400">
+              <a href="/docs" className="text-neutral-900 dark:text-neutral-100 font-semibold">Documentation</a>
+              <a href="/dashboard" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Dashboard</a>
+              <a href="/community" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Showcase</a>
+              <a href="/contact" className="hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Support</a>
+            </nav>
           </div>
 
+          {/* Right: Next.js Style Search Bar + Actions */}
           <div className="flex items-center gap-3">
-            <a href="/contact" className={`hidden sm:block text-xs font-semibold hover:text-purple-500 transition-colors ${isLight ? "text-slate-600" : "text-slate-300"}`}>Support</a>
+            {/* Search Trigger Button */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className={`flex items-center justify-between gap-3 px-3 py-1.5 w-44 sm:w-64 rounded-lg border text-xs text-neutral-500 dark:text-neutral-400 transition-all cursor-pointer ${
+                isLight ? "bg-neutral-100/80 hover:bg-neutral-200/60 border-neutral-200" : "bg-neutral-900 hover:bg-neutral-800/80 border-neutral-800"
+              }`}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Search className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Search docs...</span>
+              </div>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 font-mono text-[10px] text-neutral-500 dark:text-neutral-400">
+                <span>⌘</span>K
+              </kbd>
+            </button>
+
+            <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
             <ThemeToggle />
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* ── MAIN DOCS LAYOUT ── */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Sidebar Navigation */}
-        <aside className="lg:col-span-3 space-y-6">
-          {/* Live Search Bar */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search documentation..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-8 py-2.5 rounded-2xl border text-xs font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                isLight ? "bg-white border-slate-200 text-slate-900" : "bg-white/[0.04] border-white/10 text-white"
-              }`}
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-white">✕</button>
-            )}
-          </div>
-
-          {/* Navigation Categories */}
-          <div className="space-y-5">
+      {/* ── 2. NEXT.JS 3-COLUMN MAIN LAYOUT ── */}
+      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 flex">
+        
+        {/* ── LEFT SIDEBAR (NAVIGATION TREE) ── */}
+        <aside className={`hidden lg:block w-64 shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto py-8 pr-6 border-r transition-colors ${
+          isLight ? "border-neutral-200" : "border-neutral-800"
+        }`}>
+          <div className="space-y-6 text-[13px]">
             {Array.from(new Set(topics.map((t) => t.category))).map((cat) => (
-              <div key={cat} className="space-y-1">
-                <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-gray-400 px-3 py-1.5 flex items-center gap-1.5">
-                  <Layers className="w-3 h-3 text-purple-500" />
-                  <span>{cat}</span>
+              <div key={cat} className="space-y-1.5">
+                <h4 className="font-semibold text-neutral-900 dark:text-neutral-200 text-xs px-2 mb-2 tracking-tight">
+                  {cat}
+                </h4>
+                <div className="space-y-0.5 border-l border-neutral-200 dark:border-neutral-800 ml-2 pl-2">
+                  {topics
+                    .filter((t) => t.category === cat)
+                    .map((topic) => {
+                      const isActive = activeTopicId === topic.id;
+                      return (
+                        <button
+                          key={topic.id}
+                          onClick={() => setActiveTopicId(topic.id)}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md transition-all flex items-center justify-between text-[13px] cursor-pointer ${
+                            isActive
+                              ? "font-semibold text-purple-600 dark:text-purple-400 bg-purple-500/10 dark:bg-purple-500/15"
+                              : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-900"
+                          }`}
+                        >
+                          <span className="truncate">{topic.title}</span>
+                          {topic.badge && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+                              {topic.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                 </div>
-                {filteredTopics
-                  .filter((t) => t.category === cat)
-                  .map((topic) => (
-                    <button
-                      key={topic.id}
-                      onClick={() => setActiveTopicId(topic.id)}
-                      className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between group cursor-pointer ${
-                        activeTopicId === topic.id
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/20"
-                          : isLight
-                          ? "hover:bg-slate-200/60 text-slate-700"
-                          : "hover:bg-white/5 text-slate-300 hover:text-white"
-                      }`}
-                    >
-                      <span className="truncate">{topic.title}</span>
-                      {topic.badge && activeTopicId !== topic.id && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold shrink-0 ml-2">
-                          {topic.badge}
-                        </span>
-                      )}
-                    </button>
-                  ))}
               </div>
             ))}
           </div>
         </aside>
 
-        {/* Article Reader View */}
-        <main className="lg:col-span-9">
-          <article className={`p-6 sm:p-8 rounded-3xl border backdrop-blur-xl space-y-6 ${
-            isLight ? "bg-white border-slate-200 shadow-sm" : "bg-[#0c0b14]/90 border-white/10"
-          }`}>
-            {/* Article Header */}
-            <header className="border-b border-slate-200 dark:border-white/10 pb-6 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <span className="text-xs font-mono uppercase tracking-wider text-purple-600 dark:text-purple-400 font-bold">{activeTopic.category}</span>
-                {activeTopic.badge && (
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 font-semibold">
-                    {activeTopic.badge}
-                  </span>
+        {/* ── CENTER CONTENT ARTICLE ── */}
+        <main className="flex-1 min-w-0 py-8 lg:px-12 max-w-4xl">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-4 font-mono">
+            <span>Docs</span>
+            <span>/</span>
+            <span>{activeTopic.category}</span>
+            <span>/</span>
+            <span className="text-neutral-900 dark:text-neutral-200 font-semibold">{activeTopic.title}</span>
+          </div>
+
+          {/* Title & Summary */}
+          <div className="space-y-3 pb-8 border-b border-neutral-200 dark:border-neutral-800 mb-8">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-neutral-100">
+              {activeTopic.title}
+            </h1>
+            <p className="text-[16px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              {activeTopic.summary}
+            </p>
+          </div>
+
+          {/* Topic Body Content */}
+          <div className="space-y-8">
+            {activeTopic.content}
+          </div>
+
+          {/* Previous / Next Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-12 mt-12 border-t border-neutral-200 dark:border-neutral-800">
+            {prevTopic ? (
+              <button
+                onClick={() => setActiveTopicId(prevTopic.id)}
+                className={`p-4 rounded-xl border text-left transition-all group cursor-pointer ${
+                  isLight ? "bg-white hover:bg-neutral-50 border-neutral-200" : "bg-neutral-950 hover:bg-neutral-900 border-neutral-800"
+                }`}
+              >
+                <div className="text-xs text-neutral-500 flex items-center gap-1 mb-1">
+                  <span>←</span> Previous
+                </div>
+                <div className="font-semibold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-purple-500 transition-colors">
+                  {prevTopic.title}
+                </div>
+              </button>
+            ) : <div />}
+
+            {nextTopic && (
+              <button
+                onClick={() => setActiveTopicId(nextTopic.id)}
+                className={`p-4 rounded-xl border text-right transition-all group cursor-pointer ${
+                  isLight ? "bg-white hover:bg-neutral-50 border-neutral-200" : "bg-neutral-950 hover:bg-neutral-900 border-neutral-800"
+                }`}
+              >
+                <div className="text-xs text-neutral-500 flex items-center justify-end gap-1 mb-1">
+                  Next <span>→</span>
+                </div>
+                <div className="font-semibold text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-purple-500 transition-colors">
+                  {nextTopic.title}
+                </div>
+              </button>
+            )}
+          </div>
+
+          {/* Helpful Feedback Widget */}
+          <div className="pt-8 mt-8 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between text-xs text-neutral-500">
+            <span>Was this documentation page helpful?</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setHelpfulFeedback("yes")}
+                className={`px-3 py-1.5 rounded-md border transition-all cursor-pointer ${
+                  helpfulFeedback === "yes" ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 font-semibold" : "bg-neutral-100 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white"
+                }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setHelpfulFeedback("no")}
+                className={`px-3 py-1.5 rounded-md border transition-all cursor-pointer ${
+                  helpfulFeedback === "no" ? "bg-rose-500/10 border-rose-500 text-rose-500 font-semibold" : "bg-neutral-100 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white"
+                }`}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </main>
+
+        {/* ── RIGHT SIDEBAR ("ON THIS PAGE" TOC) ── */}
+        <aside className={`hidden xl:block w-64 shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto py-8 pl-6 border-l transition-colors ${
+          isLight ? "border-neutral-200" : "border-neutral-800"
+        }`}>
+          <div className="space-y-4 text-xs">
+            <h4 className="font-semibold text-neutral-900 dark:text-neutral-200 uppercase tracking-wider text-[11px] font-mono">
+              On this page
+            </h4>
+            <div className="space-y-2 text-neutral-600 dark:text-neutral-400">
+              {activeTopic.subheadings.map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => scrollToHeading(sub.id)}
+                  className="block w-full text-left hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors truncate cursor-pointer"
+                >
+                  {sub.title}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 space-y-2 text-neutral-500">
+              <a href="/contact" className="flex items-center gap-1.5 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Ask questions on Discord</span>
+              </a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Edit this page on GitHub</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* ── 3. SPOTLIGHT COMMAND PALETTE SEARCH MODAL (Cmd+K) ── */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.15 }}
+              className={`w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
+                isLight ? "bg-white border-neutral-200" : "bg-[#0a0a0a] border-neutral-800 text-white"
+              }`}
+            >
+              {/* Search Header */}
+              <div className="flex items-center px-4 border-b border-neutral-200 dark:border-neutral-800">
+                <Search className="w-4 h-4 text-neutral-400 shrink-0 mr-3" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search documentation, features, guides..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full py-4 text-sm bg-transparent border-none focus:outline-none text-neutral-900 dark:text-neutral-100 placeholder-neutral-400"
+                />
+                <button
+                  onClick={() => setIsSearchOpen(false)}
+                  className="p-1 rounded-md text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Search Results List */}
+              <div className="p-2 max-h-80 overflow-y-auto space-y-1">
+                {filteredTopics.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-neutral-500">
+                    No results found for "{searchQuery}"
+                  </div>
+                ) : (
+                  filteredTopics.map((topic) => (
+                    <button
+                      key={topic.id}
+                      onClick={() => {
+                        setActiveTopicId(topic.id);
+                        setIsSearchOpen(false);
+                        setSearchQuery("");
+                      }}
+                      className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
+                        isLight ? "hover:bg-neutral-100" : "hover:bg-neutral-900"
+                      }`}
+                    >
+                      <div>
+                        <div className="text-xs font-mono text-purple-500 uppercase">{topic.category}</div>
+                        <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{topic.title}</div>
+                        <div className="text-xs text-neutral-500 line-clamp-1">{topic.summary}</div>
+                      </div>
+                      <CornerDownLeft className="w-4 h-4 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  ))
                 )}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight outfit text-slate-900 dark:text-white">{activeTopic.title}</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{activeTopic.summary}</p>
-            </header>
 
-            {/* Article Content */}
-            <div className="pt-2">{activeTopic.content}</div>
-
-            {/* Helpful Feedback Widget */}
-            <footer className="border-t border-slate-200 dark:border-white/10 pt-6 flex items-center justify-between text-xs">
-              <span className="text-slate-500 dark:text-gray-400 font-medium">Was this guide helpful?</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setHelpfulFeedback("yes")}
-                  className={`px-3 py-1.5 rounded-xl border transition-all font-semibold cursor-pointer ${
-                    helpfulFeedback === "yes" ? "bg-emerald-500/20 border-emerald-500 text-emerald-400" : "bg-white/5 border-white/10 hover:border-white/20 text-slate-300"
-                  }`}
-                >
-                  👍 Yes
-                </button>
-                <button
-                  onClick={() => setHelpfulFeedback("no")}
-                  className={`px-3 py-1.5 rounded-xl border transition-all font-semibold cursor-pointer ${
-                    helpfulFeedback === "no" ? "bg-rose-500/20 border-rose-500 text-rose-400" : "bg-white/5 border-white/10 hover:border-white/20 text-slate-300"
-                  }`}
-                >
-                  👎 No
-                </button>
+              {/* Search Footer */}
+              <div className="p-3 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex items-center justify-between text-[11px] text-neutral-500 font-mono">
+                <div className="flex items-center gap-2">
+                  <span>Navigation:</span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-neutral-300 dark:border-neutral-700">ESC to close</kbd>
+                </div>
+                <span>Next.js Documentation Style</span>
               </div>
-            </footer>
-          </article>
-        </main>
-      </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
