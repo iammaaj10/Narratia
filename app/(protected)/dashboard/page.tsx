@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { getCachedUser } from "@/lib/auth/cache";
 import { Wand2, Star, Loader2 } from "lucide-react";
 import {
   PlusCircle,
@@ -63,7 +64,7 @@ export default function DashboardPage() {
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getCachedUser();
 
     if (!user) return;
 

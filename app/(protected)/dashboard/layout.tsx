@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { getCachedUser, getCachedProfile } from "@/lib/auth/cache";
 import ProfileAvatar from "./components/ProfileAvatar";
 import IncomingInvites from "./components/IncomingInvites";
 import NotificationBell from "./components/NotificationBell";
@@ -38,7 +39,7 @@ export default function DashboardLayout({
         const {
           data: { user },
           error: userError,
-        } = await supabase.auth.getUser();
+        } = await getCachedUser();
 
         if (userError || !user) {
           setUnauthenticated(true);
@@ -46,11 +47,7 @@ export default function DashboardLayout({
           return;
         }
 
-        let { data, error } = await supabase
-          .from("profiles")
-          .select("username, avatar_url")
-          .eq("id", user.id)
-          .maybeSingle();
+        let { data, error } = await getCachedProfile(user.id);
 
         if (!data) {
           const baseUsername = user.email?.split("@")[0] || "Writer";

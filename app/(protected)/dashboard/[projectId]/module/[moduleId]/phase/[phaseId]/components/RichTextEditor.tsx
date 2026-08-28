@@ -47,6 +47,7 @@ export default function RichTextEditor({
   const [selectedText, setSelectedText] = useState("");
   const [isEditorReady, setIsEditorReady] = useState(false);
   const aiToolbarRef = useRef<AIToolbarRef>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   const editor = useEditor({
     immediatelyRender: false,
@@ -93,7 +94,14 @@ export default function RichTextEditor({
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Debounce onChange to prevent parent re-renders and auto-save spam on every keystroke
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        onChange(editor.getHTML());
+        debounceTimerRef.current = null;
+      }, 500); // 500ms debounce
     },
     onCreate: ({ editor }) => {
       // Set content again when editor is created to ensure it's loaded
@@ -111,7 +119,7 @@ export default function RichTextEditor({
       
       // Only update if content is different and not empty
       // This prevents infinite loops while ensuring content loads
-      if (content !== currentContent) {
+      if (content !== currentContent && !debounceTimerRef.current) {
         editor.commands.setContent(content || "");
       }
     }
@@ -121,16 +129,21 @@ export default function RichTextEditor({
   useEffect(() => {
     if (!editor) return;
 
+    let selectionTimer: NodeJS.Timeout;
     const updateSelection = () => {
-      const { from, to } = editor.state.selection;
-      const text = editor.state.doc.textBetween(from, to, " ");
-      setSelectedText(text);
+      clearTimeout(selectionTimer);
+      selectionTimer = setTimeout(() => {
+        const { from, to } = editor.state.selection;
+        const text = editor.state.doc.textBetween(from, to, " ");
+        setSelectedText(text);
+      }, 300); // Debounce selection to avoid heavy re-renders while dragging
     };
 
     editor.on("selectionUpdate", updateSelection);
 
     return () => {
       editor.off("selectionUpdate", updateSelection);
+      clearTimeout(selectionTimer);
     };
   }, [editor]);
 

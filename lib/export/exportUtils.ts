@@ -1,13 +1,4 @@
-import jsPDF from "jspdf";
-import {
-  Document,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-  Packer,
-} from "docx";
-import { saveAs } from "file-saver";
+// Dependencies are dynamically imported inside export functions to reduce bundle size
 
 type Phase = {
   title: string;
@@ -43,7 +34,8 @@ function htmlToPlainText(html: string): string {
     .trim();
 }
 
-export const exportAsPDF = (data: ExportData) => {
+export const exportAsPDF = async (data: ExportData) => {
+  const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF();
   let yPosition = 20;
   const pageHeight = doc.internal.pageSize.height;
@@ -142,6 +134,8 @@ export const exportAsPDF = (data: ExportData) => {
 // EXPORT AS DOCX (CORRECTED VERSION)
 // ============================================
 export const exportAsDOCX = async (data: ExportData) => {
+  const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, Packer } = await import("docx");
+  const { saveAs } = await import("file-saver");
   const children: any[] = [];
 
   // Title
@@ -281,7 +275,8 @@ export const exportAsDOCX = async (data: ExportData) => {
 // ============================================
 // EXPORT AS TXT
 // ============================================
-export const exportAsTXT = (data: ExportData) => {
+export const exportAsTXT = async (data: ExportData) => {
+  const { saveAs } = await import("file-saver");
   let content = "";
 
   // Title
@@ -333,6 +328,8 @@ export const exportAsTXT = (data: ExportData) => {
 
 // Optional: Enhanced version with better styling
 export const exportAsDOCXEnhanced = async (data: ExportData) => {
+  const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, Packer } = await import("docx");
+  const { saveAs } = await import("file-saver");
   const children: any[] = [];
 
   // Title with styling

@@ -3,14 +3,17 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import VersionHistory from "./components/VersionHistory";
+import dynamic from "next/dynamic";
 import CommentsPanel from "./components/CommentsPanel";
 import RichTextEditor from "./components/RichTextEditor";
-import AIWritingPartner from "./components/AIWritingPartner";
-import FocusModeEditor from "./components/FocusModeEditor";
-import StoryWiki from "./components/StoryWiki";
 import { savePhaseMemory, extractAndSaveEntities } from "@/lib/ai/storyMemory";
-import WritingSprintModal from "./components/WritingSprintModal";
+
+// Dynamically import heavy components to reduce initial bundle size
+const VersionHistory = dynamic(() => import("./components/VersionHistory"), { ssr: false });
+const AIWritingPartner = dynamic(() => import("./components/AIWritingPartner"), { ssr: false });
+const FocusModeEditor = dynamic(() => import("./components/FocusModeEditor"), { ssr: false });
+const StoryWiki = dynamic(() => import("./components/StoryWiki"), { ssr: false });
+const WritingSprintModal = dynamic(() => import("./components/WritingSprintModal"), { ssr: false });
 import {
   ArrowLeft,
   Save,

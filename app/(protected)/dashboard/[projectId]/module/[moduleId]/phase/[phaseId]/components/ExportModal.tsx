@@ -146,11 +146,11 @@ export default function ExportModal({
 
       // Export based on format
       if (format === "pdf") {
-        exportAsPDF(exportData);
+        await exportAsPDF(exportData);
       } else if (format === "docx") {
         await exportAsDOCX(exportData);
       } else if (format === "txt") {
-        exportAsTXT(exportData);
+        await exportAsTXT(exportData);
       }
 
       onClose();

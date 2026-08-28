@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { getCachedUser } from "@/lib/auth/cache";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Bell, Check, Trash2, X, CheckCheck, UserCheck, MessageSquare, ShieldAlert, Sparkles } from "lucide-react";
@@ -69,7 +70,7 @@ export default function NotificationBell() {
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getCachedUser();
 
     if (!user) {
       setLoading(false);
@@ -152,7 +153,7 @@ export default function NotificationBell() {
   const markAllAsRead = async () => {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getCachedUser();
 
     if (!user) return;
 
@@ -171,7 +172,7 @@ export default function NotificationBell() {
   const clearAllNotifications = async () => {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getCachedUser();
 
     if (!user) return;
 
@@ -189,7 +190,7 @@ export default function NotificationBell() {
   const clearReadNotifications = async () => {
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await getCachedUser();
 
     if (!user) return;
 
