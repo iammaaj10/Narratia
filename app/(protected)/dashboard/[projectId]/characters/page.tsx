@@ -15,6 +15,7 @@ import {
   UserMinus,
   Search,
   Filter,
+  Network
 } from "lucide-react";
 import {
   CharacterProfile,
@@ -158,6 +159,14 @@ export default function CharactersPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push(`/dashboard/${projectId}/relationship-map`)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-500/20 rounded-xl hover:bg-teal-100 dark:hover:bg-teal-500/20 transition-all text-sm font-medium"
+            >
+              <Network className="w-4 h-4" />
+              Relationship Map
+            </button>
+
             <button
               onClick={handleImportFromWiki}
               disabled={importing}

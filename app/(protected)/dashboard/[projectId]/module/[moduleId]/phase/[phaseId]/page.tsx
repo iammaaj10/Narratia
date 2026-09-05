@@ -35,6 +35,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  Shield,
 } from "lucide-react";
 
 type Phase = {
@@ -869,6 +870,15 @@ export default function WritingEditorPage() {
               >
                 <RefreshCw className={`w-4 h-4 ${isSyncingMemory ? "animate-spin" : ""}`} />
                 <span>Memory</span>
+              </button>
+
+              {/* Continuity Check Button */}
+              <button
+                onClick={() => window.open(`/dashboard/${projectId}/continuity`, "_blank")}
+                title="Run Continuity Check — opens in a new tab"
+                className="flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-transparent rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/30 transition-all font-medium text-sm"
+              >
+                <Shield className="w-4 h-4" />
               </button>
 
               {/* Story Wiki Button */}

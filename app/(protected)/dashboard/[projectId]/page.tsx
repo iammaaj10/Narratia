@@ -20,7 +20,9 @@ import {
   MoreVertical,
   Calendar,
   Edit,
-  Trash2
+  Trash2,
+  Shield,
+  Network
 } from "lucide-react";
 import ExportModal from "./module/[moduleId]/phase/[phaseId]/components/ExportModal";
 import ShareSettingsModal from "../components/ShareSettingsModal";
@@ -501,7 +503,50 @@ export default function ProjectDetailPage() {
           </div>
         </motion.div>
 
-        {/* Story Modules Section */}
+        {/* Continuity Checker — Quick Access */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.38 }}
+          onClick={() => router.push(`/dashboard/${projectId}/continuity`)}
+          className="group cursor-pointer p-5 rounded-2xl border border-orange-200 dark:border-orange-500/20 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-500/[0.06] dark:to-red-500/[0.04] hover:shadow-lg hover:border-orange-300 dark:hover:border-orange-500/40 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center border border-orange-200 dark:border-orange-500/30 group-hover:scale-110 transition-transform">
+                <Shield className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-300 transition-colors">Continuity Checker</h2>
+                <p className="text-sm text-slate-500 dark:text-gray-400">AI-powered plot hole detection across all chapters</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-400 dark:text-gray-500 group-hover:text-orange-600 dark:group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
+          </div>
+        </motion.div>
+
+        {/* Relationship Map — Quick Access */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.39 }}
+          onClick={() => router.push(`/dashboard/${projectId}/relationship-map`)}
+          className="group cursor-pointer p-5 rounded-2xl border border-teal-200 dark:border-teal-500/20 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-500/[0.06] dark:to-emerald-500/[0.04] hover:shadow-lg hover:border-teal-300 dark:hover:border-teal-500/40 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-500/20 flex items-center justify-center border border-teal-200 dark:border-teal-500/30 group-hover:scale-110 transition-transform">
+                <Network className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-300 transition-colors">Relationship Map</h2>
+                <p className="text-sm text-slate-500 dark:text-gray-400">Interactive node graph of character connections</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-slate-400 dark:text-gray-500 group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
+          </div>
+        </motion.div>
+
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
