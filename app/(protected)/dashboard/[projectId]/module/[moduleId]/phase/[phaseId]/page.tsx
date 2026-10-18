@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import dynamic from "next/dynamic";
 import CommentsPanel from "./components/CommentsPanel";
 import RichTextEditor from "./components/RichTextEditor";
+import CollaboratorAvatars from "./components/CollaboratorAvatars";
+import { useRealtimeCollab } from "./components/useRealtimeCollab";
 import { savePhaseMemory, extractAndSaveEntities } from "@/lib/ai/storyMemory";
 
 // Dynamically import heavy components to reduce initial bundle size
@@ -88,6 +90,24 @@ export default function WritingEditorPage() {
   const [isSyncingMemory, setIsSyncingMemory] = useState(false);
   const [isTeam, setIsTeam] = useState(false);
   const [modulePhases, setModulePhases] = useState<{ id: string; title: string }[]>([]);
+  const [currentUsername, setCurrentUsername] = useState("");
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
+
+  // ── Real-time collaborative editing ──
+  const handleRemoteContentUpdate = useCallback((remoteContent: string, senderId: string) => {
+    setContent(remoteContent);
+    updateCounts(remoteContent);
+    lastSavedContentRef.current = remoteContent;
+  }, []);
+
+  const { collaborators, broadcastContent } = useRealtimeCollab({
+    phaseId,
+    currentUserId,
+    currentUsername,
+    currentAvatarUrl,
+    onRemoteContentUpdate: handleRemoteContentUpdate,
+    enabled: isTeam,
+  });
 
   const handleSwitchPhase = (targetPhaseId: string) => {
     if (!targetPhaseId || targetPhaseId === phaseId) return;
@@ -173,6 +193,18 @@ export default function WritingEditorPage() {
       }
 
       setCurrentUserId(user.id);
+
+      // Fetch current user's profile for presence display
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("username, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileData) {
+        setCurrentUsername(profileData.username || "Unknown");
+        setCurrentAvatarUrl(profileData.avatar_url || null);
+      }
 
       const { data: phaseData, error: phaseError } = await supabase
         .from("phases")
@@ -316,6 +348,9 @@ export default function WritingEditorPage() {
   const handleContentChange = (value: string) => {
     setContent(value);
     updateCounts(value);
+
+    // Broadcast to other collaborators in real-time
+    broadcastContent(value);
 
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -847,6 +882,9 @@ export default function WritingEditorPage() {
 
             {/* Desktop Controls */}
             <div className="hidden lg:flex items-center gap-3">
+              {/* Live Collaborators */}
+              <CollaboratorAvatars collaborators={collaborators} />
+
               {/* Word Count */}
               <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-400 px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg font-medium">
                 <span>{wordCount.toLocaleString()}w</span>
