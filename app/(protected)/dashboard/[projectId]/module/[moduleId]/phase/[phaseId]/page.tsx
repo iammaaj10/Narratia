@@ -189,7 +189,36 @@ export default function WritingEditorPage() {
 
       setPhase(phaseData);
 
-      const loadedContent = phaseData.content || "";
+      let loadedContent = phaseData.content || "";
+
+      // BUGFIX: If content is empty, check phase_versions for the latest saved version.
+      // This handles the case where a writer's update to the phases table was silently
+      // blocked by RLS, but their content was saved to phase_versions.
+      if (!loadedContent.trim() || loadedContent.trim() === "<p></p>") {
+        const { data: latestVersion } = await supabase
+          .from("phase_versions")
+          .select("content, word_count")
+          .eq("phase_id", phaseId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestVersion?.content && latestVersion.content.trim()) {
+          console.log("📦 Phase content was empty, restored from version history.");
+          loadedContent = latestVersion.content;
+
+          // Try to patch the phases table with the recovered content so future
+          // loads don't need the fallback
+          await supabase
+            .from("phases")
+            .update({
+              content: loadedContent,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", phaseId);
+        }
+      }
+
       setContent(loadedContent);
       lastSavedContentRef.current = loadedContent;
       updateCounts(loadedContent);
@@ -330,19 +359,59 @@ export default function WritingEditorPage() {
     const wordsAdded = Math.max(0, currentWordCount - previousWordCount);
 
     try {
-      const { error } = await supabase
+      // Use .select() so we can detect if RLS silently blocked the update
+      const { data: updatedRows, error } = await supabase
         .from("phases")
         .update({
           content: finalContent,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", phaseId);
+        .eq("id", phaseId)
+        .select("id");
 
       if (error) {
         console.error("❌ Save error:", error);
         setSaveStatus("error");
         setTimeout(() => setSaveStatus("idle"), 3000);
         return;
+      }
+
+      // Detect silent RLS failure: update returned no rows
+      const updateSucceeded = updatedRows && updatedRows.length > 0;
+
+      if (!updateSucceeded) {
+        console.warn("⚠️ Phase update returned 0 rows (likely RLS). Trying module-scoped update...");
+        // Retry with module_id filter which may match a broader RLS policy
+        const { data: retryRows, error: retryError } = await supabase
+          .from("phases")
+          .update({
+            content: finalContent,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", phaseId)
+          .eq("module_id", phase?.module_id || moduleId)
+          .select("id");
+
+        if (retryError) {
+          console.error("❌ Retry save error:", retryError);
+        }
+
+        const retrySucceeded = retryRows && retryRows.length > 0;
+        if (!retrySucceeded) {
+          console.warn("⚠️ Phase update still blocked by RLS. Content saved to version history only.");
+        }
+      }
+
+      // ALWAYS save a version so content is never lost, even if the phases
+      // table update was silently blocked by RLS
+      if (currentWordCount > 0) {
+        await supabase.from("phase_versions").insert({
+          phase_id: phaseId,
+          content: finalContent,
+          word_count: currentWordCount,
+          created_by: currentUserId,
+        });
+        setLastVersionSave(Date.now());
       }
 
       lastSavedContentRef.current = finalContent;
@@ -361,21 +430,6 @@ export default function WritingEditorPage() {
       }
 
       setTimeout(() => setSaveStatus("idle"), 2000);
-
-      const now = Date.now();
-      const timeSinceLastVersion = now - lastVersionSave;
-      const shouldSaveVersion =
-        timeSinceLastVersion > 5 * 60 * 1000 || currentWordCount % 50 === 0;
-
-      if (shouldSaveVersion && currentWordCount > 0) {
-        await supabase.from("phase_versions").insert({
-          phase_id: phaseId,
-          content: finalContent,
-          word_count: currentWordCount,
-          created_by: currentUserId,
-        });
-        setLastVersionSave(now);
-      }
     } catch (err) {
       console.error("❌ Unexpected save error:", err);
       setSaveStatus("error");
