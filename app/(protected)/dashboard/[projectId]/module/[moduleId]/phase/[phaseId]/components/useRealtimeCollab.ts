@@ -17,20 +17,21 @@ type UseRealtimeCollabOptions = {
   currentUserId: string;
   currentUsername: string;
   currentAvatarUrl: string | null;
+  // Called when a remote peer sends a content update.
+  // The handler must set the editor content WITHOUT triggering a broadcast back.
   onRemoteContentUpdate: (content: string, senderId: string) => void;
-  enabled: boolean; // only enable for team projects
+  enabled: boolean;
 };
 
-// Distinct colors for collaborators
 const COLLAB_COLORS = [
-  "#8b5cf6", // violet
-  "#06b6d4", // cyan
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#10b981", // emerald
-  "#ec4899", // pink
-  "#3b82f6", // blue
-  "#f97316", // orange
+  "#8b5cf6",
+  "#06b6d4",
+  "#f59e0b",
+  "#ef4444",
+  "#10b981",
+  "#ec4899",
+  "#3b82f6",
+  "#f97316",
 ];
 
 function getColorForUser(userId: string): string {
@@ -51,11 +52,22 @@ export function useRealtimeCollab({
 }: UseRealtimeCollabOptions) {
   const [collaborators, setCollaborators] = useState<CollaboratorPresence[]>([]);
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const isRemoteUpdateRef = useRef(false);
+
+  // isReceivingRemote: true while we are applying a remote update.
+  // broadcastContent checks this to avoid echoing the remote change back.
+  const isReceivingRemoteRef = useRef(false);
+
   const lastBroadcastRef = useRef<string>("");
   const broadcastThrottleRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Keep a stable ref to the callback so the channel listener always calls
+  // the latest version without needing to re-subscribe.
+  const onRemoteContentUpdateRef = useRef(onRemoteContentUpdate);
+  onRemoteContentUpdateRef.current = onRemoteContentUpdate;
+
   useEffect(() => {
+    // Wait until we have a real user id AND the project is confirmed to be a
+    // team project before opening the channel.
     if (!enabled || !currentUserId || !phaseId) return;
 
     const channelName = `collab:phase:${phaseId}`;
@@ -63,17 +75,18 @@ export function useRealtimeCollab({
     const channel = supabase.channel(channelName, {
       config: {
         presence: { key: currentUserId },
-        broadcast: { self: false }, // don't receive own broadcasts
+        // ack: false = fire-and-forget broadcast (lower latency)
+        broadcast: { ack: false },
       },
     });
 
-    // ── Presence: track who's online ──
+    // ── Presence: who is currently in this phase ──────────────────────────
     channel.on("presence", { event: "sync" }, () => {
       const state = channel.presenceState();
       const users: CollaboratorPresence[] = [];
 
       Object.entries(state).forEach(([key, presences]) => {
-        if (key === currentUserId) return; // skip self
+        if (key === currentUserId) return; // exclude self
         const latest = (presences as any[])[0];
         if (latest) {
           users.push({
@@ -89,18 +102,50 @@ export function useRealtimeCollab({
       setCollaborators(users);
     });
 
-    // ── Broadcast: receive content from other editors ──
+    // Also handle join/leave explicitly so the list updates instantly
+    channel.on("presence", { event: "join" }, ({ key, newPresences }) => {
+      if (key === currentUserId) return;
+      const p = (newPresences as any[])[0];
+      if (!p) return;
+      setCollaborators((prev) => {
+        if (prev.find((c) => c.userId === key)) return prev;
+        return [
+          ...prev,
+          {
+            userId: key,
+            username: p.username || "Unknown",
+            avatarUrl: p.avatar_url || null,
+            color: getColorForUser(key),
+            lastActive: p.last_active || Date.now(),
+          },
+        ];
+      });
+    });
+
+    channel.on("presence", { event: "leave" }, ({ key }) => {
+      setCollaborators((prev) => prev.filter((c) => c.userId !== key));
+    });
+
+    // ── Broadcast: receive content changes from other editors ─────────────
     channel.on("broadcast", { event: "content-update" }, (payload) => {
-      const { content, senderId } = payload.payload;
-      if (senderId === currentUserId) return; // safety
+      const { content, senderId } = payload.payload as {
+        content: string;
+        senderId: string;
+      };
 
-      isRemoteUpdateRef.current = true;
-      onRemoteContentUpdate(content, senderId);
+      // Supabase may deliver our own broadcast if `self: true` is set in
+      // older SDK versions – guard against it.
+      if (senderId === currentUserId) return;
 
-      // Reset flag after a short delay so local edits resume normally
+      // Mark that we are about to apply a remote update so broadcastContent
+      // skips this change.
+      isReceivingRemoteRef.current = true;
+      onRemoteContentUpdateRef.current(content, senderId);
+      // Give the React render cycle time to flush before we allow broadcasts
+      // again, otherwise the editor's onUpdate fires and re-broadcasts.
       setTimeout(() => {
-        isRemoteUpdateRef.current = false;
-      }, 100);
+        isReceivingRemoteRef.current = false;
+      }, 600); // must be > RichTextEditor debounce (500ms)
     });
 
     channel.subscribe(async (status) => {
@@ -115,7 +160,7 @@ export function useRealtimeCollab({
 
     channelRef.current = channel;
 
-    // Heartbeat: update presence every 30s
+    // Heartbeat every 30 s to keep presence alive
     const heartbeat = setInterval(async () => {
       if (channelRef.current) {
         await channelRef.current.track({
@@ -124,31 +169,34 @@ export function useRealtimeCollab({
           last_active: Date.now(),
         });
       }
-    }, 30000);
+    }, 30_000);
 
     return () => {
       clearInterval(heartbeat);
-      if (broadcastThrottleRef.current) {
-        clearTimeout(broadcastThrottleRef.current);
-      }
+      if (broadcastThrottleRef.current) clearTimeout(broadcastThrottleRef.current);
       supabase.removeChannel(channel);
       channelRef.current = null;
+      setCollaborators([]);
     };
+  // Re-run whenever `enabled` flips true (i.e. after loadPhaseData resolves isTeam)
+  // or the user / phase changes.
   }, [phaseId, currentUserId, currentUsername, currentAvatarUrl, enabled]);
 
-  // Broadcast local content changes to other editors (throttled)
+  /**
+   * Call this whenever local content changes.
+   * Throttled to 800 ms and silenced while applying a remote update.
+   */
   const broadcastContent = useCallback(
     (content: string) => {
-      if (!enabled || !channelRef.current || isRemoteUpdateRef.current) return;
+      if (!enabled) return;
+      if (isReceivingRemoteRef.current) return; // never echo remote changes
+      if (!channelRef.current) return;
       if (content === lastBroadcastRef.current) return;
 
-      // Throttle: max 1 broadcast per 800ms to avoid flooding
-      if (broadcastThrottleRef.current) {
-        clearTimeout(broadcastThrottleRef.current);
-      }
+      if (broadcastThrottleRef.current) clearTimeout(broadcastThrottleRef.current);
 
       broadcastThrottleRef.current = setTimeout(() => {
-        if (channelRef.current) {
+        if (channelRef.current && !isReceivingRemoteRef.current) {
           channelRef.current.send({
             type: "broadcast",
             event: "content-update",
@@ -169,6 +217,6 @@ export function useRealtimeCollab({
   return {
     collaborators,
     broadcastContent,
-    isRemoteUpdate: isRemoteUpdateRef,
+    isReceivingRemote: isReceivingRemoteRef,
   };
 }

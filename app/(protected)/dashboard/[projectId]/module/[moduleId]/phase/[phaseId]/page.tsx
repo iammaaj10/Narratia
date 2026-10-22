@@ -93,21 +93,10 @@ export default function WritingEditorPage() {
   const [currentUsername, setCurrentUsername] = useState("");
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
 
-  // ── Real-time collaborative editing ──
-  const handleRemoteContentUpdate = useCallback((remoteContent: string, senderId: string) => {
-    setContent(remoteContent);
-    updateCounts(remoteContent);
-    lastSavedContentRef.current = remoteContent;
-  }, []);
-
-  const { collaborators, broadcastContent } = useRealtimeCollab({
-    phaseId,
-    currentUserId,
-    currentUsername,
-    currentAvatarUrl,
-    onRemoteContentUpdate: handleRemoteContentUpdate,
-    enabled: isTeam,
-  });
+  // Stable ref to the remote-update handler — populated after updateCounts is defined.
+  // Using a ref avoids a stale-closure bug where the early useCallback captured
+  // updateCounts before it was defined.
+  const remoteUpdateHandlerRef = useRef<(content: string, senderId: string) => void>(() => {});
 
   const handleSwitchPhase = (targetPhaseId: string) => {
     if (!targetPhaseId || targetPhaseId === phaseId) return;
@@ -344,6 +333,31 @@ export default function WritingEditorPage() {
     setWordCount(words.length);
     setCharCount(plainText.length);
   };
+
+  // ── Real-time collaborative editing ──────────────────────────────────────
+  // Now that updateCounts is defined we can wire up the remote handler.
+  remoteUpdateHandlerRef.current = (remoteContent: string) => {
+    setContent(remoteContent);
+    updateCounts(remoteContent);
+    // Treat the incoming content as already-saved so auto-save doesn't
+    // immediately re-upload the remote change back.
+    lastSavedContentRef.current = remoteContent;
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableRemoteHandler = useCallback(
+    (remoteContent: string, senderId: string) => remoteUpdateHandlerRef.current(remoteContent, senderId),
+    [] // stable — never recreated
+  );
+
+  const { collaborators, broadcastContent, isReceivingRemote } = useRealtimeCollab({
+    phaseId,
+    currentUserId,
+    currentUsername,
+    currentAvatarUrl,
+    onRemoteContentUpdate: stableRemoteHandler,
+    enabled: isTeam,
+  });
 
   const handleContentChange = (value: string) => {
     setContent(value);
