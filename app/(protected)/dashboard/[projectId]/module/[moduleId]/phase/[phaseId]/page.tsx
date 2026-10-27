@@ -96,7 +96,7 @@ export default function WritingEditorPage() {
   // Stable ref to the remote-update handler — populated after updateCounts is defined.
   // Using a ref avoids a stale-closure bug where the early useCallback captured
   // updateCounts before it was defined.
-  const remoteUpdateHandlerRef = useRef<(content: string, senderId: string) => void>(() => {});
+  const remoteUpdateHandlerRef = useRef<(content: string, senderId: string) => void>(() => { });
 
   const handleSwitchPhase = (targetPhaseId: string) => {
     if (!targetPhaseId || targetPhaseId === phaseId) return;
@@ -139,10 +139,10 @@ export default function WritingEditorPage() {
       setPhase((prev) =>
         prev
           ? {
-              ...prev,
-              title: editPhaseTitle.trim(),
-              description: editPhaseDescription.trim() || null,
-            }
+            ...prev,
+            title: editPhaseTitle.trim(),
+            description: editPhaseDescription.trim() || null,
+          }
           : null
       );
       setShowEditPhaseModal(false);
@@ -622,7 +622,7 @@ export default function WritingEditorPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 -m-5 sm:-m-6 bg-[#13121a]">
+    <div className="flex flex-col flex-1 h-full min-h-0 -m-5 sm:-m-6 bg-[#13121a] overflow-y-auto">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -634,7 +634,7 @@ export default function WritingEditorPage() {
       {/* Mobile Slide-out Menu */}
       <div
         className={`
-        fixed top-14 right-0 bottom-0 w-80 z-50
+        fixed top-14 right-0 bottom-0 w-[85vw] max-w-80 z-50
         bg-gray-900 backdrop-blur-xl border-l border-white/10
         transform transition-transform duration-300 ease-in-out lg:hidden
         ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
@@ -806,291 +806,288 @@ export default function WritingEditorPage() {
       </div>
 
       {/* Header */}
-      <div className="sticky top-14 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#181724] px-4 sm:px-6 py-2.5 flex-shrink-0 z-30 transition-colors">
+      <div className="sticky top-14 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#181724] px-2 sm:px-4 md:px-6 py-2 sm:py-2.5 flex-shrink-0 z-30 transition-colors">
         <div className="w-full flex items-center justify-between gap-4">
           {/* Left: Back button and title */}
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <button
-                onClick={() => {
-                  if (content !== lastSavedContentRef.current) {
-                    saveContent();
-                  }
-                  router.push(`/dashboard/${projectId}/module/${moduleId}`);
-                }}
-                className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm hidden sm:inline font-medium">Back</span>
-              </button>
-
-              <div className="border-l border-slate-200 dark:border-white/10 pl-3 min-w-0 flex-1 flex items-center gap-2">
-                {!isTeam && modulePhases.length > 1 ? (
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    {(() => {
-                      const idx = modulePhases.findIndex((p) => p.id === phaseId);
-                      const prevPhase = idx > 0 ? modulePhases[idx - 1] : null;
-                      const nextPhase = idx < modulePhases.length - 1 ? modulePhases[idx + 1] : null;
-                      return (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => prevPhase && handleSwitchPhase(prevPhase.id)}
-                            disabled={!prevPhase}
-                            className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
-                            title={prevPhase ? `Previous Scene: ${prevPhase.title}` : "First Scene"}
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                          </button>
-
-                          <div className="relative inline-block text-left max-w-[160px] sm:max-w-[240px]">
-                            <select
-                              value={phaseId}
-                              onChange={(e) => handleSwitchPhase(e.target.value)}
-                              className="appearance-none bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-purple-900 dark:text-purple-200 font-bold text-xs sm:text-sm rounded-lg pl-2.5 pr-7 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 truncate cursor-pointer w-full"
-                            >
-                              {modulePhases.map((p, index) => (
-                                <option key={p.id} value={p.id} className="bg-slate-900 text-white">
-                                  Scene {index + 1}: {p.title}
-                                </option>
-                              ))}
-                            </select>
-                            <ChevronDown className="w-3.5 h-3.5 text-purple-500 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => nextPhase && handleSwitchPhase(nextPhase.id)}
-                            disabled={!nextPhase}
-                            className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
-                            title={nextPhase ? `Next Scene: ${nextPhase.title}` : "Last Scene"}
-                          >
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </>
-                      );
-                    })()}
-                  </div>
-                ) : (
-                  <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white truncate">
-                    {phase.title}
-                  </h1>
-                )}
-
-                {canEdit && (
-                  <button
-                    onClick={openEditPhaseModal}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all text-xs font-semibold outfit cursor-pointer shrink-0 ml-1 shadow-sm"
-                    title="Edit Phase Title & Description"
-                  >
-                    <Edit className="w-3 h-3 text-purple-500" />
-                    <span>Edit Scene Info</span>
-                  </button>
-                )}
-                {module && (
-                  <p className="text-xs text-slate-500 dark:text-gray-400 truncate hidden sm:block ml-2 border-l border-slate-200 dark:border-white/10 pl-2">
-                    {module.title}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Desktop Controls */}
-            <div className="hidden lg:flex items-center gap-3">
-              {/* Live Collaborators */}
-              <CollaboratorAvatars collaborators={collaborators} />
-
-              {/* Word Count */}
-              <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-400 px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg font-medium">
-                <span>{wordCount.toLocaleString()}w</span>
-                <span className="text-slate-300 dark:text-gray-600">•</span>
-                <span>{charCount.toLocaleString()}c</span>
-              </div>
-
-              {/* Save Status */}
-              <div className="flex items-center gap-2 min-w-[90px] px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg">
-                {saveStatus === "saving" && (
-                  <>
-                    <Clock className="w-4 h-4 text-amber-600 dark:text-yellow-400 animate-spin" />
-                    <span className="text-sm font-semibold text-amber-600 dark:text-yellow-400">Saving</span>
-                  </>
-                )}
-                {saveStatus === "saved" && (
-                  <>
-                    <Check className="w-4 h-4 text-emerald-600 dark:text-green-400" />
-                    <span className="text-sm font-semibold text-emerald-600 dark:text-green-400">Saved</span>
-                  </>
-                )}
-                {saveStatus === "error" && (
-                  <>
-                    <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                    <span className="text-sm font-semibold text-red-600 dark:text-red-400">Error</span>
-                  </>
-                )}
-                {saveStatus === "idle" && (
-                  <span className="text-sm font-medium text-slate-500 dark:text-gray-400">Ready</span>
-                )}
-              </div>
-
-              {/* Sprint Companion Button */}
-              <button
-                onClick={() => setShowSprintModal(true)}
-                title="Writing Sprint & Pomodoro Timer"
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${
-                  isSprintActive
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse shadow-orange-500/20"
-                    : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:bg-amber-500/20"
-                }`}
-              >
-                <Flame className={`w-4 h-4 ${isSprintActive ? "text-white" : "text-amber-500"}`} />
-                <span>
-                  {isSprintActive
-                    ? `${sprintTimeLeft} (+${sprintWordsWritten}w)`
-                    : "Sprint"}
-                </span>
-              </button>
-
-              {/* Focus Mode Button */}
-              <button
-                onClick={() => setShowFocusMode(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
-              >
-                <Maximize className="w-4 h-4" />
-                <span>Focus</span>
-              </button>
-
-              {/* AI Partner Button */}
-              <button
-                onClick={handleOpenAIPartner}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
-              >
-                <Wand2 className="w-4 h-4" />
-                <span>AI</span>
-              </button>
-
-              {/* Memory Sync Button */}
-              <button
-                onClick={handleMemorySync}
-                disabled={isSyncingMemory}
-                title="Sync AI Memory — extracts characters, locations, and embeds text for smarter AI suggestions"
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-transparent rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
-              >
-                <RefreshCw className={`w-4 h-4 ${isSyncingMemory ? "animate-spin" : ""}`} />
-                <span>Memory</span>
-              </button>
-
-              {/* Continuity Check Button */}
-              <button
-                onClick={() => window.open(`/dashboard/${projectId}/continuity`, "_blank")}
-                title="Run Continuity Check — opens in a new tab"
-                className="flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-transparent rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/30 transition-all font-medium text-sm"
-              >
-                <Shield className="w-4 h-4" />
-              </button>
-
-              {/* Story Wiki Button */}
-              <button
-                onClick={() => {
-                  setShowWiki(!showWiki);
-                  setShowComments(false);
-                }}
-                title="Story Wiki — view auto-extracted characters, locations, and items"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${
-                  showWiki
-                    ? "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50"
-                    : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-transparent"
-                }`}
-              >
-                <BookMarked className="w-4 h-4" />
-              </button>
-
-              {/* Character Profiles Button */}
-              <button
-                onClick={() => window.open(`/dashboard/${projectId}/characters`, "_blank")}
-                title="Character Profiles — open full character bible in new tab"
-                className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all"
-              >
-                <Users className="w-4 h-4" />
-              </button>
-
-              {/* Comments Button */}
-              <button
-                onClick={() => {
-                  setShowComments(!showComments);
-                  setShowWiki(false);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-transparent rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-all"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </button>
-
-              {/* Version History Button */}
-              <button
-                onClick={() => setShowVersionHistory(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-cyan-50 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-transparent rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-500/30 transition-all"
-              >
-                <History className="w-4 h-4" />
-              </button>
-
-              {/* Save Button */}
-              <button
-                onClick={handleManualSave}
-                disabled={
-                  saveStatus === "saving" ||
-                  content === lastSavedContentRef.current
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <button
+              onClick={() => {
+                if (content !== lastSavedContentRef.current) {
+                  saveContent();
                 }
-                className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save className="w-4 h-4" />
-              </button>
-            </div>
+                router.push(`/dashboard/${projectId}/module/${moduleId}`);
+              }}
+              className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm hidden sm:inline font-medium">Back</span>
+            </button>
 
-            {/* Mobile Header Quick Tools */}
-            <div className="lg:hidden flex items-center gap-1.5">
-              {/* Quick Sprint */}
-              <button
-                onClick={() => setShowSprintModal(true)}
-                title="Writing Sprint"
-                className={`p-2 rounded-lg font-medium text-xs transition-all ${
-                  isSprintActive
-                    ? "bg-amber-500 text-white animate-pulse"
-                    : "bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30"
-                }`}
-              >
-                <Flame className="w-4 h-4" />
-              </button>
+            <div className="border-l border-slate-200 dark:border-white/10 pl-3 min-w-0 flex-1 flex items-center gap-2">
+              {!isTeam && modulePhases.length > 1 ? (
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {(() => {
+                    const idx = modulePhases.findIndex((p) => p.id === phaseId);
+                    const prevPhase = idx > 0 ? modulePhases[idx - 1] : null;
+                    const nextPhase = idx < modulePhases.length - 1 ? modulePhases[idx + 1] : null;
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => prevPhase && handleSwitchPhase(prevPhase.id)}
+                          disabled={!prevPhase}
+                          className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                          title={prevPhase ? `Previous Scene: ${prevPhase.title}` : "First Scene"}
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
 
-              {/* Quick AI */}
-              <button
-                onClick={handleOpenAIPartner}
-                title="AI Writing Partner"
-                className="p-2 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30"
-              >
-                <Wand2 className="w-4 h-4" />
-              </button>
+                        <div className="relative inline-block text-left max-w-[160px] sm:max-w-[240px]">
+                          <select
+                            value={phaseId}
+                            onChange={(e) => handleSwitchPhase(e.target.value)}
+                            className="appearance-none bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-purple-900 dark:text-purple-200 font-bold text-xs sm:text-sm rounded-lg pl-2.5 pr-7 py-1 focus:outline-none focus:ring-2 focus:ring-purple-500 truncate cursor-pointer w-full"
+                          >
+                            {modulePhases.map((p, index) => (
+                              <option key={p.id} value={p.id} className="bg-slate-900 text-white">
+                                Scene {index + 1}: {p.title}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="w-3.5 h-3.5 text-purple-500 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
+                        </div>
 
-              {/* Quick Comments */}
-              <button
-                onClick={() => {
-                  setShowComments(!showComments);
-                  setShowWiki(false);
-                }}
-                title="Comments"
-                className="p-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </button>
+                        <button
+                          type="button"
+                          onClick={() => nextPhase && handleSwitchPhase(nextPhase.id)}
+                          disabled={!nextPhase}
+                          className="p-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-gray-300 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                          title={nextPhase ? `Next Scene: ${nextPhase.title}` : "Last Scene"}
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <h1 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white truncate">
+                  {phase.title}
+                </h1>
+              )}
 
-              {/* Menu Launcher */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 ml-1"
-                title="All Tools"
-              >
-                <Menu className="w-4 h-4" />
-              </button>
+              {canEdit && (
+                <button
+                  onClick={openEditPhaseModal}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-all text-xs font-semibold outfit cursor-pointer shrink-0 ml-1 shadow-sm"
+                  title="Edit Phase Title & Description"
+                >
+                  <Edit className="w-3 h-3 text-purple-500" />
+                  <span className="hidden sm:inline">Edit Scene Info</span>
+                </button>
+              )}
+              {module && (
+                <p className="text-xs text-slate-500 dark:text-gray-400 truncate hidden sm:block ml-2 border-l border-slate-200 dark:border-white/10 pl-2">
+                  {module.title}
+                </p>
+              )}
             </div>
           </div>
+
+          {/* Desktop Controls */}
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Live Collaborators */}
+            <CollaboratorAvatars collaborators={collaborators} />
+
+            {/* Word Count */}
+            <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-400 px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg font-medium">
+              <span>{wordCount.toLocaleString()}w</span>
+              <span className="text-slate-300 dark:text-gray-600">•</span>
+              <span>{charCount.toLocaleString()}c</span>
+            </div>
+
+            {/* Save Status */}
+            <div className="flex items-center gap-2 min-w-[90px] px-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent rounded-lg">
+              {saveStatus === "saving" && (
+                <>
+                  <Clock className="w-4 h-4 text-amber-600 dark:text-yellow-400 animate-spin" />
+                  <span className="text-sm font-semibold text-amber-600 dark:text-yellow-400">Saving</span>
+                </>
+              )}
+              {saveStatus === "saved" && (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-green-400" />
+                  <span className="text-sm font-semibold text-emerald-600 dark:text-green-400">Saved</span>
+                </>
+              )}
+              {saveStatus === "error" && (
+                <>
+                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  <span className="text-sm font-semibold text-red-600 dark:text-red-400">Error</span>
+                </>
+              )}
+              {saveStatus === "idle" && (
+                <span className="text-sm font-medium text-slate-500 dark:text-gray-400">Ready</span>
+              )}
+            </div>
+
+            {/* Sprint Companion Button */}
+            <button
+              onClick={() => setShowSprintModal(true)}
+              title="Writing Sprint & Pomodoro Timer"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${isSprintActive
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse shadow-orange-500/20"
+                  : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:bg-amber-500/20"
+                }`}
+            >
+              <Flame className={`w-4 h-4 ${isSprintActive ? "text-white" : "text-amber-500"}`} />
+              <span>
+                {isSprintActive
+                  ? `${sprintTimeLeft} (+${sprintWordsWritten}w)`
+                  : "Sprint"}
+              </span>
+            </button>
+
+            {/* Focus Mode Button */}
+            <button
+              onClick={() => setShowFocusMode(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
+            >
+              <Maximize className="w-4 h-4" />
+              <span>Focus</span>
+            </button>
+
+            {/* AI Partner Button */}
+            <button
+              onClick={handleOpenAIPartner}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all font-medium text-sm"
+            >
+              <Wand2 className="w-4 h-4" />
+              <span>AI</span>
+            </button>
+
+            {/* Memory Sync Button */}
+            <button
+              onClick={handleMemorySync}
+              disabled={isSyncingMemory}
+              title="Sync AI Memory — extracts characters, locations, and embeds text for smarter AI suggestions"
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-transparent rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncingMemory ? "animate-spin" : ""}`} />
+              <span>Memory</span>
+            </button>
+
+            {/* Continuity Check Button */}
+            <button
+              onClick={() => window.open(`/dashboard/${projectId}/continuity`, "_blank")}
+              title="Run Continuity Check — opens in a new tab"
+              className="flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-transparent rounded-lg hover:bg-orange-100 dark:hover:bg-orange-500/30 transition-all font-medium text-sm"
+            >
+              <Shield className="w-4 h-4" />
+            </button>
+
+            {/* Story Wiki Button */}
+            <button
+              onClick={() => {
+                setShowWiki(!showWiki);
+                setShowComments(false);
+              }}
+              title="Story Wiki — view auto-extracted characters, locations, and items"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${showWiki
+                  ? "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50"
+                  : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-transparent"
+                }`}
+            >
+              <BookMarked className="w-4 h-4" />
+            </button>
+
+            {/* Character Profiles Button */}
+            <button
+              onClick={() => window.open(`/dashboard/${projectId}/characters`, "_blank")}
+              title="Character Profiles — open full character bible in new tab"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all"
+            >
+              <Users className="w-4 h-4" />
+            </button>
+
+            {/* Comments Button */}
+            <button
+              onClick={() => {
+                setShowComments(!showComments);
+                setShowWiki(false);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-transparent rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/30 transition-all"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
+
+            {/* Version History Button */}
+            <button
+              onClick={() => setShowVersionHistory(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-50 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-transparent rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-500/30 transition-all"
+            >
+              <History className="w-4 h-4" />
+            </button>
+
+            {/* Save Button */}
+            <button
+              onClick={handleManualSave}
+              disabled={
+                saveStatus === "saving" ||
+                content === lastSavedContentRef.current
+              }
+              className="flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-transparent rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Mobile Header Quick Tools */}
+          <div className="lg:hidden flex items-center gap-1.5">
+            {/* Quick Sprint */}
+            <button
+              onClick={() => setShowSprintModal(true)}
+              title="Writing Sprint"
+              className={`p-2 rounded-lg font-medium text-xs transition-all ${isSprintActive
+                  ? "bg-amber-500 text-white animate-pulse"
+                  : "bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30"
+                }`}
+            >
+              <Flame className="w-4 h-4" />
+            </button>
+
+            {/* Quick AI */}
+            <button
+              onClick={handleOpenAIPartner}
+              title="AI Writing Partner"
+              className="p-2 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30"
+            >
+              <Wand2 className="w-4 h-4" />
+            </button>
+
+            {/* Quick Comments */}
+            <button
+              onClick={() => {
+                setShowComments(!showComments);
+                setShowWiki(false);
+              }}
+              title="Comments"
+              className="p-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </button>
+
+            {/* Menu Launcher */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors border border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-300 ml-1"
+              title="All Tools"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+      </div>
 
       {/* Phase Description */}
       {phase.description && (
@@ -1105,7 +1102,7 @@ export default function WritingEditorPage() {
       )}
 
       {/* Main Editor & Side Panels Container */}
-      <div className="flex-1 flex min-h-[550px] bg-white dark:bg-[#13121a]">
+      <div className="flex-1 flex min-h-0 bg-white dark:bg-[#13121a]">
         <div className="flex-1 min-w-0 h-full">
           <RichTextEditor
             content={content}

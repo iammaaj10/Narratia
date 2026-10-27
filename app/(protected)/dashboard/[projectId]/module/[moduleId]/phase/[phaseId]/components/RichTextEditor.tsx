@@ -48,7 +48,7 @@ export default function RichTextEditor({
   const [isEditorReady, setIsEditorReady] = useState(false);
   const aiToolbarRef = useRef<AIToolbarRef>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -90,7 +90,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6",
+          "prose prose-invert prose-lg max-w-none focus:outline-none min-h-[200px] sm:min-h-[300px] md:min-h-[400px] px-3 py-3 sm:px-5 sm:py-4 md:px-8 md:py-6",
       },
     },
     onUpdate: ({ editor }) => {
@@ -116,7 +116,7 @@ export default function RichTextEditor({
   useEffect(() => {
     if (editor && isEditorReady && content !== undefined) {
       const currentContent = editor.getHTML();
-      
+
       // Only update if content is different and not empty
       // This prevents infinite loops while ensuring content loads
       if (content !== currentContent && !debounceTimerRef.current) {
@@ -200,8 +200,8 @@ export default function RichTextEditor({
   return (
     <div className="flex flex-col h-full bg-transparent rich-text-editor transition-colors">
       {/* Toolbar */}
-      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-[106px] z-20">
-        <div className="flex items-center gap-1 p-2 overflow-x-auto custom-scrollbar flex-nowrap">
+      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-0 z-20">
+        <div className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 overflow-x-auto custom-scrollbar flex-wrap sm:flex-nowrap">
           {/* AI Toolbar */}
           <AIToolbar
             ref={aiToolbarRef}
@@ -212,240 +212,224 @@ export default function RichTextEditor({
           />
 
           {/* Text Formatting */}
-          <div className="flex items-center gap-1 pr-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 sm:gap-1 pr-1.5 sm:pr-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("bold")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("bold")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Bold (Ctrl+B)"
             >
-              <Bold className="w-4 h-4" />
+              <Bold className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("italic")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("italic")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Italic (Ctrl+I)"
             >
-              <Italic className="w-4 h-4" />
+              <Italic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleUnderline().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("underline")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("underline")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Underline (Ctrl+U)"
             >
-              <UnderlineIcon className="w-4 h-4" />
+              <UnderlineIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("strike")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("strike")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Strikethrough"
             >
-              <Strikethrough className="w-4 h-4" />
+              <Strikethrough className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
-          {/* Text Alignment */}
-          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+          {/* Text Alignment — hidden on tiny screens, visible from sm+ */}
+          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={() => handleSetAlign("left")}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive({ textAlign: "left" })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: "left" })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Align Left"
             >
-              <AlignLeft className="w-4 h-4" />
+              <AlignLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => handleSetAlign("center")}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive({ textAlign: "center" })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: "center" })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Align Center"
             >
-              <AlignCenter className="w-4 h-4" />
+              <AlignCenter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => handleSetAlign("right")}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive({ textAlign: "right" })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: "right" })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Align Right"
             >
-              <AlignRight className="w-4 h-4" />
+              <AlignRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => handleSetAlign("justify")}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive({ textAlign: "justify" })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: "justify" })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Justify Text"
             >
-              <AlignJustify className="w-4 h-4" />
+              <AlignJustify className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
           {/* Headings */}
-          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 1 }).run()
               }
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("heading", { level: 1 })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("heading", { level: 1 })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Heading 1"
             >
-              <Heading1 className="w-4 h-4" />
+              <Heading1 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 2 }).run()
               }
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("heading", { level: 2 })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("heading", { level: 2 })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Heading 2"
             >
-              <Heading2 className="w-4 h-4" />
+              <Heading2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 3 }).run()
               }
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("heading", { level: 3 })
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("heading", { level: 3 })
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Heading 3"
             >
-              <Heading3 className="w-4 h-4" />
+              <Heading3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
           {/* Lists */}
-          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("bulletList")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("bulletList")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Bullet List"
             >
-              <List className="w-4 h-4" />
+              <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("orderedList")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("orderedList")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Numbered List"
             >
-              <ListOrdered className="w-4 h-4" />
+              <ListOrdered className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
           {/* Blocks */}
-          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("blockquote")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("blockquote")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Quote"
             >
-              <Quote className="w-4 h-4" />
+              <Quote className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("codeBlock")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("codeBlock")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Code Block"
             >
-              <Code className="w-4 h-4" />
+              <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400"
+              className="p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400"
               title="Horizontal Rule (Scene Break)"
             >
-              <Minus className="w-4 h-4" />
+              <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
-          {/* Link */}
-          <div className="flex items-center gap-1 px-2 border-r border-slate-200 dark:border-white/10">
+          {/* Link — hidden on tiny screens */}
+          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
             <button
               onClick={setLink}
-              className={`p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${
-                editor.isActive("link")
+              className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("link")
                   ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold"
                   : "text-slate-600 dark:text-gray-400"
-              }`}
+                }`}
               title="Add Link"
             >
-              <LinkIcon className="w-4 h-4" />
+              <LinkIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
           {/* Undo/Redo */}
-          <div className="flex items-center gap-1 px-2">
+          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2">
             <button
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().undo()}
-              className="p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed"
               title="Undo (Ctrl+Z)"
             >
-              <Undo className="w-4 h-4" />
+              <Undo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().redo()}
-              className="p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors text-slate-600 dark:text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed"
               title="Redo (Ctrl+Shift+Z)"
             >
-              <Redo className="w-4 h-4" />
+              <Redo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
-          {/* Word Count */}
-          <div className="ml-auto hidden sm:flex items-center gap-3 px-3 text-xs text-slate-500 dark:text-gray-400 font-medium shrink-0">
+          {/* Word Count — always visible */}
+          <div className="ml-auto flex items-center gap-1.5 sm:gap-3 px-2 sm:px-3 text-[10px] sm:text-xs text-slate-500 dark:text-gray-400 font-medium shrink-0">
             <div>{editor.storage.characterCount.words()}w</div>
             <div>{editor.storage.characterCount.characters()}c</div>
           </div>
@@ -453,7 +437,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div className="flex-1 p-4 sm:p-6 sm:px-8 bg-white dark:bg-[#13121a]">
+      <div className="flex-1 p-2 sm:p-4 md:p-6 md:px-8 bg-white dark:bg-[#13121a]">
         <EditorContent editor={editor} />
       </div>
 
@@ -462,8 +446,24 @@ export default function RichTextEditor({
         .rich-text-editor .ProseMirror {
           color: #1e293b;
           font-family: "Georgia", serif;
-          line-height: 1.8;
-          min-height: 300px;
+          line-height: 1.6;
+          min-height: 200px;
+          font-size: 0.95rem;
+        }
+
+        @media (min-width: 640px) {
+          .rich-text-editor .ProseMirror {
+            line-height: 1.8;
+            min-height: 300px;
+            font-size: 1rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .rich-text-editor .ProseMirror {
+            min-height: 400px;
+            font-size: 1.1rem;
+          }
         }
 
         html.dark .rich-text-editor .ProseMirror {
@@ -487,11 +487,26 @@ export default function RichTextEditor({
         }
 
         .rich-text-editor .ProseMirror h1 {
-          font-size: 2.5rem;
+          font-size: 1.5rem;
           font-weight: bold;
-          margin-top: 2rem;
-          margin-bottom: 1rem;
+          margin-top: 1.25rem;
+          margin-bottom: 0.75rem;
           color: #0f172a;
+        }
+
+        @media (min-width: 640px) {
+          .rich-text-editor .ProseMirror h1 {
+            font-size: 2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .rich-text-editor .ProseMirror h1 {
+            font-size: 2.5rem;
+            margin-top: 2rem;
+          }
         }
 
         html.dark .rich-text-editor .ProseMirror h1 {
@@ -499,11 +514,27 @@ export default function RichTextEditor({
         }
 
         .rich-text-editor .ProseMirror h2 {
-          font-size: 2rem;
+          font-size: 1.25rem;
           font-weight: bold;
-          margin-top: 1.75rem;
-          margin-bottom: 0.875rem;
+          margin-top: 1.25rem;
+          margin-bottom: 0.625rem;
           color: #0f172a;
+        }
+
+        @media (min-width: 640px) {
+          .rich-text-editor .ProseMirror h2 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .rich-text-editor .ProseMirror h2 {
+            font-size: 2rem;
+            margin-top: 1.75rem;
+            margin-bottom: 0.875rem;
+          }
         }
 
         html.dark .rich-text-editor .ProseMirror h2 {
@@ -511,11 +542,27 @@ export default function RichTextEditor({
         }
 
         .rich-text-editor .ProseMirror h3 {
-          font-size: 1.5rem;
+          font-size: 1.1rem;
           font-weight: bold;
-          margin-top: 1.5rem;
-          margin-bottom: 0.75rem;
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
           color: #0f172a;
+        }
+
+        @media (min-width: 640px) {
+          .rich-text-editor .ProseMirror h3 {
+            font-size: 1.25rem;
+            margin-top: 1.25rem;
+            margin-bottom: 0.625rem;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .rich-text-editor .ProseMirror h3 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+          }
         }
 
         html.dark .rich-text-editor .ProseMirror h3 {

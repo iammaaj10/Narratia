@@ -118,52 +118,52 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
   return (
     <>
       {/* AI Toolbar */}
-      <div className="flex items-center gap-2 px-2 border-r border-slate-200 dark:border-white/10">
+      <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
         <button
           onClick={() => handleAIAction("suggest")}
           disabled={loading}
-          className="p-2 rounded hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors text-purple-600 dark:text-purple-400 disabled:opacity-50"
+          className="p-1.5 sm:p-2 rounded hover:bg-purple-100 dark:hover:bg-purple-500/20 transition-colors text-purple-600 dark:text-purple-400 disabled:opacity-50"
           title="Continue Writing (AI)"
         >
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
           ) : (
-            <Bot className="w-4 h-4" />
+            <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           )}
         </button>
 
         <button
           onClick={() => handleAIAction("fix")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors text-blue-600 dark:text-blue-400 disabled:opacity-50"
+          className="p-1.5 sm:p-2 rounded hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors text-blue-600 dark:text-blue-400 disabled:opacity-50"
           title="Fix Grammar & Style"
         >
-          <Wand2 className="w-4 h-4" />
+          <Wand2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           onClick={() => handleAIAction("expand")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors text-emerald-600 dark:text-green-400 disabled:opacity-50"
+          className="p-1.5 sm:p-2 rounded hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors text-emerald-600 dark:text-green-400 disabled:opacity-50"
           title="Expand Text"
         >
-          <Maximize2 className="w-4 h-4" />
+          <Maximize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         <button
           onClick={() => handleAIAction("shorten")}
           disabled={loading || !selectedText}
-          className="p-2 rounded hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-colors text-orange-600 dark:text-orange-400 disabled:opacity-50"
+          className="p-1.5 sm:p-2 rounded hover:bg-orange-100 dark:hover:bg-orange-500/20 transition-colors text-orange-600 dark:text-orange-400 disabled:opacity-50"
           title="Shorten Text"
         >
-          <Minimize2 className="w-4 h-4" />
+          <Minimize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
       </div>
 
       {/* AI Result Modal */}
       {showResult && result && (
-        <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 top-40">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-white/10 p-4 sm:p-6 max-w-3xl w-full max-h-[85vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Bot className="w-5 h-5 text-purple-600 dark:text-purple-400" />
