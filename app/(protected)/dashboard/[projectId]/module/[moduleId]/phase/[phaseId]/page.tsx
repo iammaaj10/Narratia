@@ -588,6 +588,18 @@ export default function WritingEditorPage() {
     };
   }, [content]);
 
+  // Lock body scroll when mobile menu is open so background page doesn't scroll
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 px-4">
@@ -636,15 +648,16 @@ export default function WritingEditorPage() {
         className={`
         fixed top-14 right-0 bottom-0 w-[85vw] max-w-80 z-50
         bg-gray-900 backdrop-blur-xl border-l border-white/10
+        flex flex-col
         transform transition-transform duration-300 ease-in-out lg:hidden
         ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
       `}
       >
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-950/80">
+        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-950/80 flex-shrink-0">
           <h3 className="text-lg font-bold text-white">Editor Tools</h3>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="px-3 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20 border border-white/15 transition-all flex items-center gap-1 text-xs font-semibold"
+            className="px-3 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20 border border-white/15 transition-all flex items-center gap-1 text-xs font-semibold cursor-pointer"
             title="Close Menu"
           >
             <X className="w-5 h-5" />
@@ -652,7 +665,7 @@ export default function WritingEditorPage() {
           </button>
         </div>
 
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-3 flex-1 overflow-y-auto overscroll-contain touch-pan-y pb-24">
           {/* Stats */}
           <div className="bg-white/5 rounded-xl p-4 space-y-3">
             <div className="flex justify-between items-center">
