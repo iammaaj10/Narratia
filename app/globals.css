@@ -37,4 +37,15 @@
   html.light ::-webkit-scrollbar-thumb:hover {
     background-color: #94a3b8;
   }
+
+  /* Hide scrollbar on mobile toolbar for cleaner look */
+  @media (max-width: 639px) {
+    .rich-text-editor .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .rich-text-editor .custom-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
 }

@@ -118,7 +118,7 @@ const AIToolbar = forwardRef<AIToolbarRef, AIToolbarProps>(({
   return (
     <>
       {/* AI Toolbar */}
-      <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+      <div className="flex items-center gap-0.5 sm:gap-2 px-1 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
         <button
           onClick={() => handleAIAction("suggest")}
           disabled={loading}

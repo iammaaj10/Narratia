@@ -200,8 +200,8 @@ export default function RichTextEditor({
   return (
     <div className="flex flex-col h-full bg-transparent rich-text-editor transition-colors">
       {/* Toolbar */}
-      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-[106px] z-20">
-        <div className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 overflow-x-auto custom-scrollbar flex-wrap sm:flex-nowrap">
+      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-[94px] sm:top-[106px] z-20">
+        <div className="flex items-center gap-0.5 sm:gap-1 p-1 sm:p-2 overflow-x-auto custom-scrollbar flex-nowrap">
           {/* AI Toolbar */}
           <AIToolbar
             ref={aiToolbarRef}
@@ -212,7 +212,7 @@ export default function RichTextEditor({
           />
 
           {/* Text Formatting */}
-          <div className="flex items-center gap-0.5 sm:gap-1 pr-1.5 sm:pr-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 pr-1 sm:pr-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
               className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("bold")
@@ -256,7 +256,7 @@ export default function RichTextEditor({
           </div>
 
           {/* Text Alignment — hidden on tiny screens, visible from sm+ */}
-          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={() => handleSetAlign("left")}
               className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: "left" })
@@ -300,7 +300,7 @@ export default function RichTextEditor({
           </div>
 
           {/* Headings */}
-          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 px-1 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 1 }).run()
@@ -340,7 +340,7 @@ export default function RichTextEditor({
           </div>
 
           {/* Lists */}
-          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 px-1 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("bulletList")
@@ -364,7 +364,7 @@ export default function RichTextEditor({
           </div>
 
           {/* Blocks */}
-          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-0.5 px-1 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("blockquote")
@@ -394,8 +394,8 @@ export default function RichTextEditor({
             </button>
           </div>
 
-          {/* Link — hidden on tiny screens */}
-          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 border-r border-slate-200 dark:border-white/10">
+          {/* Link */}
+          <div className="flex items-center gap-0.5 px-1 sm:px-2 border-r border-slate-200 dark:border-white/10 shrink-0">
             <button
               onClick={setLink}
               className={`p-1.5 sm:p-2 rounded hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors ${editor.isActive("link")
@@ -409,7 +409,7 @@ export default function RichTextEditor({
           </div>
 
           {/* Undo/Redo */}
-          <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2">
+          <div className="flex items-center gap-0.5 px-1 sm:px-2 shrink-0">
             <button
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().undo()}
@@ -437,7 +437,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content */}
-      <div className="flex-1 p-2 sm:p-4 md:p-6 md:px-8 bg-white dark:bg-[#13121a]">
+      <div className="flex-1 px-2 py-3 sm:p-4 md:p-6 md:px-8 bg-white dark:bg-[#13121a]">
         <EditorContent editor={editor} />
       </div>
 
