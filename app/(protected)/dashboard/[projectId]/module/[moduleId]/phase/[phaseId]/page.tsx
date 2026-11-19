@@ -622,7 +622,7 @@ export default function WritingEditorPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 h-full min-h-0 -m-5 sm:-m-6 bg-[#13121a] overflow-y-auto">
+    <div className="flex flex-col flex-1 h-full min-h-0 -m-5 sm:-m-6 bg-[#13121a]">
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
@@ -936,8 +936,8 @@ export default function WritingEditorPage() {
               onClick={() => setShowSprintModal(true)}
               title="Writing Sprint & Pomodoro Timer"
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${isSprintActive
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse shadow-orange-500/20"
-                  : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:bg-amber-500/20"
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white animate-pulse shadow-orange-500/20"
+                : "bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:bg-amber-500/20"
                 }`}
             >
               <Flame className={`w-4 h-4 ${isSprintActive ? "text-white" : "text-amber-500"}`} />
@@ -994,8 +994,8 @@ export default function WritingEditorPage() {
               }}
               title="Story Wiki — view auto-extracted characters, locations, and items"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border ${showWiki
-                  ? "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50"
-                  : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-transparent"
+                ? "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-500/50"
+                : "bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-transparent"
                 }`}
             >
               <BookMarked className="w-4 h-4" />
@@ -1049,8 +1049,8 @@ export default function WritingEditorPage() {
               onClick={() => setShowSprintModal(true)}
               title="Writing Sprint"
               className={`p-2 rounded-lg font-medium text-xs transition-all ${isSprintActive
-                  ? "bg-amber-500 text-white animate-pulse"
-                  : "bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30"
+                ? "bg-amber-500 text-white animate-pulse"
+                : "bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/30"
                 }`}
             >
               <Flame className="w-4 h-4" />

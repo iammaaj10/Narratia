@@ -200,7 +200,7 @@ export default function RichTextEditor({
   return (
     <div className="flex flex-col h-full bg-transparent rich-text-editor transition-colors">
       {/* Toolbar */}
-      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-0 z-20">
+      <div className="border-b border-slate-200/80 dark:border-white/[0.08] bg-slate-50/95 dark:bg-[#181724]/95 backdrop-blur-md sticky top-[106px] z-20">
         <div className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 overflow-x-auto custom-scrollbar flex-wrap sm:flex-nowrap">
           {/* AI Toolbar */}
           <AIToolbar
